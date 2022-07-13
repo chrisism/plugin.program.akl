@@ -315,7 +315,6 @@ def cmd_rom_metadata_nplayers_online(args):
         
     AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
 
-
 @AppMediator.register('ROM_EDIT_METADATA_RATING')
 def cmd_rom_metadata_rating(args):
     rom_id = args['rom_id'] if 'rom_id' in args else None   
@@ -607,3 +606,25 @@ def cmd_manage_rom_tags(args):
 
         if did_tag_change:
             uow.commit()
+
+# -------------------------------------------------------------------------------------------------
+# ROM ADD
+# -------------------------------------------------------------------------------------------------
+@AppMediator.register('ADD_STANDALONE_ROM')
+def cmd_add_rom(args):
+    logger.debug('ADD_STANDALONE_ROM: cmd_add_rom() BEGIN')
+    category_id:str = args['category_id'] if 'category_id' in args else None
+    
+    if category_id is None:
+        logger.warning('cmd_add_rom(): No Category id supplied.')
+        kodi.notify_warn("Invalid parameters supplied.")
+        return
+    
+    rom_name = ""
+    is_file_based = kodi.dialog_yesno("Is it a file based ROM/executable?")
+    if is_file_based:
+        #kodi.dialog_get_directory   get File, parse name as possible name
+        pass
+    # ask name input, prefill
+    # create, store, refresh view. Rest goes through context menu
+    

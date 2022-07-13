@@ -426,7 +426,6 @@ def qry_listitem_context_menu_items(list_item_data, container_data)-> typing.Lis
     is_category: bool           = item_type == constants.OBJ_CATEGORY
     is_romcollection: bool      = item_type == constants.OBJ_ROMCOLLECTION
     is_virtual_category: bool   = item_type == constants.OBJ_CATEGORY_VIRTUAL
-    is_virtual_collection: bool = item_type == constants.OBJ_COLLECTION_VIRTUAL
     is_rom: bool                = item_type == constants.OBJ_ROM
     
     commands = []
@@ -435,11 +434,13 @@ def qry_listitem_context_menu_items(list_item_data, container_data)-> typing.Lis
         commands.append(('Edit ROM', _context_menu_url_for(f'/rom/edit/{item_id}')))
         commands.append(('Link ROM in other collection', _context_menu_url_for('/execute/command/link_rom',{'rom_id':item_id})))
         commands.append(('Add ROM to AKL Favourites', _context_menu_url_for('/execute/command/add_rom_to_favourites',{'rom_id':item_id})))
+        
     if is_category: 
         commands.append(('View Category', _context_menu_url_for(f'/categories/view/{item_id}')))
         commands.append(('Edit Category', _context_menu_url_for(f'/categories/edit/{item_id}')))
         commands.append(('Add new Category',_context_menu_url_for(f'/categories/add/{item_id}/in/{container_id}')))
         commands.append(('Add new ROM Collection', _context_menu_url_for(f'/romcollection/add/{item_id}/in/{container_id}')))
+        commands.append(('Add new ROM (Standalone)', _context_menu_url_for(f'/categories/addrom/{container_id}')))
         
     if is_romcollection: 
         commands.append(('View ROM Collection', _context_menu_url_for(f'/romcollection/view/{item_id}')))
@@ -448,10 +449,10 @@ def qry_listitem_context_menu_items(list_item_data, container_data)-> typing.Lis
     if not is_category and container_is_category:
         commands.append(('Add new Category',_context_menu_url_for(f'/categories/add/{container_id}')))
         commands.append(('Add new ROM Collection', _context_menu_url_for(f'/romcollection/add/{container_id}')))
-    
+        
     if is_virtual_category:
         commands.append((f'Rebuild {item_name} view', _context_menu_url_for('execute/command/render_vcategory_view',{'vcategory_id':item_id})))
-        
+                
     return commands
 
 def _context_menu_url_for(url: str, params: dict = None) -> str:
