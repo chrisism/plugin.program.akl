@@ -387,7 +387,8 @@ def qry_container_context_menu_items(container_data) -> typing.List[typing.Tuple
     commands = []
     if is_category: 
         commands.append(('Rebuild {} view'.format(container_name),
-                        _context_menu_url_for('execute/command/render_view',{'category_id':container_id})))    
+                        _context_menu_url_for('execute/command/render_view',{'category_id':container_id})))
+        
     if is_romcollection:
         commands.append(('Search ROM in collection', _context_menu_url_for(f'/collection/{container_id}/search')))
         commands.append(('Rebuild {} view'.format(container_name),
@@ -440,7 +441,6 @@ def qry_listitem_context_menu_items(list_item_data, container_data)-> typing.Lis
         commands.append(('Edit Category', _context_menu_url_for(f'/categories/edit/{item_id}')))
         commands.append(('Add new Category',_context_menu_url_for(f'/categories/add/{item_id}/in/{container_id}')))
         commands.append(('Add new ROM Collection', _context_menu_url_for(f'/romcollection/add/{item_id}/in/{container_id}')))
-        commands.append(('Add new ROM (Standalone)', _context_menu_url_for(f'/categories/addrom/{container_id}')))
         
     if is_romcollection: 
         commands.append(('View ROM Collection', _context_menu_url_for(f'/romcollection/view/{item_id}')))
@@ -449,6 +449,9 @@ def qry_listitem_context_menu_items(list_item_data, container_data)-> typing.Lis
     if not is_category and container_is_category:
         commands.append(('Add new Category',_context_menu_url_for(f'/categories/add/{container_id}')))
         commands.append(('Add new ROM Collection', _context_menu_url_for(f'/romcollection/add/{container_id}')))
+    
+    if container_is_category:
+        commands.append(('Add new ROM (Standalone)', _context_menu_url_for(f'/categories/addrom/{container_id}')))
         
     if is_virtual_category:
         commands.append((f'Rebuild {item_name} view', _context_menu_url_for('execute/command/render_vcategory_view',{'vcategory_id':item_id})))
