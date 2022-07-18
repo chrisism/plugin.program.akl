@@ -652,20 +652,17 @@ def cmd_manage_rom_tags(args):
 # -------------------------------------------------------------------------------------------------
 @AppMediator.register('ADD_STANDALONE_ROM')
 def cmd_add_rom(args):
-    import xbmcgui
-    logger.debug('ADD_STANDALONE_ROM: cmd_add_rom() BEGIN')
     category_id:str = args['category_id'] if 'category_id' in args else None
     
     if category_id is None:
-        logger.warning('cmd_add_rom(): No Category id supplied.')
+        logger.warning('No Category id supplied.')
         kodi.notify_warn("Invalid parameters supplied.")
         return
     
     rom_name = ""
     is_file_based = kodi.dialog_yesno("Is it a file based ROM/executable?")
     if is_file_based:
-        #TODO: change to file_path = kodi.dialog_get_file("Select file") - remove xmbcgui import
-        file_path =  xbmcgui.Dialog().browse(1, "Select file", "")
+        file_path = kodi.dialog_get_file("Select file")
         if file_path is not None:
             path = io.FileName(file_path)
             rom_name = path.getBaseNoExt()
