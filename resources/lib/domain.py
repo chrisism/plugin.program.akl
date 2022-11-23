@@ -1368,7 +1368,7 @@ class ROM(MetaDataItemABC):
         return self.entity_data['launch_count'] if 'launch_count' in self.entity_data else 0
 
     def get_last_launch_date(self):
-        return self.entity_data['last_launch_timestamp']
+        return self.entity_data['last_launch_timestamp'] if 'last_launch_timestamp' in self.entity_data else None
 
     def get_scanned_with(self) -> str:
         return self.entity_data['scanned_by_id'] if 'scanned_by_id' in self.entity_data else None
