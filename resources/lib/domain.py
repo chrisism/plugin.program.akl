@@ -76,6 +76,7 @@ class AssetInfo(object):
     def __str__(self):
         return self.name
 
+
 # Abstract base class for all DB entities
 class EntityABC(object):
     __metaclass__ = abc.ABCMeta
@@ -352,12 +353,13 @@ class ROMLauncherAddon(ROMAddon):
             self.addon.get_addon_id(), 
             self.get_configure_command_for_rom(rom))
 
+
 class RetroplayerLauncherAddon(ROMLauncherAddon):
     
     def get_launch_command(self, rom: ROM) -> dict:
         return None
 
-    def get_configure_command(self, romcollection: ROMCollection) -> dict: 
+    def get_configure_command(self, romcollection: ROMCollection) -> dict:
         return None
 
     def launch(self, rom: ROM):
@@ -545,10 +547,12 @@ class MetaDataItemABC(EntityABC):
     def get_object_name(self) -> str: pass
 
     @abc.abstractmethod
-    def get_assets_kind(self) -> int: pass
+    def get_assets_kind(self) -> int:
+        pass
 
     @abc.abstractmethod
-    def get_type(self) -> str: pass
+    def get_type(self) -> str:
+        pass
 
     # --- Metadata --------------------------------------------------------------------------------
     def get_name(self):
@@ -1298,11 +1302,13 @@ class ROM(MetaDataItemABC):
         identifier = self.get_scanned_data_element('identifier')
         name = self.get_name()
         
-        if identifier: return identifier
-        if name: return name
+        if identifier:
+            return identifier
+        if name:
+            return name
         
-        return 'ROM_{}'.format(self.get_id())
-      
+        return f'ROM_{self.get_id()}'
+          
     # inherited value from ROMCollection
     def get_platform(self):
         return self.entity_data['platform'] if 'platform' in self.entity_data else None
@@ -1353,7 +1359,7 @@ class ROM(MetaDataItemABC):
 
     def is_favourite(self) -> bool:
         return self.entity_data['is_favourite'] if 'is_favourite' in self.entity_data else False
-
+    
     def get_tags(self) -> typing.List[str]:
         if self.tags is not None:
             return [tag for tag in self.tags.keys() if tag is not None]
