@@ -2364,8 +2364,8 @@ class VirtualCategoryFactory(object):
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }, [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
-                Asset({'id' : '', 'asset_type' : constants.ASSET_ICON_ID,   'filepath' : globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Browse_by_ESRB_icon.png').getPath()}),
-                Asset({'id' : '', 'asset_type' : constants.ASSET_POSTER_ID, 'filepath' : globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Browse_by_ESRB_poster.png').getPath()}),
+                Asset({'id' : '', 'asset_type' : constants.ASSET_ICON_ID,   'filepath' : globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Browse_by_PEGI_icon.png').getPath()}),
+                Asset({'id' : '', 'asset_type' : constants.ASSET_POSTER_ID, 'filepath' : globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Browse_by_PEGI_poster.png').getPath()}),
             ])  
                      
         if vcategory_id == constants.VCATEGORY_RATING_ID:
