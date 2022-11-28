@@ -1344,7 +1344,7 @@ class AelAddonRepository(object):
             yield AelAddon(addon_data)
             
     def insert_addon(self, addon: AelAddon):
-        self.logger.info("AelAddonRepository.insert_addon(): Saving addon '{}'".format(addon.get_addon_id()))        
+        self.logger.info("Saving addon '{}'".format(addon.get_addon_id()))        
         self._uow.execute(qry.INSERT_ADDON,
                     addon.get_id(),
                     addon.get_name(),
@@ -1354,7 +1354,8 @@ class AelAddonRepository(object):
                     addon.get_extra_settings_str())
         
     def update_addon(self, addon: AelAddon):
-        self.logger.info("AelAddonRepository.update_addon(): Updating addon '{}'".format(addon.get_addon_id()))        
+        self.logger.info("Updating addon '{}'".format(addon.get_addon_id()))       
+        self.logger.info(f"EXTRA SETTINGS: {addon.get_extra_settings_str()}") 
         self._uow.execute(qry.UPDATE_ADDON,
                     addon.get_name(),
                     addon.get_addon_id(),
