@@ -20,6 +20,7 @@ from __future__ import division
 import logging
 import typing
 import collections
+import time
 
 # -- Kodi libs --
 import xbmc
@@ -32,7 +33,7 @@ from akl.utils import kodi
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
 from resources.lib.repositories import UnitOfWork, AelAddonRepository
-from resources.lib.domain import AelAddon
+from resources.lib.domain import AelAddon, g_assetFactory
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +60,7 @@ def cmd_show_addons(args):
         addons = repository.find_all()
 
         options = collections.OrderedDict()
+        options["cmd_SCAN_FOR_ADDONS"] = "> Scan for new or updated addons"
         for addon in addons:
             logger.info(f"Installed Addon {addon.get_addon_id()} v{addon.get_version()} {addon.get_addon_type()}")
             if addon.get_addon_id() in options:
@@ -70,7 +72,98 @@ def cmd_show_addons(args):
         selected_option = kodi.OrdDictionaryDialog().select(s, options)
         if selected_option is None:
             return
-  
+
+        if selected_option.startswith("cmd_"):
+            cmd = selected_option.replace("cmd_", "")
+            AppMediator.sync_cmd(cmd)
+            cmd_show_addons()
+            return
+
+        AppMediator.sync_cmd("ADDON_DETAILS", {'addon_id': selected_option})
+
+
+@AppMediator.register('ADDON_DETAILS')
+def cmd_addon_details(args):
+    addon_id:str = args['addon_id'] if 'addon_id' in args else None
+    
+    options = collections.OrderedDict()
+    options["UPDATE"] = "Refresh/update addon"
+    options["METADATA"] = "Supported metadata"
+    options["ASSETS"] = "Supported assets"
+    options["SETTINGS"] = "Plugin settings"
+    
+    addon = xbmcaddon.Addon(addon_id)
+    title = f"Addon: {addon.getAddonInfo('name')}"
+    
+    selected_option = kodi.OrdDictionaryDialog().select(title, options)
+    if selected_option is None:
+        AppMediator.sync_cmd('SHOW_ADDONS')
+        return
+
+    if selected_option == "UPDATE":
+        kodi.run_script(addon_id, {'--cmd': 'update-settings'})
+        time.sleep(1)
+        
+        addon = xbmcaddon.Addon(addon_id)
+        addon_name = addon.getAddonInfo('name')
+        addon_types = addon.getSettingString('akl.plugin_types').split('|')
+        addon_version = addon.getAddonInfo('version')
+        
+        uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+        with uow:
+            repository = AelAddonRepository(uow)  
+
+            if constants.AddonType.LAUNCHER.name in addon_types:
+                ael_addon = repository.find_by_addon_id(addon_id, constants.AddonType.LAUNCHER)
+                specific_name = addon.getSetting('akl.launcher.friendlyname')
+                ael_addon.set_name(specific_name if specific_name else addon_name)
+                ael_addon.set_version(addon_version)
+                repository.update_addon(ael_addon)
+
+            if constants.AddonType.SCANNER.name in addon_types:
+                ael_addon = repository.find_by_addon_id(addon_id, constants.AddonType.SCANNER) 
+                specific_name = addon.getSetting('akl.scanner.friendlyname')
+                ael_addon.set_name(specific_name if specific_name else addon_name)
+                ael_addon.set_version(addon_version)
+                repository.update_addon(ael_addon)
+
+            if constants.AddonType.SCRAPER.name in addon_types:
+                ael_addon = repository.find_by_addon_id(addon_id, constants.AddonType.SCRAPER) 
+                specific_name = addon.getSetting('akl.scraper.friendlyname')
+                ael_addon.set_name(specific_name if specific_name else addon_name)
+                ael_addon.set_version(addon_version)
+                ael_addon.set_extra_settings({
+                    'supported_metadata': addon.getSetting('akl.scraper.supported_metadata'),
+                    'supported_assets': addon.getSetting('akl.scraper.supported_assets')
+                })
+                repository.update_addon(ael_addon)
+            uow.commit()
+            kodi.notify("Updated addon")
+        cmd_addon_details(args)
+        return
+
+    if selected_option == "METADATA":
+        supported_metadata_str = addon.getSetting('akl.scraper.supported_metadata')
+        options = { m: constants.METADATA_DESCRIPTIONS[m] for m in supported_metadata_str.split('|') }
+        kodi.OrdDictionaryDialog().select(f"Supported metadata: {addon.getAddonInfo('name')}", options)
+        cmd_addon_details(args)
+        return
+
+    if selected_option == "ASSETS":
+        supported_assets_str = addon.getSetting('akl.scraper.supported_assets')
+        assets = g_assetFactory.get_asset_list_by_IDs(supported_assets_str.split('|'))
+        options = { a.id: a.name for a in assets }
+        kodi.OrdDictionaryDialog().select(f"Supported assets: {addon.getAddonInfo('name')}", options)
+        cmd_addon_details(args)
+        return
+    
+    if selected_option == "SETTINGS":
+        addon.openSettings()
+        cmd_addon_details(args)
+        return
+
+    AppMediator.sync_cmd('SHOW_ADDONS')
+
 
 def _check_installed_addons() -> int:
     addon_count = 0
@@ -185,6 +278,14 @@ def _process_scraper_addon(
     if addon_id in existing_addon_ids:                
         if existing_addon_ids[addon_id].get_version() == addon_obj.get_version():
             return
+
+        kodi.run_script(addon_id, {'--cmd': 'update-settings'})
+        time.sleep(1)
+        addon_obj.set_extra_settings({
+            'supported_metadata': addon.getSetting('akl.scraper.supported_metadata'),
+            'supported_assets': addon.getSetting('akl.scraper.supported_assets')
+        })
+
         addon_obj.set_id(existing_addon_ids[addon_id].get_id())
         addon_repository.update_addon(addon_obj)
         logger.debug(f'Updated scraper addon {addon_id}')

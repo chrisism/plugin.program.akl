@@ -1317,6 +1317,8 @@ class AelAddonRepository(object):
     def find_by_addon_id(self, addon_id:str, type: constants.AddonType) -> AelAddon:
         self._uow.execute(qry.SELECT_ADDON_BY_ADDON_ID, addon_id, type.name)
         result_set = self._uow.single_result()
+        if result_set is None:
+            return None
         return AelAddon(result_set)
 
     def find_all(self) -> typing.Iterator[AelAddon]:
