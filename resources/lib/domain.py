@@ -2,7 +2,8 @@
 #
 # Advanced Kodi Launcher miscellaneous set of objects
 #
-# Copyright (c) Wintermute0110 <wintermute0110@gmail.com> / Chrisism <crizizz@gmail.com>
+# Copyright (c) Chrisism <crizizz@gmail.com>
+# Portions (c) Wintermute0110 <wintermute0110@gmail.com> 
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
