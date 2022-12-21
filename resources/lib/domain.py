@@ -1691,7 +1691,7 @@ class ROM(MetaDataItemABC):
         if constants.META_ESRB_ID in metadata_to_update\
                 and api_rom_obj.get_esrb_rating() \
                 and (overwrite_existing_metadata or \
-                    _is_empty(self.get_esrb_rating(), constants.DEFAULT_META_ESRB)):
+                    _is_empty_or_default(self.get_esrb_rating(), constants.DEFAULT_META_ESRB)):
             self.set_esrb_rating(api_rom_obj.get_esrb_rating())
         
         if constants.META_PEGI_ID in metadata_to_update\

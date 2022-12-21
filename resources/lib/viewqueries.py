@@ -33,10 +33,11 @@ from akl.utils import kodi
 
 from resources.lib import globals
 from resources.lib.commands.mediator import AppMediator
-from resources.lib.commands import view_rendering_commands
 from resources.lib.repositories import ViewRepository
 
 logger = logging.getLogger(__name__)
+
+
 #
 # Root view items
 #
@@ -98,6 +99,7 @@ def qry_get_root_items():
     
     return container
 
+
 #
 # View pre-rendered items.
 #
@@ -105,12 +107,6 @@ def qry_get_view_items(view_id: str, is_virtual_view=False):
     views_repository = ViewRepository(globals.g_PATHS)
     container = views_repository.find_items(view_id, is_virtual_view)
     return container
-
-#
-# View database unrendered items.
-#
-def qry_get_database_view_items(category_id: str, collection_value: str):
-    return view_rendering_commands.cmd_render_virtual_collection(category_id, collection_value)
 
 #
 # Utilities items
@@ -299,6 +295,7 @@ def qry_get_utilities_items():
     
     return container
 
+
 #
 # Global Reports items
 #
@@ -377,6 +374,7 @@ def qry_get_globalreport_items():
     })
     return container
 
+
 #
 # Default context menu items for the whole container.
 #
@@ -416,6 +414,7 @@ def qry_container_context_menu_items(container_data) -> typing.List[typing.Tuple
     commands.append(('AKL addon settings', 'Addon.OpenSettings({0})'.format(globals.addon_id)))
 
     return commands
+
 
 #
 # ListItem specific context menu items.
@@ -468,8 +467,9 @@ def qry_listitem_context_menu_items(list_item_data, container_data)-> typing.Lis
                 
     return commands
 
+
 def _context_menu_url_for(url: str, params: dict = None) -> str:
     if params is not None:
         url = '{}?{}'.format(url, urlencode(params))
     url = globals.router.url_for_path(url)
-    return 'RunPlugin({})'.format(url)
+    return f'RunPlugin({url})'

@@ -46,6 +46,7 @@ from akl.utils import kodi
 
 from resources.lib import viewqueries, globals
 from resources.lib.commands.mediator import AppMediator
+from resources.lib.commands import view_rendering_commands
 from resources.lib.globals import router
 
 logger = logging.getLogger(__name__)
@@ -142,7 +143,7 @@ def vw_route_render_virtual_view(view_id: str):
 @router.route('/collection/virtual/<category_id>/items')
 def vw_route_render_virtual_items_view(category_id: str):
     collection_value = router.args["value"][0]
-    container               = viewqueries.qry_get_database_view_items(category_id, collection_value)
+    container = view_rendering_commands.cmd_render_virtual_collection(category_id, collection_value)
     container_context_items = viewqueries.qry_container_context_menu_items(container)
 
     filter_type = router.args['filter'][0] if 'filter' in router.args else None
@@ -213,6 +214,25 @@ def vw_view_romcollection(romcollection_id: str):
 def vw_edit_romcollection(romcollection_id: str):
     AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id })
 
+@router.route('/rom/<rom_id>/view')
+def vw_view_rom(rom_id):
+
+    rom_view_data = view_rendering_commands.cmd_render_rom_details(rom_id)
+    rom_list_item = render_list_item(rom_view_data)
+
+    assets_model = []
+    for asset_key, asset_val in rom_view_data['art'].items():
+        list_item = xbmcgui.ListItem(asset_key)
+        list_item.setLabel2(asset_val)
+        list_item.setArt({'thumb': asset_val})
+        assets_model.append(list_item)
+
+    # collections_data = view_rendering_commands.cmd_render_romcollection_view_data()
+    ui = ViewRomGUI('script-akl-romdetails.xml', globals.addon_path, 'default', '1080i', True, 
+                    rom_model=[rom_list_item], assets_model=assets_model)
+    ui.doModal()
+    del ui
+
 @router.route('/rom/edit/<rom_id>')
 def vw_edit_rom(rom_id: str):
     AppMediator.async_cmd('EDIT_ROM', {'rom_id': rom_id })
@@ -223,7 +243,7 @@ def vw_edit_rom(rom_id: str):
 @router.route('/execute/rom/<rom_id>')
 def vw_route_execute_rom(rom_id):
     AppMediator.async_cmd("EXECUTE_ROM", {'rom_id': rom_id} )
-    
+
 # -------------------------------------------------------------------------------------------------
 # UI render methods
 # -------------------------------------------------------------------------------------------------
@@ -244,21 +264,26 @@ def render_list_items(container_data:dict, container_context_items = [], filter_
         if filter_method and not filter_method.is_valid(list_item_data):
             continue
         
-        name        = list_item_data['name']
-        url_str     = list_item_data['url']
-        folder_flag = list_item_data['is_folder'] 
-        item_type   = list_item_data['type']
-
-        list_item = xbmcgui.ListItem(name)
-        list_item.setInfo(item_type, list_item_data['info'])
-        list_item.setArt(list_item_data['art'])
-        list_item.setProperties(list_item_data['properties'])
+        list_item = render_list_item(list_item_data)
+        url_str = list_item_data['url']
+        folder_flag = list_item_data['is_folder']
 
         if xbmc.getCondVisibility("!Skin.HasSetting(KioskMode.Enabled)"):
             item_context_items = viewqueries.qry_listitem_context_menu_items(list_item_data, container_data)
             list_item.addContextMenuItems(item_context_items + container_context_items)
 
         xbmcplugin.addDirectoryItem(handle = router.handle, url = url_str, listitem = list_item, isFolder = folder_flag)
+
+def render_list_item(list_item_data: dict) -> xbmcgui.ListItem:
+    name        = list_item_data['name']
+    item_type   = list_item_data['type']
+
+    list_item = xbmcgui.ListItem(name)
+    list_item.setInfo(item_type, list_item_data['info'])
+    list_item.setArt(list_item_data['art'])
+    list_item.setProperties(list_item_data['properties'])
+
+    return list_item
 
 # -------------------------------------------------------------------------------------------------
 # UI helper methods
@@ -268,7 +293,8 @@ def render_list_items(container_data:dict, container_context_items = [], filter_
 #
 def vw_misc_set_all_sorting_methods():
     # >> This must be called only if router.handle > 0, otherwise Kodi will complain in the log.
-    if router.handle < 0: return
+    if router.handle < 0:
+        return
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_LABEL_IGNORE_FOLDERS)
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_VIDEO_YEAR)
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_STUDIO)
@@ -309,18 +335,29 @@ def vw_misc_clear_AEL_Launcher_Content():
     xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_LAUNCHER_BOXSIZE_LABEL, '')
     
 def vw_create_filter(filter_on_type:str, filter_on_value:str) -> ListFilter:
-    if filter_on_type is None: return None
-    if filter_on_value == 'UNDEFINED': filter_on_value = ''
+    if filter_on_type is None:
+        return None
+    if filter_on_value == 'UNDEFINED':
+        filter_on_value = ''
     
-    if filter_on_type == constants.META_TITLE_ID:       return OnTitleFilter(filter_on_value)    
-    if filter_on_type == constants.META_DEVELOPER_ID:   return OnDeveloperFilter(filter_on_value)
-    if filter_on_type == constants.META_GENRE_ID:       return OnGenreFilter(filter_on_value)
-    if filter_on_type == constants.META_YEAR_ID:        return OnReleaseYearFilter(filter_on_value)
-    if filter_on_type == constants.META_RATING_ID:      return OnRatingFilter(filter_on_value)    
-    if filter_on_type == constants.META_ESRB_ID:        return OnESRBFilter(filter_on_value)
-    if filter_on_type == constants.META_PEGI_ID:        return OnPEGIFilter(filter_on_value)
-    if filter_on_type == constants.META_NPLAYERS_ID:    return OnNumberOfPlayersFilter(filter_on_value)
-    if filter_on_type == 'platform':                    return OnPlatformFilter(filter_on_value)
+    if filter_on_type == constants.META_TITLE_ID:
+        return OnTitleFilter(filter_on_value)    
+    if filter_on_type == constants.META_DEVELOPER_ID:
+        return OnDeveloperFilter(filter_on_value)
+    if filter_on_type == constants.META_GENRE_ID:
+        return OnGenreFilter(filter_on_value)
+    if filter_on_type == constants.META_YEAR_ID:
+        return OnReleaseYearFilter(filter_on_value)
+    if filter_on_type == constants.META_RATING_ID:
+        return OnRatingFilter(filter_on_value)    
+    if filter_on_type == constants.META_ESRB_ID:
+        return OnESRBFilter(filter_on_value)
+    if filter_on_type == constants.META_PEGI_ID:
+        return OnPEGIFilter(filter_on_value)
+    if filter_on_type == constants.META_NPLAYERS_ID:
+        return OnNumberOfPlayersFilter(filter_on_value)
+    if filter_on_type == 'platform':
+        return OnPlatformFilter(filter_on_value)
     
     logger.debug(f'Filter called without proper filter type. "{filter_on_type}"')
     return None
@@ -370,4 +407,33 @@ class OnNumberOfPlayersFilter(ListFilter):
 class OnPlatformFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'properties' in subject and 'platform' in subject['properties'] and subject['properties']['platform'] == self.filter_on_value
-    
+
+
+class ViewRomGUI(xbmcgui.WindowXML):
+
+    def __init__(self, *args, **kwargs):
+        self.first_load = True
+        self.rom_model = kwargs['rom_model']
+        self.assets_model = kwargs['assets_model']
+
+    def onInit(self):
+        if self.first_load:
+            self.render_items()
+
+    def render_items(self):
+        self.first_load = False
+        index = 19801
+        lists = [self.rom_model, self.assets_model]
+
+        self.clearList()
+        for items in lists:
+            try:
+                cntrl = self.getControl(index)
+                cntrl.addItems(items)
+            except RuntimeError as error:
+                logger.error(f'Control with id {index} cannot be filled. Error: {error}')
+                pass
+            index += 1
+        
+        xbmc.sleep(100)
+        self.setFocusId(self.getCurrentContainerId())

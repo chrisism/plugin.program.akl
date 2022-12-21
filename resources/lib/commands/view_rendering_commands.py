@@ -240,6 +240,15 @@ def cmd_render_virtual_collection(vcategory_id: str, collection_value: str) -> d
         viewdata = _render_romcollection_view(vcollection, roms_repository)
     return viewdata
 
+def cmd_render_rom_details(rom_id: str) -> dict:
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    viewdata = None
+    with uow:
+        roms_repository = ROMsRepository(uow)
+        rom = roms_repository.find_rom(rom_id)
+        viewdata = _render_rom_listitem(rom)
+    return viewdata
+
 
 # -------------------------------------------------------------------------------------------------
 # Rendering of views (containers)
@@ -435,10 +444,14 @@ def _render_romcollection_listitem(romcollection_obj: ROMCollection) -> dict:
         'is_folder': True,
         'type': 'video',
         'info': {
-            'title'   : romcollection_name,              'year'    : romcollection_obj.get_releaseyear(),
-            'genre'   : romcollection_obj.get_genre(),   'studio'  : romcollection_obj.get_developer(),
-            'rating'  : romcollection_obj.get_rating(),  'plot'    : romcollection_obj.get_plot(),
-            'trailer' : romcollection_obj.get_trailer(), 'overlay' : ICON_OVERLAY
+            'title': romcollection_name,
+            'year': romcollection_obj.get_releaseyear(),
+            'genre': romcollection_obj.get_genre(),
+            'studio': romcollection_obj.get_developer(),
+            'rating': romcollection_obj.get_rating(),
+            'plot': romcollection_obj.get_plot(),
+            'trailer': romcollection_obj.get_trailer(),
+            'overlay': ICON_OVERLAY
         },
         'art': assets,
         'properties': { 
