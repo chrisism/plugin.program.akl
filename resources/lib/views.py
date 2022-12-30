@@ -35,6 +35,7 @@ from __future__ import annotations
 import sys
 import abc
 import logging
+import typing
 
 # --- Kodi stuff ---
 import xbmc
@@ -64,8 +65,16 @@ def run_plugin(addon_argv):
 
     # --- Bootstrap object instances --- 
     globals.g_bootstrap_instances()
+
+    argv = None
+    if sys.argv[0] == "addon.py":
+        argv = []
+        argv.append(sys.argv[1])
+        argv.append(router.handle)
+        argv.append(sys.argv[2])
+
     try:
-        router.run()
+        router.run(argv)
     except Exception as e:
         logger.error('Exception while executing route', exc_info=e)
         kodi.notify_error('Failed to execute route or command')
@@ -81,7 +90,7 @@ def vw_route_render_root():
     container = viewqueries.qry_get_root_items()
     container_context_items = viewqueries.qry_container_context_menu_items(container)
 
-    render_list_items(container, container_context_items)
+    _render_list_items(container, container_context_items)
     xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
 
 @router.route('/category/<view_id>')
@@ -104,7 +113,7 @@ def vw_route_render_collection(view_id: str):
         if container_type == constants.OBJ_ROMCOLLECTION or container_type == constants.OBJ_COLLECTION_VIRTUAL:
             kodi.notify('Collection {} has no items. Add ROMs'.format(container['name']))
     else:
-        render_list_items(container, container_context_items, filter)
+        _render_list_items(container, container_context_items, filter)
         
     xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
 
@@ -136,7 +145,7 @@ def vw_route_render_virtual_view(view_id: str):
             if kodi.dialog_yesno(f"Virtual collection {container['name']} has no items. Regenerate the views now?"):
                 AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': container['parent_id']})
     else:
-        render_list_items(container, container_context_items, filter)
+        _render_list_items(container, container_context_items, filter)
         
     xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
     
@@ -150,7 +159,7 @@ def vw_route_render_virtual_items_view(category_id: str):
     filter_term = router.args['term'][0] if 'term' in router.args else None
     filter = vw_create_filter(filter_type, filter_term)
     
-    render_list_items(container, container_context_items, filter)
+    _render_list_items(container, container_context_items, filter)
         
     xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
        
@@ -162,7 +171,7 @@ def vw_route_render_utilities():
     container = viewqueries.qry_get_utilities_items()
     container_context_items = viewqueries.qry_container_context_menu_items(container)
 
-    render_list_items(container, container_context_items)
+    _render_list_items(container, container_context_items)
     xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
     
 @router.route('/globalreports')
@@ -170,7 +179,7 @@ def vw_route_render_globalreports():
     container = viewqueries.qry_get_globalreport_items()
     container_context_items = viewqueries.qry_container_context_menu_items(container)
 
-    render_list_items(container, container_context_items)
+    _render_list_items(container, container_context_items)
     xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)    
 
 # -------------------------------------------------------------------------------------------------
@@ -214,35 +223,40 @@ def vw_view_romcollection(romcollection_id: str):
 def vw_edit_romcollection(romcollection_id: str):
     AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id })
 
-@router.route('/rom/<rom_id>/view')
-def vw_view_rom(rom_id):
-
-    rom_view_data = view_rendering_commands.cmd_render_rom_details(rom_id)
-    rom_list_item = render_list_item(rom_view_data)
-
-    assets_model = []
-    for asset_key, asset_val in rom_view_data['art'].items():
-        list_item = xbmcgui.ListItem(asset_key)
-        list_item.setLabel2(asset_val)
-        list_item.setArt({'thumb': asset_val})
-        assets_model.append(list_item)
-
-    # collections_data = view_rendering_commands.cmd_render_romcollection_view_data()
-    ui = ViewRomGUI('script-akl-romdetails.xml', globals.addon_path, 'default', '1080i', True, 
-                    rom_model=[rom_list_item], assets_model=assets_model)
-    ui.doModal()
-    del ui
-
 @router.route('/rom/edit/<rom_id>')
 def vw_edit_rom(rom_id: str):
     AppMediator.async_cmd('EDIT_ROM', {'rom_id': rom_id })
 
 # -------------------------------------------------------------------------------------------------
-# ROM execution
+# ROM execution / view
 # -------------------------------------------------------------------------------------------------    
 @router.route('/execute/rom/<rom_id>')
 def vw_route_execute_rom(rom_id):
     AppMediator.async_cmd("EXECUTE_ROM", {'rom_id': rom_id} )
+
+
+@router.route('/rom/<rom_id>/view')
+def vw_view_rom(rom_id):
+    container = viewqueries.qry_get_view_item(rom_id)
+    ui = ViewRomGUI('script-akl-romdetails.xml', globals.addon_path, 'default', '1080i', True,
+                    container_id=19801,container_data=container)
+    ui.doModal()
+    del ui
+
+
+@router.route('/rom/<rom_id>/metadata')
+def vw_view_rom_metadata(rom_id):
+    container = viewqueries.qry_get_view_metadata(rom_id)
+    _render_list_items(container)
+    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+    return []
+
+
+@router.route('/rom/<rom_id>/assets')
+def vw_view_rom_assets(rom_id):
+    container = viewqueries.qry_get_view_assets(rom_id)
+    _render_list_items(container)
+    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
 
 # -------------------------------------------------------------------------------------------------
 # UI render methods
@@ -250,7 +264,7 @@ def vw_route_execute_rom(rom_id):
 #
 # Renders items for a view.
 #
-def render_list_items(container_data:dict, container_context_items = [], filter_method:ListFilter = None):
+def _render_list_items(container_data:dict, container_context_items = [], filter_method:ListFilter = None):
     vw_misc_set_all_sorting_methods()
     vw_misc_set_AEL_Content(container_data['obj_type'] if 'obj_type' in container_data else constants.OBJ_NONE)
     vw_misc_clear_AEL_Launcher_Content()
@@ -264,7 +278,7 @@ def render_list_items(container_data:dict, container_context_items = [], filter_
         if filter_method and not filter_method.is_valid(list_item_data):
             continue
         
-        list_item = render_list_item(list_item_data)
+        list_item = _render_list_item(list_item_data)
         url_str = list_item_data['url']
         folder_flag = list_item_data['is_folder']
 
@@ -274,16 +288,71 @@ def render_list_items(container_data:dict, container_context_items = [], filter_
 
         xbmcplugin.addDirectoryItem(handle = router.handle, url = url_str, listitem = list_item, isFolder = folder_flag)
 
-def render_list_item(list_item_data: dict) -> xbmcgui.ListItem:
-    name        = list_item_data['name']
-    item_type   = list_item_data['type']
+def _render_list_item(list_item_data: dict) -> xbmcgui.ListItem:
+    name = list_item_data['name']
+    name2 = list_item_data['name2'] if 'name2' in list_item_data else ""
+    item_type = list_item_data['type']
 
-    list_item = xbmcgui.ListItem(name)
+    list_item = xbmcgui.ListItem(name, label2=name2)
     list_item.setInfo(item_type, list_item_data['info'])
     list_item.setArt(list_item_data['art'])
     list_item.setProperties(list_item_data['properties'])
 
     return list_item
+
+
+class ViewRomGUI(xbmcgui.WindowXML):
+
+    def __init__(self, *args, **kwargs):
+        self.first_load = True
+        
+        self.container_id = kwargs['container_id']
+        self.container_data = kwargs['container_data']
+
+    def onInit(self):
+        if self.first_load:
+            self._render_items()
+
+        self.textviewer_id = self.getProperty("TextViewerButtonId")
+        self.global_button_id = self.getProperty("GlobalButtonId")
+
+    def onClick(self, controlId: int):
+        str_control_id = str(controlId)
+
+        if str_control_id == self.textviewer_id:
+            plot = self.container_data["items"][0]["info"]["plot"]
+            xbmcgui.Dialog().textviewer(kodi.translate(40811), plot)
+
+        if str_control_id == self.global_button_id:
+            uri = self.getProperty("call")
+            args = self.getProperty("callargs")
+            logger.info(f'u {uri} a {args}')
+            uri_args = None
+            if args:
+                args_lst = args.split("=")
+                uri_args = { args_lst[0]: args_lst[1]}
+            self.close()
+            kodi.update_uri(uri, uri_args)
+
+        return super().onClick(controlId)
+
+    def _render_items(self):
+        self.first_load = False
+        self.clearList()
+        try:
+            cntrl = self.getControl(self.container_id)
+            # Container Properties
+            if 'properties' in self.container_data:
+                for property, value in self.container_data['properties'].items():
+                    self.setContainerProperty(property, value)
+
+            for list_item_data in self.container_data['items']:
+                list_item = _render_list_item(list_item_data)
+                cntrl.addItem(list_item)
+        except RuntimeError as error:
+            logger.error(f'Control cannot be filled. Error: {error}')
+            pass
+
 
 # -------------------------------------------------------------------------------------------------
 # UI helper methods
@@ -298,8 +367,8 @@ def vw_misc_set_all_sorting_methods():
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_LABEL_IGNORE_FOLDERS)
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_VIDEO_YEAR)
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_STUDIO)
-    xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_GENRE)
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_GENRE)
 
 #
 # Set the AEL content type.
@@ -407,33 +476,3 @@ class OnNumberOfPlayersFilter(ListFilter):
 class OnPlatformFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'properties' in subject and 'platform' in subject['properties'] and subject['properties']['platform'] == self.filter_on_value
-
-
-class ViewRomGUI(xbmcgui.WindowXML):
-
-    def __init__(self, *args, **kwargs):
-        self.first_load = True
-        self.rom_model = kwargs['rom_model']
-        self.assets_model = kwargs['assets_model']
-
-    def onInit(self):
-        if self.first_load:
-            self.render_items()
-
-    def render_items(self):
-        self.first_load = False
-        index = 19801
-        lists = [self.rom_model, self.assets_model]
-
-        self.clearList()
-        for items in lists:
-            try:
-                cntrl = self.getControl(index)
-                cntrl.addItems(items)
-            except RuntimeError as error:
-                logger.error(f'Control with id {index} cannot be filled. Error: {error}')
-                pass
-            index += 1
-        
-        xbmc.sleep(100)
-        self.setFocusId(self.getCurrentContainerId())

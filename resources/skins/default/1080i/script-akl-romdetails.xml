@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
+	<onload>SetProperty(TextViewerButtonId,138)</onload>
+	<onload>SetProperty(GlobalButtonId,19810)</onload>
 	<defaultcontrol always="true">8</defaultcontrol>
-	<!-- <onload>SetProperty(infobackground,$ESCINFO[ListItem.Art(fanart)],home)</onload>
-	<onunload>ClearProperty(infobackground,home)</onunload> -->
 	<controls>
 		<control type="list" id="19801">
 			<description>Storage container for the item details</description>
@@ -13,7 +13,16 @@
 			<itemlayout/>
 			<focusedlayout/>
 		</control>
+		<control type="button" id="19810">
+			<description>Hidden general action button</description>
+			<top>-3000</top>
+			<left>-3000</left>
+			<width>1</width>
+			<height>1</height>
+		</control>
+
 		<control type="group">
+			<description>Main window</description>
 			<centertop>50%</centertop>
 			<height>1080</height>
 			<centerleft>50%</centerleft>
@@ -33,11 +42,19 @@
 					<texture colordiffuse="FF0E597E">backgrounds/grayfade.jpg</texture>
 				</control>
 			</control>
+		
 			<control type="group">
 				<description>Poster/Boxfront</description>
 				<top>150</top>
 				<left>66</left>
-				<include>OpenClose_Left</include>
+				<animation type="WindowOpen">
+					<effect type="fade" start="0" end="100" time="300" tween="sine" easing="out" />
+					<effect type="slide" start="-320" end="0" time="400" tween="cubic" easing="out" />
+				</animation>
+				<animation type="WindowClose">
+					<effect type="fade" start="100" end="0" time="300" tween="sine" easing="out" />
+					<effect type="slide" start="0" end="-320" time="300" tween="cubic" easing="out" />
+				</animation>
 				<control type="image">
 					<top>-16</top>
 					<left>-16</left>
@@ -78,11 +95,22 @@
 					</control>
 				</control>
 			</control>
-			<control type="group">
-				<include>OpenClose_Right</include>
+
+			<control type="group">	
+				<description>Lists and boxes</description>			
+				<animation type="WindowOpen">
+					<effect type="fade" start="0" end="100" time="300" tween="sine" easing="out" />
+					<effect type="slide" start="320" end="0" time="400" tween="cubic" easing="out" />
+				</animation>
+				<animation type="WindowClose">
+					<effect type="fade" start="100" end="0" time="300" tween="sine" easing="out" />
+					<effect type="slide" start="0" end="320" time="300" tween="cubic" easing="out" />
+				</animation>					
 				<left>620</left>
 				<top>-30</top>
+
 				<control type="group" id="140">
+					<description>Plot box</description>	
 					<top>468</top>
 					<control type="button" id="138">
 						<width>754</width>
@@ -91,15 +119,12 @@
 						<textoffsety>20</textoffsety>
 						<aligny>bottom</aligny>
 						<label></label>
-						<onclick condition="!String.IsEmpty(Container(19801).ListItem.Plot)">SetProperty(TextViewer_Header,$LOCALIZE[207],home)</onclick>
-						<onclick condition="!String.IsEmpty(Container(19801).ListItem.Plot)">SetProperty(TextViewer_Text,$ESCINFO[Container(19801).ListItem.Plot],home)</onclick>
-						<onclick condition="!String.IsEmpty(Container(19801).ListItem.Plot)">ActivateWindow(1102)</onclick>
 						<onup>19802</onup>
 						<onleft>4000</onleft>
 						<onright>4000</onright>
 						<ondown>5000</ondown>
+						<texturefocus border="21" colordiffuse="FF12A0C7">buttons/button-fo.png</texturefocus>
 						<texturenofocus border="21">dialogs/dialog-bg.png</texturenofocus>
-						<visible>Integer.IsGreater(Container(19801).NumItems,0)</visible>
 					</control>
 					<control type="image">
 						<left>735</left>
@@ -107,22 +132,6 @@
 						<height>418</height>
 						<aligny>bottom</aligny>
 						<texture border="21">dialogs/dialog-bg.png</texture>
-					</control>
-					<control type="button" id="139">
-						<width>1245</width>
-						<height>418</height>
-						<textoffsetx>40</textoffsetx>
-						<textoffsety>20</textoffsety>
-						<aligny>bottom</aligny>
-						<label></label>
-						<onclick condition="!String.IsEmpty(Container(19801).ListItem.Plot)">SetProperty(TextViewer_Header,$LOCALIZE[207],home)</onclick>
-						<onclick condition="!String.IsEmpty(Container(19801).ListItem.Plot)">SetProperty(TextViewer_Text,$ESCINFO[Container(19801).ListItem.Plot],home)</onclick>
-						<onclick condition="!String.IsEmpty(Container(19801).ListItem.Plot)">ActivateWindow(1102)</onclick>
-						<onup>19802</onup>
-						<onleft>4000</onleft>
-						<onright>4000</onright>
-						<ondown>5000</ondown>
-						<texturenofocus border="21">dialogs/dialog-bg.png</texturenofocus>
 					</control>
 					<control type="textbox">
 						<left>40</left>
@@ -133,7 +142,9 @@
 						<autoscroll delay="10000" time="5000" repeat="10000">true</autoscroll>
 					</control>
 				</control>
-				<control type="grouplist" id="4000">
+				
+				<control type="list" id="4000">
+					<description>Metadata list</description>
 					<orientation>vertical</orientation>
 					<left>755</left>
 					<top>488</top>
@@ -143,195 +154,117 @@
 					<onup>19802</onup>
 					<onright>140</onright>
 					<onleft>140</onleft>
-					<control type="togglebutton" id="19881">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
-						<align>left</align>
-						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<altclick>noop</altclick>
-						<label>[COLOR FF2866A4]$ADDON[plugin.program.akl 40801]: [/COLOR]$INFO[Container(19801).ListItem.Genre]</label>
-						<altlabel>$ADDON[plugin.program.akl 40801]: $INFO[Container(19801).ListItem.Genre]</altlabel>
-						<visible>!String.IsEmpty(Container(19801).ListItem.Genre)</visible>
-					</control>
-					<control type="togglebutton" id="19882">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
-						<align>left</align>
-						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<onclick condition="$PARAM[onclick_condition]">$PARAM[onclick]</onclick>
-						<altclick>noop</altclick>
-						<altclick condition="$PARAM[altclick_condition]">$PARAM[altclick]</altclick>
-						<label>[COLOR FF2866A4]$ADDON[plugin.program.akl 40803]: [/COLOR]$INFO[Container(19801).ListItem.Year]</label>
-						<altlabel>$ADDON[plugin.program.akl 40803]: $INFO[Container(19801).ListItem.Year]</altlabel>
-						<usealttexture>Control.HasFocus($PARAM[control_id])</usealttexture>
-						<visible>!String.IsEmpty(Container(19801).ListItem.Year)</visible>
-					</control>
-					<control type="togglebutton" id="19883">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
-						<align>left</align>
-						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<onclick>RunPlugin(plugin://plugin.program.aklcategory/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Studio]</onclick>
-						<altclick>noop</altclick>
-						<altclick>RunPlugin(plugin://plugin.program.aklcategory/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Studio]]</altclick>
-						<label>$INFO[Container(19801).ListItem.Studio,[COLOR FF2866A4]$ADDON[plugin.program.akl 40802]: [/COLOR]]</label>
-						<altlabel>$INFO[Container(19801).ListItem.Studio,$ADDON[plugin.program.akl 40802]: ]</altlabel>
-						<usealttexture>Control.HasFocus($PARAM[control_id])</usealttexture>
-						<visible>!String.IsEmpty(Container(19801).ListItem.Studio)</visible>
-					</control>
-					<control type="togglebutton" id="19884">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
-						<align>left</align>
-						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<onclick condition="$PARAM[onclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]</onclick>
-						<altclick>noop</altclick>
-						<altclick condition="$PARAM[altclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]]</altclick>
-						<label>$INFO[Container(19801).ListItem.Rating,[COLOR FF2866A4]$ADDON[plugin.program.akl 40806]: [/COLOR]]</label>
-						<altlabel>$INFO[Container(19801).ListItem.Rating,$ADDON[plugin.program.akl 40806]: ]</altlabel>
-						<usealttexture>Control.HasFocus($PARAM[control_id])</usealttexture>
-						<visible>!String.IsEmpty(Container(19801).ListItem.Rating)</visible>
-					</control>
-					<control type="togglebutton" id="19885">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
-						<align>left</align>
-						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<onclick condition="$PARAM[onclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]</onclick>
-						<altclick>noop</altclick>
-						<altclick condition="$PARAM[altclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]]</altclick>
-						<label>$INFO[Container(19801).ListItem.Property(esrb),[COLOR FF2866A4]$ADDON[plugin.program.akl 40804]: [/COLOR]]</label>
-						<altlabel>$INFO[Container(19801).ListItem.Property(esrb),$ADDON[plugin.program.akl 40804]: ]</altlabel>
-						<usealttexture>Control.HasFocus($PARAM[control_id])</usealttexture>
-						<visible>!String.IsEmpty(Container(19801).ListItem.Property(esrb))</visible>
-					</control>
-					<control type="togglebutton" id="19886">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
-						<align>left</align>
-						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<onclick condition="$PARAM[onclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]</onclick>
-						<altclick>noop</altclick>
-						<altclick condition="$PARAM[altclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]]</altclick>
-						<label>$INFO[Container(19801).ListItem.Property(pegi),[COLOR FF2866A4]$ADDON[plugin.program.akl 40805]: [/COLOR]]</label>
-						<altlabel>$INFO[Container(19801).ListItem.Property(pegi),$ADDON[plugin.program.akl 40805]: ]</altlabel>
-						<usealttexture>Control.HasFocus($PARAM[control_id])</usealttexture>
-						<visible>!String.IsEmpty(Container(19801).ListItem.Property(pegi))</visible>
-					</control>
-					<control type="togglebutton" id="19887">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
-						<align>left</align>
-						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<onclick condition="$PARAM[onclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]</onclick>
-						<altclick>noop</altclick>
-						<altclick condition="$PARAM[altclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]]</altclick>
-						<label>$INFO[Container(19801).ListItem.Property(nplayers),[COLOR FF2866A4]$ADDON[plugin.program.akl 40808]: [/COLOR]]</label>
-						<altlabel>$INFO[Container(19801).ListItem.Property(nplayers),$ADDON[plugin.program.akl 40808]: ]</altlabel>
-						<usealttexture>Control.HasFocus($PARAM[control_id])</usealttexture>
-						<visible>!String.IsEmpty(Container(19801).ListItem.Property(nplayers))</visible>
-					</control>
-					<control type="togglebutton" id="19888">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
-						<align>left</align>
-						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<onclick condition="$PARAM[onclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]</onclick>
-						<altclick>noop</altclick>
-						<altclick condition="$PARAM[altclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]]</altclick>
-						<label>$INFO[Container(19801).ListItem.Property(nplayers_online),[COLOR FF2866A4]$ADDON[plugin.program.akl 40809]: [/COLOR]]</label>
-						<altlabel>$INFO[Container(19801).ListItem.Property(nplayers_online),$ADDON[plugin.program.akl 40809]: ]</altlabel>
-						<usealttexture>Control.HasFocus($PARAM[control_id])</usealttexture>
-						<visible>!String.IsEmpty(Container(19801).ListItem.Property(nplayers_online))</visible>
-					</control>
-					<control type="togglebutton" id="19889">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
-						<align>left</align>
-						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<onclick condition="$PARAM[onclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]</onclick>
-						<altclick>noop</altclick>
-						<altclick condition="$PARAM[altclick_condition]">RunPlugin(plugin://plugin.program.akl/category/virtual/vcategory_developer/?term=$ESCINFO[ListItem.Rating]]</altclick>
-						<label>$INFO[Container(19801).ListItem.Property(tags),[COLOR FF2866A4]$ADDON[plugin.program.akl 40810]: [/COLOR]]</label>
-						<altlabel>$INFO[Container(19801).ListItem.Property(tags),$ADDON[plugin.program.akl 40810]: ]</altlabel>
-						<usealttexture>Control.HasFocus($PARAM[control_id])</usealttexture>
-						<visible>!String.IsEmpty(Container(19801).ListItem.Property(tags))</visible>
-					</control>
+					<onclick>SetProperty(call,$INFO[Container(4000).ListItem.Property(action)])</onclick>
+					<onclick>SetProperty(callargs,$INFO[Container(4000).ListItem.Property(args)])</onclick>
+					<onclick>SendClick(,19810)</onclick>
+					<!-- <content>$INFO[Container(19801).ListItem.Property(entityid),plugin://plugin.program.akl/rom/,/metadata]</content> -->
+					<content>
+						<item id="40801">
+							<label>$ADDON[plugin.program.akl 40801]</label>
+							<label2>$INFO[Container(19801).ListItem.Genre]</label2>
+							<property name="action">plugin://plugin.program.akl/collection/virtual/vcategory_genre/items/</property>
+							<property name="args">$INFO[Container(19801).ListItem.Genre,value=,]</property>
+							<visible>!String.IsEmpty(Container(19801).ListItem.Genre)</visible>
+						</item>
+						<item id="40803">
+							<label>$ADDON[plugin.program.akl 40803]</label>
+							<label2>$INFO[Container(19801).ListItem.Year]</label2>
+							<property name="action">plugin://plugin.program.akl/collection/virtual/vcategory_year/items/</property>
+							<property name="args">$INFO[Container(19801).ListItem.Year,value=,]</property>
+							<visible>!String.IsEmpty(Container(19801).ListItem.Year)</visible>
+						</item>
+						<item id="40802">
+							<label>$ADDON[plugin.program.akl 40802]</label>
+							<label2>$INFO[Container(19801).ListItem.Studio]</label2>
+							<property name="action">plugin://plugin.program.akl/collection/virtual/vcategory_developer/items/</property>
+							<property name="args">$INFO[Container(19801).ListItem.Studio,value=,]</property>
+							<visible>!String.IsEmpty(Container(19801).ListItem.Studio)</visible>
+						</item>
+						<item id="40806">
+							<label>$ADDON[plugin.program.akl 40806]</label>
+							<label2>$INFO[Container(19801).ListItem.Rating]</label2>
+							<property name="action">plugin://plugin.program.akl/collection/virtual/vcategory_rating/items/</property>
+							<property name="args">$INFO[Container(19801).ListItem.Rating,value=,]</property>
+							<visible>!String.IsEmpty(Container(19801).ListItem.Rating)</visible>
+						</item>
+						<item id="40804">
+							<label>$ADDON[plugin.program.akl 40804]</label>
+							<label2>$INFO[Container(19801).ListItem.Property(esrb)]</label2>
+							<property name="action">plugin://plugin.program.akl/collection/virtual/vcategory_esrb/items/</property>
+							<property name="args">$INFO[Container(19801).ListItem.Property(esrb),value=,]</property>
+							<visible>!String.IsEmpty(Container(19801).ListItem.Property(esrb))</visible>
+						</item>
+						<item id="40805">
+							<label>$ADDON[plugin.program.akl 40805]</label>
+							<label2>$INFO[Container(19801).ListItem.Property(pegi)]</label2>
+							<property name="action">plugin://plugin.program.akl/collection/virtual/vcategory_pegi/items/</property>
+							<property name="args">$INFO[Container(19801).ListItem.Property(pegi),value=,]</property>
+							<visible>!String.IsEmpty(Container(19801).ListItem.Property(pegi))</visible>
+						</item>
+						<item id="40808">
+							<label>$ADDON[plugin.program.akl 40808]</label>
+							<label2>$INFO[Container(19801).ListItem.Property(nplayers)]</label2>
+							<property name="action">plugin://plugin.program.akl/collection/virtual/vcategory_nplayers/items/</property>
+							<property name="args">$INFO[Container(19801).ListItem.Property(nplayers),value=,]</property>
+							<visible>!String.IsEmpty(Container(19801).ListItem.Property(nplayers))</visible>
+						</item>
+						<item id="40809">
+							<label>$ADDON[plugin.program.akl 40809]</label>
+							<label2>$INFO[Container(19801).ListItem.Property(nplayers_online)]</label2>
+							<property name="action"></property>
+							<visible>!String.IsEmpty(Container(19801).ListItem.Property(nplayers_online))</visible>
+						</item>
+						<item id="40810">
+							<label>$ADDON[plugin.program.akl 40810]</label>
+							<label2>$INFO[Container(19801).ListItem.Property(tags)]</label2>
+							<property name="action"></property>
+							<visible>!String.IsEmpty(Container(19801).ListItem.Property(tags))</visible>
+						</item>
+					</content>
+					<itemlayout height="49" width="472">
+						<control type="togglebutton">
+							<width>472</width>
+							<height>49</height>
+							<aligny>center</aligny>
+							<align>left</align>
+							<label></label>
+						</control>
+						<control type="label">
+							<left>0</left>
+							<width>472</width>
+							<height>49</height>
+							<textoffsetx>16</textoffsetx>
+							<aligny>center</aligny>
+							<align>left</align>
+							<font>font12</font>
+							<label>[COLOR FF2866A4]$INFO[ListItem.Label]: [/COLOR]$INFO[ListItem.Label2]</label>
+						</control>
+					</itemlayout>
+					<focusedlayout height="49" width="472">
+						<control type="togglebutton">
+							<width>472</width>
+							<height>49</height>
+							<aligny>center</aligny>
+							<align>left</align>
+							<texturefocus colordiffuse="FF12A0C7">lists/focus.png</texturefocus>
+							<texturenofocus colordiffuse="40FFFFFF">lists/focus.png</texturenofocus>
+							<label></label>
+						</control>
+						<control type="label">
+							<left>0</left>
+							<width>472</width>
+							<height>49</height>
+							<textoffsetx>16</textoffsetx>
+							<aligny>center</aligny>
+							<align>left</align>
+							<font>font12</font>
+							<label>$INFO[ListItem.Label]: $INFO[ListItem.Label2]</label>
+						</control>
+					</focusedlayout>
 				</control>
-				<control type="image">
-					<left>77</left>
-					<top>185</top>
-					<width>1090</width>
-					<height>283</height>
-					<fadetime>150</fadetime>
-					<aspectratio>keep</aspectratio>
-					<texture>$INFO[Container(19801).ListItem.Art(banner)]</texture>
-					<visible>Integer.IsEqual(Container(19802).NumItems,0)</visible>
-				</control>
+
 				<control type="panel" id="19802">
+					<description>Assets list</description>
 					<top>158</top>
 					<width>1235</width>
 					<height>370</height>
@@ -340,6 +273,7 @@
 					<ondown>140</ondown>
 					<scrolltime>200</scrolltime>
 					<orientation>horizontal</orientation>
+					<content>$INFO[Container(19801).ListItem.Property(entityid),plugin://plugin.program.akl/rom/,/assets]</content>
 					<itemlayout height="317" width="245">
 						<control type="group">
 							<top>10</top>
@@ -347,7 +281,7 @@
 								<top>0</top>
 								<width>264</width>
 								<height>317</height>
-								<texture>DefaultActorSolid.png</texture>
+								<texture>DefaultAddonImages.png</texture>
 								<aspectratio aligny="center">scale</aspectratio>
 								<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
 								<bordersize>20</bordersize>
@@ -362,8 +296,8 @@
 							</control>
 							<control type="image">
 								<left>20</left>
-								<width>224</width>
 								<height>80</height>
+								<width>224</width>
 								<bottom>10</bottom>
 								<texture>overlays/overlayfade.png</texture>
 								<animation effect="fade" start="100" end="80" time="0" condition="true">Conditional</animation>
@@ -399,7 +333,7 @@
 								<top>0</top>
 								<width>264</width>
 								<height>317</height>
-								<texture>DefaultActorSolid.png</texture>
+								<texture>DefaultAddonImages.png</texture>
 								<aspectratio aligny="center">scale</aspectratio>
 								<bordertexture border="21" infill="false">overlays/shadow.png</bordertexture>
 								<bordersize>20</bordersize>
@@ -453,7 +387,9 @@
 						</control>
 					</focusedlayout>
 				</control>
+
 				<control type="grouplist" id="5000">
+					<description>Buttons List</description>
 					<left>0</left>
 					<top>864</top>
 					<width>1246</width>
@@ -472,120 +408,130 @@
 						<height>142</height>
 						<align>center</align>
 						<aligny>top</aligny>
-						<texturefocus border="21" colordiffuse="FF2866A4">buttons/button-fo.png</texturefocus>
+						<texturefocus border="21" colordiffuse="FF12A0C7">buttons/button-fo.png</texturefocus>
 						<texturenofocus border="21">buttons/button-nofo.png</texturenofocus>
-						<textoffsetx>35</textoffsetx>
+						<textoffsetx>22</textoffsetx>
 						<textoffsety>78</textoffsety>
 						<radioposx>108</radioposx>
-						<radioposy>40</radioposy>
+						<radioposy>16</radioposy>
 						<radiowidth>48</radiowidth>
 						<font>font12</font>
 						<textureradioonfocus colordiffuse="D0FFFFFF">icons/launch.png</textureradioonfocus>
 						<textureradioonnofocus colordiffuse="D0FFFFFF">icons/launch.png</textureradioonnofocus>
 						<textureradioofffocus colordiffuse="D0FFFFFF">icons/launch.png</textureradioofffocus>
 						<textureradiooffnofocus colordiffuse="D0FFFFFF">icons/launch.png</textureradiooffnofocus>
-						<textureradiooffdisabled colordiffuse="disabled">icons/launch.png</textureradiooffdisabled>
-						<textureradioondisabled colordiffuse="disabled">icons/launch.png</textureradioondisabled>
-						<selected>String.IsEmpty(Container(19801).ListItem.Label)</selected>
+						<textureradiooffdisabled colordiffuse="40FFFFFF">icons/launch.png</textureradiooffdisabled>
+						<textureradioondisabled colordiffuse="40FFFFFF">icons/launch.png</textureradioondisabled>
 						<label>$ADDON[plugin.program.akl 40851]</label>
+						<onclick>RunPlugin(plugin://plugin.program.akl/execute/rom/$INFO[Container(19801).ListItem.Property(entityid)])</onclick>
+						<animation effect="fade" start="100" end="0" time="300" delay="300">Hidden</animation>
 					</control>
 					<control type="radiobutton" id="19981">
-						<width>264</width>
+						<width>262</width>
 						<height>142</height>
 						<align>center</align>
 						<aligny>top</aligny>
-						<texturefocus border="21" colordiffuse="button_focus">buttons/button-fo.png</texturefocus>
+						<texturefocus border="21" colordiffuse="FF12A0C7">buttons/button-fo.png</texturefocus>
 						<texturenofocus border="21">buttons/button-nofo.png</texturenofocus>
 						<textoffsetx>22</textoffsetx>
 						<textoffsety>78</textoffsety>
 						<radioposx>108</radioposx>
-						<radioposy>40</radioposy>
+						<radioposy>16</radioposy>
 						<radiowidth>48</radiowidth>
 						<font>font12</font>
 						<textureradioonfocus colordiffuse="D0FFFFFF">icons/trailer.png</textureradioonfocus>
 						<textureradioonnofocus colordiffuse="D0FFFFFF">icons/trailer.png</textureradioonnofocus>
 						<textureradioofffocus colordiffuse="D0FFFFFF">icons/trailer.png</textureradioofffocus>
 						<textureradiooffnofocus colordiffuse="D0FFFFFF">icons/trailer.png</textureradiooffnofocus>
-						<textureradiooffdisabled colordiffuse="disabled">icons/trailer.png</textureradiooffdisabled>
-						<textureradioondisabled colordiffuse="disabled">icons/trailer.png</textureradioondisabled>
-						<label>Trailer</label>
-						<onclick condition="$PARAM[onclick_1_condition]">$PARAM[onclick_1]</onclick>
-						<onclick condition="$PARAM[onclick_2_condition]">$PARAM[onclick_2]</onclick>
-						<onclick condition="$PARAM[onclick_3_condition]">$PARAM[onclick_3]</onclick>
+						<textureradiooffdisabled colordiffuse="40FFFFFF">icons/trailer.png</textureradiooffdisabled>
+						<textureradioondisabled colordiffuse="40FFFFFF">icons/trailer.png</textureradioondisabled>
+						<label>$LOCALIZE[20410]</label>
+						<onclick>PlayMedia($INFO[Container(19801).ListItem.Trailer])</onclick>
 						<animation effect="fade" start="100" end="0" time="300" delay="300">Hidden</animation>
-					</control>				
-					<control type="group" id="400">
-						<width>264</width>
-						<visible>Control.IsEnabled(7) | !String.IsEmpty(ListItem.Rating)</visible>
-						<control type="button" id="7">				
-							<width>264</width>
-							<height>142</height>
-							<align>center</align>
-							<aligny>top</aligny>
-							<texturefocus border="21" colordiffuse="button_focus">buttons/button-fo.png</texturefocus>
-							<texturenofocus border="21">buttons/button-nofo.png</texturenofocus>
-							<textoffsetx>22</textoffsetx>
-							<textoffsety>78</textoffsety>
-							<radioposx>108</radioposx>
-							<radioposy>13</radioposy>
-							<radiowidth>48</radiowidth>
-							<font>font12</font>
-							<textureradioonfocus colordiffuse="D0FFFFFF"></textureradioonfocus>
-							<textureradioonnofocus colordiffuse="D0FFFFFF"></textureradioonnofocus>
-							<textureradioofffocus colordiffuse="D0FFFFFF"></textureradioofffocus>
-							<textureradiooffnofocus colordiffuse="D0FFFFFF"></textureradiooffnofocus>
-							<textureradiooffdisabled colordiffuse="disabled"></textureradiooffdisabled>
-							<textureradioondisabled colordiffuse="disabled"></textureradioondisabled>
-							<label>$ADDON[plugin.program.akl 40806]</label>
-							<onleft>441</onleft>
-							<onright>101</onright>
-							<onup>140</onup>
-							<ondown condition="Integer.IsEqual(Container(5000).CurrentItem,1)">SetFocus(19802,0)</ondown>
-							<ondown condition="Integer.IsEqual(Container(5000).CurrentItem,2)">SetFocus(19802,1)</ondown>
-							<ondown condition="Integer.IsEqual(Container(5000).CurrentItem,3)">SetFocus(19802,2)</ondown>
-							<ondown condition="Integer.IsEqual(Container(5000).CurrentItem,4)">SetFocus(19802,3)</ondown>
-							<ondown condition="Integer.IsEqual(Container(5000).CurrentItem,5)">SetFocus(19802,4)</ondown>
-						</control>
-						<control type="label">
-							<label>$INFO[ListItem.Rating]</label>
-							<font>font45_title</font>
-							<left>0</left>
-							<top>24</top>
-							<width>264</width>
-							<align>center</align>
-						</control>
-						<control type="image">
-							<texture>icons/rating.png</texture>
-							<left>108</left>
-							<top>30</top>
-							<width>48</width>
-							<height>48</height>
-							<align>center</align>
-							<visible>String.IsEmpty(ListItem.Rating)</visible>
-						</control>
 					</control>
-					
-					<control type="togglebutton" id="19898">
-						<width>472</width>
-						<height>49</height>
-						<textoffsetx>16</textoffsetx>
-						<aligny>center</aligny>
+					<control type="radiobutton" id="19982">
+						<width>262</width>
+						<height>142</height>
+						<align>center</align>
+						<aligny>top</aligny>
+						<texturefocus border="21" colordiffuse="FF12A0C7">buttons/button-fo.png</texturefocus>
+						<texturenofocus border="21">buttons/button-nofo.png</texturenofocus>
+						<textoffsetx>22</textoffsetx>
+						<textoffsety>78</textoffsety>
+						<radioposx>108</radioposx>
+						<radioposy>16</radioposy>
+						<radiowidth>48</radiowidth>
 						<font>font12</font>
-						<texturefocus colordiffuse="FF2866A4">lists/focus.png</texturefocus>
-						<alttexturefocus colordiffuse="FF2866A4">lists/focus.png</alttexturefocus>
-						<texturenofocus />
-						<alttexturenofocus />
-						<onclick>noop</onclick>
-						<label>Vrrr</label>
+						<textureradioonfocus colordiffuse="D0FFFFFF">icons/system.png</textureradioonfocus>
+						<textureradioonnofocus colordiffuse="D0FFFFFF">icons/system.png</textureradioonnofocus>
+						<textureradioofffocus colordiffuse="D0FFFFFF">icons/system.png</textureradioofffocus>
+						<textureradiooffnofocus colordiffuse="D0FFFFFF">icons/system.png</textureradiooffnofocus>
+						<textureradiooffdisabled colordiffuse="40FFFFFF">icons/system.png</textureradiooffdisabled>
+						<textureradioondisabled colordiffuse="40FFFFFF">icons/system.png</textureradioondisabled>
+						<label>$LOCALIZE[21435] $LOCALIZE[14241]</label>
+						<onclick>RunPlugin(plugin://plugin.program.akl/execute/command/rom_edit_assets/?rom_id=$INFO[Container(19801).ListItem.Property(entityid)])</onclick>
+						<animation effect="fade" start="100" end="0" time="300" delay="300">Hidden</animation>
+					</control>
+
+					<control type="radiobutton" id="19982">
+						<width>262</width>
+						<height>142</height>
+						<align>center</align>
+						<aligny>top</aligny>
+						<texturefocus border="21" colordiffuse="FF12A0C7">buttons/button-fo.png</texturefocus>
+						<texturenofocus border="21">buttons/button-nofo.png</texturenofocus>
+						<textoffsetx>22</textoffsetx>
+						<textoffsety>78</textoffsety>
+						<radioposx>108</radioposx>
+						<radioposy>16</radioposy>
+						<radiowidth>48</radiowidth>
+						<font>font12</font>
+						<textureradioonfocus colordiffuse="D0FFFFFF">icons/image.png</textureradioonfocus>
+						<textureradioonnofocus colordiffuse="D0FFFFFF">icons/image.png</textureradioonnofocus>
+						<textureradioofffocus colordiffuse="D0FFFFFF">icons/image.png</textureradioofffocus>
+						<textureradiooffnofocus colordiffuse="D0FFFFFF">icons/image.png</textureradiooffnofocus>
+						<textureradiooffdisabled colordiffuse="40FFFFFF">icons/image.png</textureradiooffdisabled>
+						<textureradioondisabled colordiffuse="40FFFFFF">icons/image.png</textureradioondisabled>
+						<label>$ADDON[plugin.program.akl 40854]</label>
+						<onclick>RunPlugin(plugin://plugin.program.akl/execute/command/rom_edit_metadata/?rom_id=$INFO[Container(19801).ListItem.Property(entityid)])</onclick>
+						<animation effect="fade" start="100" end="0" time="300" delay="300">Hidden</animation>
 					</control>
 				</control>
-				<!-- <include content="LeftRightArrows">
-					<param name="list_id" value="5000" />
-					<param name="left_posx" value="-15" />
-					<param name="right_posx" value="1240" />
-					<param name="posy" value="924" />
-					<param name="visible" value="true" />
-				</include>
+				<control type="image">
+					<left>-15</left>
+					<top>924</top>
+					<width>28</width>
+					<height>28</height>
+					<texture flipx="true" colordiffuse="FF12A0C7">overlays/arrowright.png</texture>
+					<animation effect="zoom" start="0,100" end="100,100" center="auto" time="200">VisibleChange</animation>
+					<animation effect="zoom" start="0,100" end="100,100" delay="500" center="auto" time="200">WindowOpen</animation>
+					<animation effect="zoom" start="100,100" end="0,100" center="auto" time="200">WindowClose</animation>
+					<visible>Control.IsVisible(5000) + Container(5000).HasPrevious</visible>
+					<visible>true</visible>
+				</control>
+				<control type="image">
+					<left>1240</left>
+					<top>924</top>
+					<width>28</width>
+					<height>28</height>
+					<texture colordiffuse="FF12A0C7">overlays/arrowright.png</texture>
+					<animation effect="zoom" start="0,100" end="100,100" center="auto" time="200">VisibleChange</animation>
+					<animation effect="zoom" start="0,100" end="100,100" delay="500" center="auto" time="200">WindowOpen</animation>
+					<animation effect="zoom" start="100,100" end="0,100" center="auto" time="200">WindowClose</animation>
+					<visible>Control.IsVisible(5000) + Container(5000).HasNext</visible>
+					<visible>true</visible>
+				</control>
+				<control type="button" id="5000500">
+					<left>-15</left>
+					<top>924</top>
+					<width>28</width>
+					<height>28</height>
+					<texturefocus />
+					<texturenofocus />
+					<onclick>Control.Move(5000,-1)</onclick>
+					<visible allowhiddenfocus="true">Container(5000).HasPrevious + [Control.HasFocus(5000) | Control.HasFocus(5000500)]</visible>
+				</control>
+				<!-- 
 				<include content="LeftRightArrows">
 					<param name="list_id" value="19802" />
 					<param name="left_posx" value="-15" />
@@ -594,6 +540,7 @@
 					<param name="visible" value="true" />
 				</include> -->
 			</control>
+			
 			<control type="label">
 				<right>80</right>
 				<top>970</top>
@@ -611,6 +558,7 @@
 				<animation effect="fade" start="0" end="100" time="300">Visible</animation>
 				<animation effect="fade" start="100" end="0" time="200">Hidden</animation>
 			</control>
+
 			<control type="grouplist">
 				<description>Header</description>
 				<left>100</left>

@@ -240,15 +240,6 @@ def cmd_render_virtual_collection(vcategory_id: str, collection_value: str) -> d
         viewdata = _render_romcollection_view(vcollection, roms_repository)
     return viewdata
 
-def cmd_render_rom_details(rom_id: str) -> dict:
-    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
-    viewdata = None
-    with uow:
-        roms_repository = ROMsRepository(uow)
-        rom = roms_repository.find_rom(rom_id)
-        viewdata = _render_rom_listitem(rom)
-    return viewdata
-
 
 # -------------------------------------------------------------------------------------------------
 # Rendering of views (containers)
@@ -284,7 +275,7 @@ def _render_root_view(categories_repository: CategoryRepository, romcollections_
 
     for rom in root_roms:
         try:
-            root_items.append(_render_rom_listitem(rom))
+            root_items.append(render_rom_listitem(rom))
         except Exception:
             logger.exception(f"Exception while rendering list item ROM '{rom.get_name()}'")                  
 
@@ -345,7 +336,7 @@ def _render_category_view(category_obj: Category, categories_repository: Categor
 
     for rom in roms:
         try:
-            view_items.append(_render_rom_listitem(rom))
+            view_items.append(render_rom_listitem(rom))
         except Exception:
             logger.exception(f"Exception while rendering list item ROM '{rom.get_name()}'")
                   
@@ -371,11 +362,11 @@ def _render_romcollection_view(romcollection_obj: ROMCollection, roms_repository
     for rom in roms:
         try:
             rom.apply_romcollection_asset_mapping(romcollection_obj)
-            view_items.append(_render_rom_listitem(rom))
+            view_items.append(render_rom_listitem(rom))
         except Exception:
             logger.exception(f'Exception while rendering list item ROM "{rom.get_name()}"')
         
-    logger.debug(f'Storing {len(view_items)} items for romcollection "{romcollection_obj.get_name()}" view.')
+    logger.debug(f'Found {len(view_items)} items for romcollection "{romcollection_obj.get_name()}" view.')
     view_data['items'] = view_items
     return view_data
 
@@ -471,7 +462,7 @@ def _render_romcollection_listitem(romcollection_obj: ROMCollection) -> dict:
     #if not settings.getSettingAsBool('display_hide_LB_scraper'):  render_vcategory_LB_offline_scraper_row()
 
 
-def _render_rom_listitem(rom_obj: ROM) -> dict:
+def render_rom_listitem(rom_obj: ROM) -> dict:
     # --- Do not render row if romcollection finished ---
     if rom_obj.is_finished() and settings.getSettingAsBool('display_hide_finished'):
         return
@@ -525,12 +516,16 @@ def _render_rom_listitem(rom_obj: ROM) -> dict:
         AKL_MultiDisc_bool_value = constants.AKL_MULTIDISC_BOOL_VALUE_TRUE
 
     list_name = rom_obj.get_name()
+    sub_label = rom_obj.get_rom_identifier()
     if list_name is None or list_name == '':
-        list_name = rom_obj.get_rom_identifier()
+        list_name = sub_label
+    if list_name == sub_label:
+        sub_label = None
 
     return {
         'id': rom_obj.get_id(),
         'name': list_name,
+        'name2': sub_label,
         'url': globals.router.url_for_path(f'execute/rom/{rom_obj.get_id()}'),
         'is_folder': False,
         'type': 'video',
@@ -546,6 +541,7 @@ def _render_rom_listitem(rom_obj: ROM) -> dict:
         },
         'art': assets,
         'properties': {
+            'entityid': rom_obj.get_id(),
             'platform': rom_obj.get_platform(),
             'nplayers': rom_obj.get_number_of_players(),
             'nplayers_online': rom_obj.get_number_of_players_online(),

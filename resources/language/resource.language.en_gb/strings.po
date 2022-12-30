@@ -252,6 +252,10 @@ msgctxt "#40810"
 msgid "Tags"
 msgstr ""
 
+msgctxt "#40811"
+msgid "Plot"
+msgstr ""
+
 ############################
 # Actions
 ############################
@@ -266,6 +270,10 @@ msgstr ""
 
 msgctxt "#40853"
 msgid "Edit"
+msgstr ""
+
+msgctxt "#40854"
+msgid "Edit assets"
 msgstr ""
 
 ############################
