@@ -220,7 +220,8 @@ def qry_get_view_assets(rom_id: str):
                 'type': 'pictures',
                 'name': asset_info.name,
                 'name2': asset.get_path() if asset else None,
-                'url': asset.get_path() if asset else None,
+                'url': asset.get_path() if asset else globals.router.url_for_path(
+                    f'/execute/command/rom_edit_assets/?rom_id={rom_id}&selected_asset={asset_id}'),
                 'info': {
                     'title': asset_info.name,
                     'picturepath': asset.get_path() if asset else None,

@@ -269,11 +269,15 @@ msgid "Play trailer"
 msgstr ""
 
 msgctxt "#40853"
-msgid "Edit"
+msgid "Edit Metadata"
 msgstr ""
 
 msgctxt "#40854"
-msgid "Edit assets"
+msgid "Edit Assets/Artwork"
+msgstr ""
+
+msgctxt "#40855"
+msgid "Scrape ROM"
 msgstr ""
 
 ############################
