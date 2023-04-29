@@ -35,6 +35,12 @@ CREATE TABLE IF NOT EXISTS assetpaths(
     asset_type TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS assetmappings {
+    id TEXT PRIMARY KEY,
+    mapped_asset_type TEXT NOT NULL,
+    to_asset_type TEXT NOT NULL
+};
+
 CREATE TABLE IF NOT EXISTS akl_addon(
     id TEXT PRIMARY KEY, 
     name TEXT,
@@ -171,6 +177,24 @@ CREATE TABLE IF NOT EXISTS rom_launchers(
 -------------------------------------------------
 -- ASSETS JOIN TABLES
 -------------------------------------------------
+CREATE TABLE IF NOT EXISTS metadata_assetmappings(
+    metadata_id TEXT,
+    assetmapping_id TEXT,
+    FOREIGN KEY (metadata_id) REFERENCES metadata (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (assetmapping_id) REFERENCES assetmappings (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS romcollection_roms_assetmappings(
+    romcollection_id TEXT,
+    assetmapping_id TEXT,
+    FOREIGN KEY (romcollection_id) REFERENCES romcollections (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (assetmapping_id) REFERENCES assetmappings (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
 CREATE TABLE IF NOT EXISTS category_assets(
     category_id TEXT,
     asset_id TEXT,
@@ -215,7 +239,6 @@ CREATE TABLE IF NOT EXISTS rom_assetpaths(
     FOREIGN KEY (assetpaths_id) REFERENCES assetpaths (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
-
 -------------------------------------------------
 -- VIEWS
 -------------------------------------------------
