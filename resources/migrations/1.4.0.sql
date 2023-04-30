@@ -1,4 +1,4 @@
-
+-- CREATE NEW TABLES
 CREATE TABLE IF NOT EXISTS assetmappings {
     id TEXT PRIMARY KEY,
     mapped_asset_type TEXT NOT NULL,
@@ -154,3 +154,61 @@ INSERT INTO romcollection_roms_assetmappings (romcollection_id, assetmapping_id)
     SELECT rc.id, rc.id || 'rmlog'
     FROM romcollections as rc WHERE rc.roms_default_clearlogo != 's_clearlogo';
 
+-- UPDATE EXISTING TABLES AND VIEWS
+DROP VIEW vw_romcollections;
+DROP VIEW vw_categories;
+
+ALTER TABLE categories
+    DROP default_icon,
+    DROP default_fanart,
+    DROP default_banner,
+    DROP default_poster,
+    DROP default_clearlogo;
+
+ALTER TABLE romcollections
+    DROP default_icon,
+    DROP default_fanart,
+    DROP default_banner,
+    DROP default_poster,
+    DROP default_controller,
+    DROP default_clearlogo,
+    DROP roms_default_icon,
+    DROP roms_default_fanart,
+    DROP roms_default_banner,
+    DROP roms_default_poster,
+    DROP roms_default_clearlogo;
+
+CREATE VIEW IF NOT EXISTS vw_categories AS SELECT 
+    c.id AS id, 
+    c.parent_id AS parent_id,
+    c.metadata_id,
+    c.name AS m_name,
+    m.year AS m_year, 
+    m.genre AS m_genre,
+    m.developer AS m_developer,
+    m.rating AS m_rating,
+    m.plot AS m_plot,
+    m.finished AS finished,
+    m.assets_path AS assets_path,
+    (SELECT COUNT(*) FROM categories AS sc WHERE sc.parent_id = c.id) AS num_categories,
+    (SELECT COUNT(*) FROM romcollections AS sr WHERE sr.parent_id = c.id) AS num_collections
+FROM categories AS c 
+    INNER JOIN metadata AS m ON c.metadata_id = m.id;
+       
+CREATE VIEW IF NOT EXISTS vw_romcollections AS SELECT 
+    r.id AS id, 
+    r.parent_id AS parent_id,
+    r.metadata_id,
+    r.name AS m_name,
+    m.year AS m_year, 
+    m.genre AS m_genre,
+    m.developer AS m_developer,
+    m.rating AS m_rating,
+    m.plot AS m_plot,
+    m.finished AS finished,
+    m.assets_path AS assets_path,
+    r.platform AS platform,
+    r.box_size AS box_size,
+    (SELECT COUNT(*) FROM roms AS rms INNER JOIN roms_in_romcollection AS rrs ON rms.id = rrs.rom_id AND rrs.romcollection_id = r.id) as num_roms
+FROM romcollections AS r 
+    INNER JOIN metadata AS m ON r.metadata_id = m.id;    
