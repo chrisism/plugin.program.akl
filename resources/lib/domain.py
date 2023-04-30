@@ -1041,6 +1041,7 @@ class ROMCollection(MetaDataItemABC):
                  assets_data: typing.List[Asset] = None,
                  asset_paths: typing.List[AssetPath] = None,
                  asset_mappings: typing.List[AssetMapping] = None,
+                 rom_asset_mappings: typing.List[AssetMapping] = [],
                  launchers_data: typing.List[ROMLauncherAddon] = [], 
                  scanners_data: typing.List[ROMCollectionScanner] = []):
         # Concrete classes are responsible of creating a default entity_data dictionary
@@ -1049,6 +1050,7 @@ class ROMCollection(MetaDataItemABC):
             entity_data = _get_default_ROMCollection_data_model()
             entity_data['id'] = text.misc_generate_random_SID()
             
+        self.rom_asset_mappings = rom_asset_mappings
         self.launchers_data = launchers_data
         self.scanners_data = scanners_data
         super(ROMCollection, self).__init__(entity_data, assets_data, asset_paths, asset_mappings)
@@ -1087,33 +1089,21 @@ class ROMCollection(MetaDataItemABC):
 
     #
     # Gets the actual assetinfo object that is mapped for
-    # the given (ROM) assetinfo for this particular MetaDataItem.
+    # the given assetinfo for ROMs within this collection.
     #
-    def get_mapped_ROM_asset_info(self, asset_info=None, asset_id=None) -> AssetInfo:
-        if asset_info is None and asset_id is None:
-            return None
-        if asset_id is not None:
-            asset_info = g_assetFactory.get_asset_info(asset_id)
-        
-        mapped_key = self.get_mapped_ROM_asset_key(asset_info)
-        mapped_asset_info = g_assetFactory.get_asset_info_by_key(mapped_key)
-        return mapped_asset_info
+    def get_ROM_asset_mapping(self, asset_info: AssetInfo):
+        mapped_asset = next((m for m in self.rom_asset_mappings if m.asset_info.id == asset_info.id), None)
+        if not mapped_asset:
+            return asset_info
+        return mapped_asset.to_asset_info
+	
+    def set_mapped_ROM_asset(self, asset_info: AssetInfo, mapped_to_info: AssetInfo):
+        mapped_asset = next((m for m in self.rom_asset_mappings if m.asset_info.id == asset_info.id), None)
+        if not mapped_asset:
+            mapped_asset = AssetMapping()
+            self.rom_asset_mappings.append(mapped_asset)
 
-    #
-    # Gets the database filename mapped for asset_info.
-    # Note that the mapped asset uses diferent fields wheter it is a Category/Launcher/ROM
-    #
-    def get_mapped_ROM_asset_key(self, asset_info: AssetInfo) -> str:
-        if asset_info.rom_default_key == '':
-            logger.error(f'Requested mapping for AssetInfo without default key. Type {asset_info.id}')
-            raise constants.AddonError('Not supported asset type used. This might be a bug!')  
-        
-        if asset_info.rom_default_key not in self.entity_data:
-            return asset_info.key   
-        return self.entity_data[asset_info.rom_default_key]
-
-    def set_mapped_ROM_asset_key(self, asset_info: AssetInfo, mapped_to_info: AssetInfo):
-        self.entity_data[asset_info.rom_default_key] = mapped_to_info.key
+        mapped_asset.set_mapping(asset_info, mapped_to_info)
 
     #
     # Get a list of assets with duplicated paths. Refuse to do anything if duplicated paths found.
@@ -1798,7 +1788,7 @@ class ROM(MetaDataItemABC):
     def apply_romcollection_asset_mapping(self, romcollection: ROMCollection):
         mappable_assets = romcollection.get_ROM_mappable_asset_list()
         for mappable_asset in mappable_assets:
-            mapped_asset = romcollection.get_mapped_ROM_asset_info(mappable_asset)
+            mapped_asset = romcollection.get_ROM_asset_mapping(mappable_asset)
             self.set_mapped_asset(mappable_asset, mapped_asset)
         
     def __str__(self):

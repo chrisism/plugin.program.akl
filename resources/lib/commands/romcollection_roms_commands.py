@@ -99,8 +99,7 @@ def cmd_set_roms_default_artwork(args):
         options = collections.OrderedDict()
         for default_asset_info in default_assets_list:
             # >> Label is the string 'Choose asset for XXXX (currently YYYYY)'
-            mapped_asset_key = romcollection.get_mapped_ROM_asset_key(default_asset_info)
-            mapped_asset_info = g_assetFactory.get_asset_info_by_key(mapped_asset_key)
+            mapped_asset_info = romcollection.get_ROM_asset_mapping(default_asset_info)
             # --- Append to list of ListItems ---
             options[default_asset_info] = 'Choose asset for {0} (currently {1})'.format(default_asset_info.name, mapped_asset_info.name)
         
@@ -114,8 +113,7 @@ def cmd_set_roms_default_artwork(args):
             return
         
         logger.debug('cmd_set_roms_default_artwork() Main select() returned {0}'.format(selected_asset_info.name))    
-        mapped_asset_key    = romcollection.get_mapped_ROM_asset_key(selected_asset_info)
-        mapped_asset_info   = g_assetFactory.get_asset_info_by_key(mapped_asset_key)
+        mapped_asset_info = romcollection.get_ROM_asset_mapping(selected_asset_info)
         mappable_asset_list = g_assetFactory.get_asset_list_by_IDs(constants.ROM_ASSET_ID_LIST, 'image')
         logger.debug('cmd_set_roms_default_artwork() {0} currently is mapped to {1}'.format(selected_asset_info.name, mapped_asset_info.name))
             
@@ -137,7 +135,7 @@ def cmd_set_roms_default_artwork(args):
             return   
         
         logger.debug('cmd_set_roms_default_artwork() Mapable selected {0}.'.format(new_selected_asset_info.name))
-        romcollection.set_mapped_ROM_asset_key(selected_asset_info, new_selected_asset_info)
+        romcollection.set_mapped_ROM_asset(selected_asset_info, new_selected_asset_info)
         kodi.notify('{0} {1} mapped to {2}'.format(
             romcollection.get_object_name(), selected_asset_info.name, new_selected_asset_info.name
         ))

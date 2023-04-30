@@ -79,18 +79,11 @@ SELECT_VCOLLECTION_YEAR = "SELECT DISTINCT(m_year) AS option_value FROM vw_roms"
 SELECT_VCOLLECTION_NPLAYERS = "SELECT DISTINCT(m_nplayers) AS option_value FROM vw_roms"   
 SELECT_VCOLLECTION_RATING = "SELECT DISTINCT(m_rating) AS option_value FROM vw_roms"   
 
-INSERT_ROMCOLLECTION               = """
-                                    INSERT INTO romcollections (
-                                            id,name,parent_id,metadata_id,platform,box_size, 
-                                            roms_default_icon,roms_default_fanart,roms_default_banner,roms_default_poster,roms_default_clearlogo
-                                        ) VALUES (?,?,?,?,?,?,?,?,?,?,?)
-                                    """
-UPDATE_ROMCOLLECTION               = """
-                                    UPDATE romcollections SET 
-                                        name=?, platform=?, box_size=?, 
-                                        roms_default_icon=?, roms_default_fanart=?, roms_default_banner=?, roms_default_poster=?, roms_default_clearlogo=?
-                                        WHERE id =?
-                                    """
+INSERT_ROMCOLLECTION = """
+                        INSERT INTO romcollections (id,name,parent_id,metadata_id,platform,box_size) 
+                        VALUES (?,?,?,?,?,?)
+                        """
+UPDATE_ROMCOLLECTION = "UPDATE romcollections SET name=?, platform=?, box_size=? WHERE id =?"
 UPDATE_ROMCOLLECTION_PARENT = "UPDATE romcollections SET parent_id = ? WHERE id =?"
 DELETE_ROMCOLLECTION = "DELETE FROM romcollections WHERE id = ?"
 
@@ -124,27 +117,56 @@ SELECT_ROMCOLLECTION_ASSET_MAPPINGS_BY_ROM = """
                                     INNER JOIN romcollections AS rc ON mm.metadata_id = rc.metadata_id
                                     INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rc.id WHERE rr.rom_id = ?
                                     """
+SELECT_SPECIFIC_ROMCOLLECTION_ROM_ASSET_MAPPINGS = """
+                                    SELECT am.*, rm.romcollection_id FROM assetmappings AS am 
+                                    INNER JOIN romcollection_roms_assetmappings AS rm ON rm.assetmapping_id = am.id 
+                                    AND rm.romcollection_id = ?
+                                    """
+SELECT_ROMCOLLECTION_ROM_ASSET_MAPPINGS = """
+                                    SELECT am.*, mm.romcollection_id FROM assetmappings AS am 
+                                    INNER JOIN romcollection_roms_assetmappings AS rm ON rm.assetmapping_id = am.id 
+                                    INNER JOIN romcollections AS rc ON rm.romcollection_id = rc.id
+                                    """
+SELECT_ROOT_ROMCOLLECTION_ROM_ASSET_MAPPINGS = """
+                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
+                                    INNER JOIN romcollection_roms_assetmappings AS rm ON rm.assetmapping_id = am.id 
+                                    INNER JOIN romcollections AS rc ON rm.romcollection_id = rc.id
+                                    WHERE parent_id IS NULL
+                                    """
+SELECT_ROMCOLLECTION_ROM_ASSET_MAPPINGS_BY_PARENT = """
+                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
+                                    INNER JOIN romcollection_roms_assetmappings AS rm ON rm.assetmapping_id = am.id 
+                                    INNER JOIN romcollections AS rc ON rm.romcollection_id = rc.id
+                                    WHERE parent_id = ?
+                                    """
+SELECT_ROMCOLLECTION_ROM_ASSET_MAPPINGS_BY_ROM = """
+                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
+                                    INNER JOIN romcollection_roms_assetmappings AS rm ON rm.assetmapping_id = am.id 
+                                    INNER JOIN romcollections AS rc ON rm.romcollection_id = rc.id
+                                    INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rc.id WHERE rr.rom_id = ?
+                                    """
 
 INSERT_ROMCOLLECTION_ASSET = "INSERT INTO romcollection_assets (romcollection_id, asset_id) VALUES (?, ?)"
 INSERT_ROMCOLLECTION_ASSET_PATH = "INSERT INTO romcollection_assetpaths (romcollection_id, assetpaths_id) VALUES (?, ?)"
+INSERT_ROMCOLLECTION_ROM_ASSET_MAPPING = "INSERT INTO romcollection_roms_assetmappings (romcollection_id, assetmapping_id) VALUES (?,?)"
 
-INSERT_ROM_IN_ROMCOLLECTION        = "INSERT INTO roms_in_romcollection (rom_id, romcollection_id) VALUES (?,?)"
-REMOVE_ROM_FROM_ROMCOLLECTION      = "DELETE FROM roms_in_romcollection WHERE rom_id = ? AND romcollection_id = ?"
-REMOVE_ROMS_FROM_ROMCOLLECTION    =  "DELETE FROM roms_in_romcollection WHERE romcollection_id = ?"
+INSERT_ROM_IN_ROMCOLLECTION = "INSERT INTO roms_in_romcollection (rom_id, romcollection_id) VALUES (?,?)"
+REMOVE_ROM_FROM_ROMCOLLECTION = "DELETE FROM roms_in_romcollection WHERE rom_id = ? AND romcollection_id = ?"
+REMOVE_ROMS_FROM_ROMCOLLECTION =  "DELETE FROM roms_in_romcollection WHERE romcollection_id = ?"
 
-SELECT_ROMCOLLECTION_LAUNCHERS     = "SELECT * FROM vw_romcollection_launchers WHERE romcollection_id = ?"
-INSERT_ROMCOLLECTION_LAUNCHER      = "INSERT INTO romcollection_launchers (id, romcollection_id, akl_addon_id, settings, is_default) VALUES (?,?,?,?,?)"
-UPDATE_ROMCOLLECTION_LAUNCHER      = "UPDATE romcollection_launchers SET settings = ?, is_default = ? WHERE id = ?"
-DELETE_ROMCOLLECTION_LAUNCHERS     = "DELETE FROM romcollection_launchers WHERE romcollection_id = ?"
-DELETE_ROMCOLLECTION_LAUNCHER      = "DELETE FROM romcollection_launchers WHERE romcollection_id = ? AND id = ?"
+SELECT_ROMCOLLECTION_LAUNCHERS = "SELECT * FROM vw_romcollection_launchers WHERE romcollection_id = ?"
+INSERT_ROMCOLLECTION_LAUNCHER = "INSERT INTO romcollection_launchers (id, romcollection_id, akl_addon_id, settings, is_default) VALUES (?,?,?,?,?)"
+UPDATE_ROMCOLLECTION_LAUNCHER = "UPDATE romcollection_launchers SET settings = ?, is_default = ? WHERE id = ?"
+DELETE_ROMCOLLECTION_LAUNCHERS = "DELETE FROM romcollection_launchers WHERE romcollection_id = ?"
+DELETE_ROMCOLLECTION_LAUNCHER = "DELETE FROM romcollection_launchers WHERE romcollection_id = ? AND id = ?"
 
-SELECT_ROMCOLLECTION_SCANNERS      = "SELECT * FROM vw_romcollection_scanners WHERE romcollection_id = ?"
-INSERT_ROMCOLLECTION_SCANNER       = "INSERT INTO romcollection_scanners (id, romcollection_id, akl_addon_id, settings) VALUES (?,?,?,?)"
-UPDATE_ROMCOLLECTION_SCANNER       = "UPDATE romcollection_scanners SET settings = ? WHERE id = ?"
-DELETE_ROMCOLLECTION_SCANNER       = "DELETE FROM romcollection_scanners WHERE romcollection_id = ? AND id = ?"
+SELECT_ROMCOLLECTION_SCANNERS = "SELECT * FROM vw_romcollection_scanners WHERE romcollection_id = ?"
+INSERT_ROMCOLLECTION_SCANNER = "INSERT INTO romcollection_scanners (id, romcollection_id, akl_addon_id, settings) VALUES (?,?,?,?)"
+UPDATE_ROMCOLLECTION_SCANNER = "UPDATE romcollection_scanners SET settings = ? WHERE id = ?"
+DELETE_ROMCOLLECTION_SCANNER = "DELETE FROM romcollection_scanners WHERE romcollection_id = ? AND id = ?"
 
 SELECT_ROMCOLLECTION_LAUNCHERS_BY_ROM = "SELECT rl.* FROM vw_romcollection_launchers AS rl INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rl.romcollection_id WHERE rr.rom_id = ?"
-SELECT_ROMCOLLECTION_SCANNERS_BY_ROM  = "SELECT rs.* FROM vw_romcollection_scanners AS rs INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rs.romcollection_id WHERE rr.rom_id = ?"
+SELECT_ROMCOLLECTION_SCANNERS_BY_ROM = "SELECT rs.* FROM vw_romcollection_scanners AS rs INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rs.romcollection_id WHERE rr.rom_id = ?"
 
 #
 # ROMsRepository -> ROMs from SQLite DB
