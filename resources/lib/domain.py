@@ -226,8 +226,12 @@ class AssetPath(EntityABC):
     def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
         self.asset_info:AssetInfo = None
         if entity_data is None:
-            entity_data = _get_default_asset_path_data_model()
-        
+            entity_data =  {
+                'id' : '',
+                'path' : '',
+                'asset_type' : ''
+            }
+
         if 'asset_type' in entity_data and entity_data['asset_type']:
             self.asset_info = g_assetFactory.get_asset_info(entity_data['asset_type'])
         
@@ -254,6 +258,49 @@ class AssetPath(EntityABC):
     def clear(self):
         self.entity_data['path'] = None
          
+
+class AssetMapping(EntityABC):
+        
+    def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
+        self.asset_info:AssetInfo = None
+        self.to_asset_info:AssetInfo = None
+
+        if entity_data is None:
+            entity_data = {
+                'id' : '',
+                'mapped_asset_type' : '',
+                'to_asset_type' : ''
+            }
+        
+        if 'mapped_asset_type' in entity_data and entity_data['mapped_asset_type']:
+            self.asset_info = g_assetFactory.get_asset_info(entity_data['mapped_asset_type'])
+        if 'to_asset_type' in entity_data and entity_data['to_asset_type']:
+            self.to_asset_info = g_assetFactory.get_asset_info(entity_data['to_asset_type'])
+        
+        super(AssetMapping, self).__init__(entity_data)
+    
+    def get_asset_info_id(self) -> str:
+        return self.asset_info.id 
+    
+    def get_asset_info(self) -> AssetInfo:
+        return self.asset_info
+    
+    def get_mapped_to_asset_info(self) -> str:
+        return self.to_asset_info
+    
+    def set_mapping(self, info:AssetInfo, to:AssetInfo): 
+        self.asset_info = info
+        self.to_asset_info = to
+    
+    def clear(self):
+        self.to_asset_info = None
+         
+    def is_mapped(self):
+        if self.to_asset_info is None:
+            return False
+        if self.to_asset_info.id == self.asset_info.id:
+            return False
+        return True
 
 # legacy
 # |----- LauncherABC (abstract class)
@@ -541,7 +588,8 @@ class MetaDataItemABC(EntityABC):
     def __init__(self, 
                  entity_data: typing.Dict[str, typing.Any], 
                  assets: typing.List[Asset],
-                 asset_paths_data: typing.List[AssetPath] = None):
+                 asset_paths_data: typing.List[AssetPath] = None,
+                 asset_mappings: typing.List[AssetMapping] = []):
         
         self.assets: typing.Dict[str, Asset] = {}
         if assets is not None:
@@ -552,7 +600,8 @@ class MetaDataItemABC(EntityABC):
         if asset_paths_data is not None:
             for path in asset_paths_data:
                 self.asset_paths[path.get_asset_info_id()] = path
-                
+        
+        self.asset_mappings = asset_mappings
         super(MetaDataItemABC, self).__init__(entity_data)
 
     # --------------------------------------------------------------------------------------------
@@ -570,7 +619,10 @@ class MetaDataItemABC(EntityABC):
     def get_type(self) -> str:
         pass
 
-    # --- Metadata --------------------------------------------------------------------------------        
+    # --- Metadata --------------------------------------------------------------------------------
+    def get_metadata_id(self):
+        return self.entity_data['metadata_id']
+
     def get_name(self):
         return self.entity_data['m_name'] if 'm_name' in self.entity_data else 'Unknown'
 
@@ -772,29 +824,21 @@ class MetaDataItemABC(EntityABC):
             asset_info = g_assetFactory.get_asset_info(asset_id)
             value = ''
             fallback_str = ''
-            
-            if asset_id in self.assets:
+            if asset_info.id == constants.ASSET_ICON_ID:
+                fallback_str = self.get_default_icon()
+                
+            if self.is_mappable_asset(asset_info):
+                asset_info = self.get_asset_mapping(asset_info)
+
+            if asset_info.id in self.assets:
                 asset = self.assets[asset_id]
                 value = asset.get_path()
             
-            if self.is_mappable_asset(asset_info):
-                if asset_info.id == constants.ASSET_ICON_ID:
-                    fallback_str = self.get_default_icon()
-                value = self.get_mapped_asset_str(asset_info, fallback=fallback_str)
-                
+            if value == '':
+                value = fallback_str
+
             view_assets[asset_info.fname_infix] = value
         return view_assets
-    # 
-    # Gets the asset path (str) of the mapped asset type following
-    # the given input of either an assetinfo object or asset id.
-    #
-    def get_mapped_asset_str(self, asset_info=None, asset_id=None, fallback = '') -> str:
-        asset_info = self.get_mapped_asset_info(asset_info, asset_id)
-        asset = self.get_asset(asset_info.id)
-        if asset is not None and asset.get_path() != '':
-            return asset.get_path()
-        
-        return fallback
     
     #
     # Get a list of the assets that can be mapped to a defaultable asset.
@@ -803,43 +847,23 @@ class MetaDataItemABC(EntityABC):
     def get_mappable_asset_list(self) -> typing.List[AssetInfo]: 
         return g_assetFactory.get_asset_list_by_IDs(self.get_mappable_asset_ids_list(), 'image')
 
-    def get_mapped_assets(self) -> typing.Dict[str,str]:
-        mappable_assets = self.get_mappable_asset_list()
-        mapped_assets = {}
-        for mappable_asset in mappable_assets:
-            if mappable_asset.id == constants.ASSET_ICON_ID: 
-                mapped_assets[mappable_asset.fname_infix] = self.get_mapped_asset_str(mappable_asset, fallback=self.get_default_icon())
-            else: mapped_assets[mappable_asset.fname_infix] = self.get_mapped_asset_str(mappable_asset)
-        return mapped_assets
-
     #
     # Gets the actual assetinfo object that is mapped for
     # the given assetinfo for this particular MetaDataItem.
     #
-    def get_mapped_asset_info(self, asset_info=None, asset_id=None):
-        if asset_info is None and asset_id is None: return None
-        if asset_id is not None: asset_info = g_assetFactory.get_asset_info(asset_id)
-        
-        mapped_key = self.get_mapped_asset_key(asset_info)
-        mapped_asset_info = g_assetFactory.get_asset_info_by_key(mapped_key)
-        return mapped_asset_info
-       
-    #
-    # Gets the database filename mapped for asset_info.
-    # Note that the mapped asset uses diferent fields wheter it is a Category/Launcher/ROM
-    #
-    def get_mapped_asset_key(self, asset_info: AssetInfo):
-        if asset_info.default_key == '':
-            logger.error('Requested mapping for AssetInfo without default key. Type {}'.format(asset_info.id))
-            raise constants.AddonError('Not supported asset type used. This might be a bug!')  
-        
-        if asset_info.default_key not in self.entity_data:
-            return asset_info.key
-        
-        return self.entity_data[asset_info.default_key]
+    def get_asset_mapping(self, asset_info: AssetInfo):
+        mapped_asset = next((m for m in self.asset_mappings if m.asset_info.id == asset_info.id), None)
+        if not mapped_asset:
+            return asset_info
+        return mapped_asset.to_asset_info
 	
-    def set_mapped_asset_key(self, asset_info: AssetInfo, mapped_to_info: AssetInfo):
-        self.entity_data[asset_info.default_key] = mapped_to_info.key
+    def set_mapped_asset(self, asset_info: AssetInfo, mapped_to_info: AssetInfo):
+        mapped_asset = next((m for m in self.asset_mappings if m.asset_info.id == asset_info.id), None)
+        if not mapped_asset:
+            mapped_asset = AssetMapping()
+            self.asset_mappings.append(mapped_asset)
+
+        mapped_asset.set_mapping(asset_info, mapped_to_info)
         
     def __str__(self):
         return '{}#{}: {}'.format(self.get_object_name(), self.get_id(), self.get_name())
@@ -851,20 +875,25 @@ class MetaDataItemABC(EntityABC):
 class Category(MetaDataItemABC):
     __metaclass__ = abc.ABCMeta
     
-    def __init__(self, category_dic: typing.Dict[str, typing.Any] = None, assets: typing.List[Asset] = None):
+    def __init__(self, 
+                 category_dic: typing.Dict[str, typing.Any] = None, 
+                 assets: typing.List[Asset] = None,
+                 asset_mappings: typing.List[AssetMapping] = None):
         # Concrete classes are responsible of creating a default entity_data dictionary
         # with sensible defaults.
         if category_dic is None:
             category_dic = _get_default_category_data_model()
             category_dic['id'] = text.misc_generate_random_SID()
-        super(Category, self).__init__(category_dic, assets)
+        super(Category, self).__init__(category_dic, assets, None, asset_mappings)
 
-    def get_object_name(self): return 'Category'
+    def get_object_name(self):
+        return 'Category'
 
     def get_assets_kind(self):
         return constants.KIND_ASSET_CATEGORY
     
-    def get_type(self): return constants.OBJ_CATEGORY
+    def get_type(self):
+        return constants.OBJ_CATEGORY
     
     # parent category / romcollection this item belongs to.
     def get_parent_id(self) -> str:
@@ -1011,6 +1040,7 @@ class ROMCollection(MetaDataItemABC):
                  entity_data: dict = None, 
                  assets_data: typing.List[Asset] = None,
                  asset_paths: typing.List[AssetPath] = None,
+                 asset_mappings: typing.List[AssetMapping] = None,
                  launchers_data: typing.List[ROMLauncherAddon] = [], 
                  scanners_data: typing.List[ROMCollectionScanner] = []):
         # Concrete classes are responsible of creating a default entity_data dictionary
@@ -1021,7 +1051,7 @@ class ROMCollection(MetaDataItemABC):
             
         self.launchers_data = launchers_data
         self.scanners_data = scanners_data
-        super(ROMCollection, self).__init__(entity_data, assets_data, asset_paths)
+        super(ROMCollection, self).__init__(entity_data, assets_data, asset_paths, asset_mappings)
 
     def get_object_name(self): return 'ROM Collection'
 
@@ -1046,7 +1076,8 @@ class ROMCollection(MetaDataItemABC):
     def get_asset_ids_list(self):
         return constants.LAUNCHER_ASSET_ID_LIST
 
-    def get_mappable_asset_ids_list(self): return constants.MAPPABLE_LAUNCHER_ASSET_ID_LIST
+    def get_mappable_asset_ids_list(self):
+        return constants.MAPPABLE_LAUNCHER_ASSET_ID_LIST
 
     def get_default_icon(self) -> str:
         return 'DefaultGameAddons.png'   
@@ -1313,6 +1344,7 @@ class ROM(MetaDataItemABC):
                  tag_data: dict = None, 
                  assets_data: typing.List[Asset] = None,
                  asset_paths_data: typing.List[AssetPath] = None,
+                 asset_mappings: typing.List[AssetMapping] = None,
                  scanned_data: dict = {},
                  launchers_data: typing.List[ROMLauncherAddon] = []):
         if rom_data is None:
@@ -1327,7 +1359,7 @@ class ROM(MetaDataItemABC):
             tag_data_str = str(rom_data['rom_tags'])
             self.tags = {t: '' for t in tag_data_str.split(',')}
         
-        super(ROM, self).__init__(rom_data, assets_data, asset_paths_data)
+        super(ROM, self).__init__(rom_data, assets_data, asset_paths_data, asset_mappings)
         
     def get_object_name(self): return 'ROM'
 
@@ -1767,7 +1799,7 @@ class ROM(MetaDataItemABC):
         mappable_assets = romcollection.get_ROM_mappable_asset_list()
         for mappable_asset in mappable_assets:
             mapped_asset = romcollection.get_mapped_ROM_asset_info(mappable_asset)
-            self.set_mapped_asset_key(mappable_asset, mapped_asset)
+            self.set_mapped_asset(mappable_asset, mapped_asset)
         
     def __str__(self):
         """Overrides the default implementation"""
@@ -2572,12 +2604,4 @@ def _get_default_asset_data_model():
         'id' : '',
         'filepath' : '',
         'asset_type' : ''
-    }
-    
-def _get_default_asset_path_data_model():
-    return {
-        'id' : '',
-        'path' : '',
-        'asset_type' : ''
-    }
-    
+    }    
