@@ -113,7 +113,13 @@ class AppService(object):
                 migrations_files_to_execute.append(migration_file)
         
         migrations_files_to_execute.sort(key = lambda f: (LooseVersion(f.getBaseNoExt())))
-        uow.migrate_database(migrations_files_to_execute)
+        
+        version_to_store = LooseVersion(globals.addon_version)
+        file_version = LooseVersion(migrations_files_to_execute[-1].getBaseNoExt())
+        if file_version > version_to_store:
+            version_to_store = file_version
+
+        uow.migrate_database(migrations_files_to_execute, version_to_store)
     
     def _perform_scans(self):
         # SCAN FOR ADDONS

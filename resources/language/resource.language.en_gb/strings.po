@@ -297,7 +297,7 @@ msgid "Rebuild all views"
 msgstr ""
 
 msgctxt "#40857"
-msgid "Run database migrations (warning!)"
+msgid "Run database migrations"
 msgstr ""
 
 msgctxt "#40858"

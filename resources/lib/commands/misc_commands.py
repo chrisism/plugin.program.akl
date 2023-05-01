@@ -19,6 +19,7 @@ from __future__ import division
 
 import logging
 import typing
+import collections
 
 from datetime import datetime
 from xml.etree import cElementTree as ET
@@ -225,23 +226,32 @@ def cmd_execute_reset_db(args):
 
 @AppMediator.register('RUN_DB_MIGRATIONS')
 def cmd_execute_reset_db(args):
-    if not kodi.dialog_yesno('Are you sure you want to run database migrations?'):
-        return
-    
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     if not globals.g_PATHS.DATABASE_MIGRATIONS_PATH.exists():
         globals.g_PATHS.DATABASE_MIGRATIONS_PATH.makedirs()
 
+    options = collections.OrderedDict()
     db_version = LooseVersion(uow.get_database_version())
     migrations_files_available  = globals.g_PATHS.DATABASE_MIGRATIONS_PATH.scanFilesInPath("*.sql")
-    migrations_files_to_execute = []
-    for migration_file in migrations_files_available:
-        if LooseVersion(migration_file.getBaseNoExt()) > db_version:
-            migrations_files_to_execute.append(migration_file)
     
-    migrations_files_to_execute.sort(key = lambda f: (LooseVersion(f.getBaseNoExt())))
-    uow.migrate_database(migrations_files_to_execute)
+    for migration_file in migrations_files_available:
+        options[migration_file] = migration_file.getBase()
+    
+            
+    dialog = kodi.OrdDictionaryDialog()
+    selected_file = dialog.select(f"Select migrations to execute (Current version {db_version})", options)
 
+    if selected_file is None:
+        return
+    
+    version_to_store = LooseVersion(globals.addon_version)
+    file_version = LooseVersion(selected_file.getBaseNoExt())
+    if file_version > version_to_store:
+        version_to_store = file_version
+    if db_version > version_to_store:
+        version_to_store = db_version
+
+    uow.migrate_database([selected_file], version_to_store)
     kodi.notify('Done running migrations on the database')
 
 @AppMediator.register('CHECK_DUPLICATE_ASSET_DIRS')

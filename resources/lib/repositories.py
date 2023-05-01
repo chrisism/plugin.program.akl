@@ -349,16 +349,22 @@ class UnitOfWork(object):
             
         self.create_empty_database(schema_file_path)
 
-    def migrate_database(self, migration_files:typing.List[io.FileName]):
+    def migrate_database(self, migration_files:typing.List[io.FileName], new_db_version):
+        # make copy for backup
+        backup_filepath = self._db_path.changeExtension(".db.bak")
+        if backup_filepath.exists():
+            backup_filepath.unlink()
+        self._db_path.copy(backup_filepath)
+        
         self.open_session()
         
         for migration_file in migration_files:
             self.logger.info(f'Executing migration script: {migration_file.getPath()}')
             sql_statements = migration_file.loadFileToStr()
             self.execute_script(sql_statements)
-       
-        self.logger.info(f'Updating database schema version of app {globals.addon_id} to {globals.addon_version}')     
-        self.conn.execute("UPDATE akl_version SET version=? WHERE app=?", [globals.addon_version, globals.addon_id])
+
+        self.logger.info(f'Updating database schema version of app {globals.addon_id} to {new_db_version}')     
+        self.conn.execute("UPDATE akl_version SET version=? WHERE app=?", [globals.addon_version, new_db_version])
         self.commit()
         self.close_session()
 
