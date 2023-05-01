@@ -35,11 +35,11 @@ CREATE TABLE IF NOT EXISTS assetpaths(
     asset_type TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS assetmappings {
+CREATE TABLE IF NOT EXISTS assetmappings (
     id TEXT PRIMARY KEY,
     mapped_asset_type TEXT NOT NULL,
     to_asset_type TEXT NOT NULL
-};
+);
 
 CREATE TABLE IF NOT EXISTS akl_addon(
     id TEXT PRIMARY KEY, 

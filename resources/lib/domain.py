@@ -852,6 +852,8 @@ class MetaDataItemABC(EntityABC):
     # the given assetinfo for this particular MetaDataItem.
     #
     def get_asset_mapping(self, asset_info: AssetInfo):
+        if not self.asset_mappings:
+            return asset_info
         mapped_asset = next((m for m in self.asset_mappings if m.asset_info.id == asset_info.id), None)
         if not mapped_asset:
             return asset_info
@@ -869,7 +871,7 @@ class MetaDataItemABC(EntityABC):
         return '{}#{}: {}'.format(self.get_object_name(), self.get_id(), self.get_name())
 
 # -------------------------------------------------------------------------------------------------
-# Class representing an AKL Cateogry.
+# Class representing an AKL Category.
 # Contains code to generate the context menus passed to Dialog.select()
 # -------------------------------------------------------------------------------------------------
 class Category(MetaDataItemABC):
@@ -878,7 +880,7 @@ class Category(MetaDataItemABC):
     def __init__(self, 
                  category_dic: typing.Dict[str, typing.Any] = None, 
                  assets: typing.List[Asset] = None,
-                 asset_mappings: typing.List[AssetMapping] = None):
+                 asset_mappings: typing.List[AssetMapping] = []):
         # Concrete classes are responsible of creating a default entity_data dictionary
         # with sensible defaults.
         if category_dic is None:
@@ -1024,11 +1026,14 @@ class Category(MetaDataItemABC):
     
 class VirtualCategory(Category):
     
-    def get_object_name(self): return 'Virtual Category'
+    def get_object_name(self):
+        return 'Virtual Category'
     
-    def get_assets_kind(self): return constants.KIND_ASSET_CATEGORY
+    def get_assets_kind(self):
+        return constants.KIND_ASSET_CATEGORY
     
-    def get_type(self): return constants.OBJ_CATEGORY_VIRTUAL
+    def get_type(self):
+        return constants.OBJ_CATEGORY_VIRTUAL
  
 # -------------------------------------------------------------------------------------------------
 # Class representing a collection of ROMs.
@@ -1040,7 +1045,7 @@ class ROMCollection(MetaDataItemABC):
                  entity_data: dict = None, 
                  assets_data: typing.List[Asset] = None,
                  asset_paths: typing.List[AssetPath] = None,
-                 asset_mappings: typing.List[AssetMapping] = None,
+                 asset_mappings: typing.List[AssetMapping] = [],
                  rom_asset_mappings: typing.List[AssetMapping] = [],
                  launchers_data: typing.List[ROMLauncherAddon] = [], 
                  scanners_data: typing.List[ROMCollectionScanner] = []):
@@ -1334,7 +1339,7 @@ class ROM(MetaDataItemABC):
                  tag_data: dict = None, 
                  assets_data: typing.List[Asset] = None,
                  asset_paths_data: typing.List[AssetPath] = None,
-                 asset_mappings: typing.List[AssetMapping] = None,
+                 asset_mappings: typing.List[AssetMapping] = [],
                  scanned_data: dict = {},
                  launchers_data: typing.List[ROMLauncherAddon] = []):
         if rom_data is None:

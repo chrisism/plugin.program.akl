@@ -123,24 +123,24 @@ SELECT_SPECIFIC_ROMCOLLECTION_ROM_ASSET_MAPPINGS = """
                                     AND rm.romcollection_id = ?
                                     """
 SELECT_ROMCOLLECTION_ROM_ASSET_MAPPINGS = """
-                                    SELECT am.*, mm.romcollection_id FROM assetmappings AS am 
+                                    SELECT am.*, rm.romcollection_id FROM assetmappings AS am 
                                     INNER JOIN romcollection_roms_assetmappings AS rm ON rm.assetmapping_id = am.id 
                                     INNER JOIN romcollections AS rc ON rm.romcollection_id = rc.id
                                     """
 SELECT_ROOT_ROMCOLLECTION_ROM_ASSET_MAPPINGS = """
-                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
+                                    SELECT am.*, rm.romcollection_id FROM assetmappings AS am 
                                     INNER JOIN romcollection_roms_assetmappings AS rm ON rm.assetmapping_id = am.id 
                                     INNER JOIN romcollections AS rc ON rm.romcollection_id = rc.id
                                     WHERE parent_id IS NULL
                                     """
 SELECT_ROMCOLLECTION_ROM_ASSET_MAPPINGS_BY_PARENT = """
-                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
+                                    SELECT am.*, rm.romcollection_id FROM assetmappings AS am 
                                     INNER JOIN romcollection_roms_assetmappings AS rm ON rm.assetmapping_id = am.id 
                                     INNER JOIN romcollections AS rc ON rm.romcollection_id = rc.id
                                     WHERE parent_id = ?
                                     """
 SELECT_ROMCOLLECTION_ROM_ASSET_MAPPINGS_BY_ROM = """
-                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
+                                    SELECT am.*, rm.romcollection_id FROM assetmappings AS am 
                                     INNER JOIN romcollection_roms_assetmappings AS rm ON rm.assetmapping_id = am.id 
                                     INNER JOIN romcollections AS rc ON rm.romcollection_id = rc.id
                                     INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rc.id WHERE rr.rom_id = ?
@@ -203,7 +203,7 @@ SELECT_ROM_ASSET_MAPPINGS_BY_CATEGORY = """
                                     INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
                                     INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
                                     INNER JOIN roms_in_category AS rc ON rc.rom_id = r.id 
-                                    AND rc.category_id = ?"
+                                    AND rc.category_id = ?
                                     """
 
 SELECT_ROMS_BY_ROOT_CATEGORY = "SELECT r.* FROM vw_roms AS r INNER JOIN roms_in_category AS rc ON rc.rom_id = r.id AND rc.category_id IS NULL"
@@ -215,7 +215,7 @@ SELECT_ROM_ASSET_MAPPINGS_BY_ROOT_CATEGORY = """
                                     INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
                                     INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
                                     INNER JOIN roms_in_category AS rc ON rc.rom_id = r.id 
-                                    AND rc.category_id IS NULL"
+                                    AND rc.category_id IS NULL
                                     """
 
 # Filter values

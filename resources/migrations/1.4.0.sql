@@ -1,9 +1,9 @@
 -- CREATE NEW TABLES
-CREATE TABLE IF NOT EXISTS assetmappings {
+CREATE TABLE IF NOT EXISTS assetmappings (
     id TEXT PRIMARY KEY,
     mapped_asset_type TEXT NOT NULL,
     to_asset_type TEXT NOT NULL
-};
+);
 
 CREATE TABLE IF NOT EXISTS metadata_assetmappings(
     metadata_id TEXT,
