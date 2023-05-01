@@ -296,6 +296,14 @@ msgctxt "#40856"
 msgid "Rebuild all views"
 msgstr ""
 
+msgctxt "#40857"
+msgid "Run database migrations (warning!)"
+msgstr ""
+
+msgctxt "#40858"
+msgid "Reset database (warning!)"
+msgstr ""
+
 ############################
 # Scraping settings
 ############################

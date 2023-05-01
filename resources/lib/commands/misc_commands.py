@@ -23,6 +23,7 @@ import typing
 from datetime import datetime
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
+from distutils.version import LooseVersion
 
 from akl.utils import kodi, io
 from akl import constants
@@ -221,6 +222,27 @@ def cmd_execute_reset_db(args):
     AppMediator.async_cmd('RENDER_VIEWS')
     AppMediator.async_cmd('SCAN_FOR_ADDONS')
     kodi.notify('Finished resetting the database')
+
+@AppMediator.register('RUN_DB_MIGRATIONS')
+def cmd_execute_reset_db(args):
+    if not kodi.dialog_yesno('Are you sure you want to run database migrations?'):
+        return
+    
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    if not globals.g_PATHS.DATABASE_MIGRATIONS_PATH.exists():
+        globals.g_PATHS.DATABASE_MIGRATIONS_PATH.makedirs()
+
+    db_version = LooseVersion(uow.get_database_version())
+    migrations_files_available  = globals.g_PATHS.DATABASE_MIGRATIONS_PATH.scanFilesInPath("*.sql")
+    migrations_files_to_execute = []
+    for migration_file in migrations_files_available:
+        if LooseVersion(migration_file.getBaseNoExt()) > db_version:
+            migrations_files_to_execute.append(migration_file)
+    
+    migrations_files_to_execute.sort(key = lambda f: (LooseVersion(f.getBaseNoExt())))
+    uow.migrate_database(migrations_files_to_execute)
+
+    kodi.notify('Done running migrations on the database')
 
 @AppMediator.register('CHECK_DUPLICATE_ASSET_DIRS')
 def cmd_check_duplicate_asset_dirs(args):
