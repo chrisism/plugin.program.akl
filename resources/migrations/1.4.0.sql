@@ -162,8 +162,8 @@ INSERT INTO romcollection_roms_assetmappings (romcollection_id, assetmapping_id)
 PRAGMA foreign_keys=OFF;
 PRAGMA legacy_alter_table=ON;
 
-DROP VIEW vw_romcollections;
-DROP VIEW vw_categories;
+DROP VIEW IF EXiSTS vw_romcollections;
+DROP VIEW IF EXiSTS vw_categories;
 
 ALTER TABLE categories RENAME TO categories_temp;
 

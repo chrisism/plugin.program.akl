@@ -364,7 +364,7 @@ class UnitOfWork(object):
             self.execute_script(sql_statements)
 
         self.logger.info(f'Updating database schema version of app {globals.addon_id} to {new_db_version}')     
-        self.conn.execute("UPDATE akl_version SET version=? WHERE app=?", [globals.addon_version, new_db_version])
+        self.conn.execute("UPDATE akl_version SET version=? WHERE app=?", [globals.addon_version, str(new_db_version)])
         self.commit()
         self.close_session()
 

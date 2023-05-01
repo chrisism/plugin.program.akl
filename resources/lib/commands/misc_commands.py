@@ -235,8 +235,7 @@ def cmd_execute_reset_db(args):
     migrations_files_available  = globals.g_PATHS.DATABASE_MIGRATIONS_PATH.scanFilesInPath("*.sql")
     
     for migration_file in migrations_files_available:
-        options[migration_file] = migration_file.getBase()
-    
+        options[migration_file.getPath()] = migration_file.getBase()
             
     dialog = kodi.OrdDictionaryDialog()
     selected_file = dialog.select(f"Select migrations to execute (Current version {db_version})", options)
@@ -244,14 +243,15 @@ def cmd_execute_reset_db(args):
     if selected_file is None:
         return
     
+    migration_file = io.FileName(selected_file)
     version_to_store = LooseVersion(globals.addon_version)
-    file_version = LooseVersion(selected_file.getBaseNoExt())
+    file_version = LooseVersion(migration_file.getBaseNoExt())
     if file_version > version_to_store:
         version_to_store = file_version
     if db_version > version_to_store:
         version_to_store = db_version
 
-    uow.migrate_database([selected_file], version_to_store)
+    uow.migrate_database([migration_file], version_to_store)
     kodi.notify('Done running migrations on the database')
 
 @AppMediator.register('CHECK_DUPLICATE_ASSET_DIRS')
