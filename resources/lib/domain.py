@@ -1133,7 +1133,7 @@ class ROMCollection(MetaDataItemABC):
     def set_mapped_ROM_asset(self, asset_info: AssetInfo, mapped_to_info: AssetInfo):
         mapped_asset = next((m for m in self.rom_asset_mappings if m.asset_info.id == asset_info.id), None)
         if not mapped_asset:
-            mapped_asset = AssetMapping()
+            mapped_asset = RomAssetMapping()
             self.rom_asset_mappings.append(mapped_asset)
 
         mapped_asset.set_mapping(asset_info, mapped_to_info)
@@ -1367,7 +1367,7 @@ class ROM(MetaDataItemABC):
                  tag_data: dict = None, 
                  assets_data: typing.List[Asset] = None,
                  asset_paths_data: typing.List[AssetPath] = None,
-                 asset_mappings: typing.List[AssetMapping] = [],
+                 asset_mappings: typing.List[RomAssetMapping] = [],
                  scanned_data: dict = {},
                  launchers_data: typing.List[ROMLauncherAddon] = []):
         if rom_data is None:
@@ -1604,7 +1604,26 @@ class ROM(MetaDataItemABC):
     
     def get_mappable_asset_ids_list(self):
         return constants.MAPPABLE_ROM_ASSET_ID_LIST
-    
+
+    def get_asset_mapping(self, asset_info: AssetInfo):
+        mapped_asset = next((m for m in self.asset_mappings if m.asset_info.id == asset_info.id), None)
+        if not mapped_asset:
+            # exception cases
+            if asset_info.id == constants.ASSET_ICON_ID:
+                return g_assetFactory.get_asset_info(constants.ASSET_BOXFRONT_ID)
+            if asset_info.id == constants.ASSET_POSTER_ID:
+                return g_assetFactory.get_asset_info(constants.ASSET_FLYER_ID)
+            return asset_info
+        return mapped_asset.to_asset_info
+
+    def set_mapped_asset(self, asset_info: AssetInfo, mapped_to_info: AssetInfo):
+        mapped_asset = next((m for m in self.asset_mappings if m.asset_info.id == asset_info.id), None)
+        if not mapped_asset:
+            mapped_asset = RomAssetMapping()
+            self.asset_mappings.append(mapped_asset)
+
+        mapped_asset.set_mapping(asset_info, mapped_to_info)
+
     def get_default_icon(self) -> str:
         return 'DefaultProgram.png'    
     

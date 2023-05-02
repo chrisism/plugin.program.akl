@@ -1112,7 +1112,7 @@ class ROMsRepository(object):
             for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
                 asset_paths.append(AssetPath(asset_paths_data))
             for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
-                asset_mappings.append(AssetMapping(mapping_data))
+                asset_mappings.append(RomAssetMapping(mapping_data))
             for tag in filter(lambda t: t['rom_id'] == rom_data['id'], tags_data_set):
                 tags[tag['tag']] = tag['id']
                 
@@ -1153,7 +1153,7 @@ class ROMsRepository(object):
             for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
                 asset_paths.append(AssetPath(asset_paths_data))
             for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
-                asset_mappings.append(AssetMapping(mapping_data))                
+                asset_mappings.append(RomAssetMapping(mapping_data))                
             for tag in filter(lambda t: t['rom_id'] == rom_data['id'], tags_data_set):
                 tags[tag['tag']] = tag['id']
                 
@@ -1216,7 +1216,7 @@ class ROMsRepository(object):
             for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
                 asset_paths.append(AssetPath(asset_paths_data))
             for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
-                asset_mappings.append(AssetMapping(mapping_data))    
+                asset_mappings.append(RomAssetMapping(mapping_data))    
             for tag in filter(lambda t: t['rom_id'] == rom_data['id'], tags_data_set):
                 tags[tag['tag']] = tag['id']
                 
@@ -1246,7 +1246,7 @@ class ROMsRepository(object):
         asset_mappings_result_set = self._uow.result_set()
         asset_mappings = []
         for mapping_data in asset_mappings_result_set:
-            asset_mappings.append(AssetMapping(mapping_data))
+            asset_mappings.append(RomAssetMapping(mapping_data))
 
         self._uow.execute(qry.SELECT_ROM_SCANNED_DATA, rom_id)
         scanned_data_result_set = self._uow.result_set()
