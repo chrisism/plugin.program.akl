@@ -305,7 +305,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
 
         # --- Update object ---
         obj_instance.set_asset(asset_info, new_asset_FN)
-        logger.debug('edit_asset() Asset key "{0}"'.format(asset_info.key))
+        logger.debug(f'edit_asset() Asset id "{asset_info.id}"')
         logger.debug('edit_asset() Linked {0} {1} to "{2}"'.format(
             obj_instance.get_object_name(), asset_info.name, new_asset_FN.getPath())
         )
@@ -376,9 +376,9 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
         # --- Update object ---
         # >> Always store original/raw paths in database.
         obj_instance.set_asset(asset_info, dest_asset_file)
-        logger.debug('edit_asset() Asset key "{0}"'.format(asset_info.key))
-        logger.debug('edit_asset() Copied file  "{0}"'.format(new_asset_file.getPath()))
-        logger.debug('edit_asset() Into         "{0}"'.format(dest_asset_file.getPath()))
+        logger.debug(f'edit_asset() Asset ID "{asset_info.id}"')
+        logger.debug(f'edit_asset() Copied file  "{new_asset_file.getPath()}"')
+        logger.debug(f'edit_asset() Into         "{dest_asset_file.getPath()}"')
         logger.debug('edit_asset() Linked {0} {1} to "{2}"'.format(
             obj_instance.get_object_name(), asset_info.name, dest_asset_file.getPath())
         )

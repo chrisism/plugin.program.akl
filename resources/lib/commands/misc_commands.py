@@ -154,7 +154,7 @@ def cmd_export_to_xml(args):
                 ET.SubElement(category_xml,'plot').text = category.get_plot()
                 ET.SubElement(category_xml,'Asset_Prefix').text = category.get_custom_attribute('Asset_Prefix')
                 for asset in category.get_assets():
-                    ET.SubElement(category_xml,asset.get_asset_info().key).text = asset.get_path()
+                    ET.SubElement(category_xml, f"s_{asset.get_asset_info().id}").text = asset.get_path()
             
             # --- Export Launchers and add XML tail ---
             # Data which is not string must be converted to string
@@ -201,7 +201,7 @@ def cmd_export_to_xml(args):
                     ET.SubElement(launcher_xml, path.get_asset_info().path_key).text = path.get_path()
 
                 for asset in collection.get_assets():
-                    ET.SubElement(launcher_xml,asset.get_asset_info().key).text = asset.get_path()
+                    ET.SubElement(launcher_xml, f"s_{asset.get_asset_info().id}").text = asset.get_path()
 
             result_xml = ET.tostring(root, 'utf-8')
             parsed_xml = minidom.parseString(result_xml)

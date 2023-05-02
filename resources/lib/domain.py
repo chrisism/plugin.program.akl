@@ -57,8 +57,7 @@ def _is_empty_or_default(input: any, default: any):
 class AssetInfo(object):
     id              = ''
     key             = ''
-    default_key     = ''
-    rom_default_key = ''
+    
     name            = ''
     description     = name
     plural          = ''
@@ -1894,17 +1893,6 @@ class AssetInfoFactory(object):
         return asset_info
     
     # Returns the corresponding assetinfo object for the
-    # given key (eg: 's_icon')
-    def get_asset_info_by_key(self, asset_key):
-        asset_info = next((a for a in list(self.ASSET_INFO_ID_DICT.values()) if a.key == asset_key), None)
-
-        if asset_info is None:
-            logger.error('get_asset_info_by_key() Wrong asset_key = {0}'.format(asset_key))
-            return AssetInfo()
-
-        return asset_info 
-             
-    # Returns the corresponding assetinfo object for the
     # given path key (eg: 'path_icon')
     def get_asset_info_by_pathkey(self, path_key):
         asset_info = next((a for a in list(self.ASSET_INFO_ID_DICT.values()) if a.path_key == path_key), None)
@@ -1947,12 +1935,6 @@ class AssetInfoFactory(object):
 
         return asset_info_list
   
-    # todo: use 1 type of identifier not number constants and name strings ('s_icon')
-    def get_asset_info_by_namekey(self, name_key):
-        if name_key == '': return None
-        kind = constants.ASSET_KEYS_TO_CONSTANTS[name_key]
-
-        return self.get_asset_info(kind)
     #
     # Get extensions to search for files
     # Input : ['png', 'jpg']
@@ -2074,58 +2056,6 @@ class AssetInfoFactory(object):
 
         return '(' + ext_string + ')'
     
-    #
-    # This must match the order of the list Category_asset_ListItem_list in _command_edit_category()
-    # TODO: deprecated?
-    @staticmethod
-    def assets_choose_Category_mapped_artwork(dict_object, key, index):
-        if   index == 0: dict_object[key] = 's_icon'
-        elif index == 1: dict_object[key] = 's_fanart'
-        elif index == 2: dict_object[key] = 's_banner'
-        elif index == 3: dict_object[key] = 's_poster'
-        elif index == 4: dict_object[key] = 's_clearlogo'
-
-    #
-    # This must match the order of the list Category_asset_ListItem_list in _command_edit_category()
-    # TODO: deprecated?
-    @staticmethod
-    def assets_get_Category_mapped_asset_idx(dict_object, key):
-        if   dict_object[key] == 's_icon':       index = 0
-        elif dict_object[key] == 's_fanart':     index = 1
-        elif dict_object[key] == 's_banner':     index = 2
-        elif dict_object[key] == 's_poster':     index = 3
-        elif dict_object[key] == 's_clearlogo':  index = 4
-        else:                                    index = 0
-
-        return index
-
-    #
-    # This must match the order of the list Launcher_asset_ListItem_list in _command_edit_launcher()
-    # TODO: deprecated?
-    @staticmethod
-    def assets_choose_Launcher_mapped_artwork(dict_object, key, index):
-        if   index == 0: dict_object[key] = 's_icon'
-        elif index == 1: dict_object[key] = 's_fanart'
-        elif index == 2: dict_object[key] = 's_banner'
-        elif index == 3: dict_object[key] = 's_poster'
-        elif index == 4: dict_object[key] = 's_clearlogo'
-        elif index == 5: dict_object[key] = 's_controller'
-
-    #
-    # This must match the order of the list Launcher_asset_ListItem_list in _command_edit_launcher()
-    # TODO: deprecated?
-    @staticmethod
-    def assets_get_Launcher_mapped_asset_idx(dict_object, key):
-        if   dict_object[key] == 's_icon':       index = 0
-        elif dict_object[key] == 's_fanart':     index = 1
-        elif dict_object[key] == 's_banner':     index = 2
-        elif dict_object[key] == 's_poster':     index = 3
-        elif dict_object[key] == 's_clearlogo':  index = 4
-        elif dict_object[key] == 's_controller': index = 5
-        else:                                    index = 0
-
-        return index
-
     # since we are using a single instance for the assetinfo factory we can automatically load
     # all the asset objects into the memory
     def _load_asset_data(self): 
@@ -2133,9 +2063,6 @@ class AssetInfoFactory(object):
         # >> These are used very frequently so I think it is better to have a cached list.
         a = AssetInfo()
         a.id                            = constants.ASSET_ICON_ID
-        a.key                           = 's_icon'
-        a.default_key                   = 'default_icon'
-        a.rom_default_key               = 'roms_default_icon'
         a.name                          = 'Icon'
         a.plural                        = 'Icons'
         a.fname_infix                   = 'icon'
@@ -2147,9 +2074,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_FANART_ID
-        a.key                           = 's_fanart'
-        a.default_key                   = 'default_fanart'
-        a.rom_default_key               = 'roms_default_fanart'
         a.name                          = 'Fanart'
         a.plural                        = 'Fanarts'
         a.fname_infix                   = 'fanart'
@@ -2161,9 +2085,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_BANNER_ID
-        a.key                           = 's_banner'
-        a.default_key                   = 'default_banner'
-        a.rom_default_key               = 'roms_default_banner'
         a.name                          = 'Banner'
         a.description                   = 'Banner / Marquee'
         a.plural                        = 'Banners'
@@ -2176,9 +2097,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()        
         a.id                            = constants.ASSET_POSTER_ID
-        a.key                           = 's_poster'
-        a.default_key                   = 'default_poster'
-        a.rom_default_key               = 'roms_default_poster'
         a.name                          = 'Poster'
         a.plural                        = 'Posters'
         a.fname_infix                   = 'poster'
@@ -2190,9 +2108,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_CLEARLOGO_ID
-        a.key                           = 's_clearlogo'
-        a.default_key                   = 'default_clearlogo'
-        a.rom_default_key               = 'roms_default_clearlogo'
         a.name                          = 'Clearlogo'
         a.plural                        = 'Clearlogos'
         a.fname_infix                   = 'clearlogo'
@@ -2204,8 +2119,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_CONTROLLER_ID
-        a.key                           = 's_controller'
-        a.default_key                   = 'default_controller'
         a.name                          = 'Controller'
         a.plural                        = 'Controllers'
         a.fname_infix                   = 'controller'
@@ -2217,7 +2130,6 @@ class AssetInfoFactory(object):
         
         a = AssetInfo()
         a.id                            = constants.ASSET_TRAILER_ID
-        a.key                           = 's_trailer'
         a.name                          = 'Trailer'
         a.plural                        = 'Trailers'
         a.fname_infix                   = 'trailer'
@@ -2229,9 +2141,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_TITLE_ID
-        a.key                           = 's_title'
-        a.default_key                   = 'default_title'
-        a.rom_default_key               = 'roms_default_title'
         a.name                          = 'Title'
         a.plural                        = 'Titles'
         a.fname_infix                   = 'title'
@@ -2243,7 +2152,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_SNAP_ID
-        a.key                           = 's_snap'
         a.name                          = 'Snap'
         a.plural                        = 'Snaps'
         a.fname_infix                   = 'snap'
@@ -2255,7 +2163,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_BOXFRONT_ID
-        a.key                           = 's_boxfront'
         a.name                          = 'Boxfront'
         a.description                   = 'Boxfront / Cabinet'
         a.plural                        = 'Boxfronts'
@@ -2268,7 +2175,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_BOXBACK_ID
-        a.key                           = 's_boxback'
         a.name                          = 'Boxback'
         a.description                   = 'Boxback / CPanel'
         a.plural                        = 'Boxbacks'
@@ -2281,7 +2187,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_CARTRIDGE_ID
-        a.key                           = 's_cartridge'
         a.name                          = 'Cartridge'
         a.description                   = 'Cartridge / PCB'
         a.plural                        = 'Cartridges'
@@ -2294,7 +2199,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_FLYER_ID
-        a.key                           = 's_flyer'
         a.name                          = 'Flyer'
         a.plural                        = 'Flyers'
         a.fname_infix                   = 'flyer'
@@ -2307,7 +2211,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_MAP_ID
-        a.key                           = 's_map'
         a.name                          = 'Map'
         a.plural                        = 'Maps'
         a.fname_infix                   = 'map'
@@ -2319,7 +2222,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_MANUAL_ID
-        a.key                           = 's_manual'
         a.name                          = 'Manual'
         a.plural                        = 'Manuals'
         a.fname_infix                   = 'manual'
@@ -2331,7 +2233,6 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_3DBOX_ID
-        a.key                           = 's_3dbox'
         a.name                          = '3D Box'
         a.plural                        = '3D Boxes'
         a.fname_infix                   = '3dbox'
@@ -2551,12 +2452,6 @@ def _get_default_category_data_model():
         'm_plot' : '',
         'finished' : False,
         #'Asset_Prefix' : '',
-        's_icon' : '',
-        's_fanart' : '',
-        's_banner' : '',
-        's_poster' : '',
-        's_clearlogo' : '',
-        's_trailer' : ''
     }
 
 def _get_default_ROMCollection_data_model():
@@ -2599,13 +2494,6 @@ def _get_default_ROMCollection_data_model():
         'timestamp_launcher' : 0.0,
         'timestamp_report' : 0.0,
         'Asset_Prefix' : '',
-        's_icon' : '',
-        's_fanart' : '',
-        's_banner' : '',
-        's_poster' : '',
-        's_clearlogo' : '',
-        's_controller' : '',
-        's_trailer' : '',
         'ROM_asset_path' : '',
         'path_3dbox' : '',
         'path_title' : '',
@@ -2642,20 +2530,7 @@ def _get_default_ROM_data_model():
         'finished' : False,
         'nointro_status' : constants.AUDIT_STATUS_NONE,
         'pclone_status' : constants.PCLONE_STATUS_NONE,
-        'cloneof' : '',
-        's_3dbox' : '',
-        's_title' : '',
-        's_snap' : '',
-        's_boxfront' : '',
-        's_boxback' : '',
-        's_cartridge' : '',
-        's_fanart' : '',
-        's_banner' : '',
-        's_clearlogo' : '',
-        's_flyer' : '',
-        's_map' : '',
-        's_manual' : '',
-        's_trailer' : ''
+        'cloneof' : ''
     }
     
 def _get_default_asset_data_model():

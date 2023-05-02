@@ -149,7 +149,7 @@ class XmlConfigurationRepository(object):
                 category_temp[xml_tag] = text_XML_line
                                 
                 if xml_tag.startswith('s_'):
-                    asset_info = g_assetFactory.get_asset_info_by_key(xml_tag)
+                    asset_info = g_assetFactory.get_asset_info(xml_tag[2:])
                     asset_data = { 'filepath': text_XML_line, 'asset_type': asset_info.id }
                     assets.append(Asset(asset_data))
                 
@@ -188,7 +188,7 @@ class XmlConfigurationRepository(object):
                 launcher_temp[xml_tag] = text_XML_line
                 
                 if xml_tag.startswith('s_'):
-                    asset_info = g_assetFactory.get_asset_info_by_key(xml_tag)
+                    asset_info = g_assetFactory.get_asset_info(xml_tag[2:])
                     asset_data = { 'filepath': text_XML_line, 'asset_type': asset_info.id }
                     assets.append(Asset(asset_data))
                     
@@ -269,7 +269,7 @@ class ROMsJsonFileRepository(object):
         assets = []
         for key, value in rom_data.items():
             if key.startswith('s_'):
-                asset_info = g_assetFactory.get_asset_info_by_key(key)
+                asset_info = g_assetFactory.get_asset_info(key[2:])
                 asset_data = { 'filepath': value, 'asset_type': asset_info.id }
                 assets.append(Asset(asset_data))
         return assets
