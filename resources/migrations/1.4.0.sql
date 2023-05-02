@@ -120,11 +120,11 @@ INSERT INTO metadata_assetmappings (metadata_id, assetmapping_id)
 -- ROMs default mappings --------------------
 INSERT INTO assetmappings (id, mapped_asset_type, to_asset_type)
     SELECT rc.id || 'rmico', 'icon', substr(rc.roms_default_icon, 3)
-    FROM romcollections as rc WHERE rc.roms_default_icon != 's_icon';
+    FROM romcollections as rc WHERE rc.roms_default_icon != 's_boxfront';
 
 INSERT INTO romcollection_roms_assetmappings (romcollection_id, assetmapping_id)
     SELECT rc.id, rc.id || 'rmico'
-    FROM romcollections as rc WHERE rc.roms_default_icon != 's_icon';
+    FROM romcollections as rc WHERE rc.roms_default_icon != 's_boxfront';
 
 INSERT INTO assetmappings (id, mapped_asset_type, to_asset_type)
     SELECT rc.id || 'rmfan', 'fanart', substr(rc.roms_default_fanart, 3)
@@ -144,11 +144,11 @@ INSERT INTO romcollection_roms_assetmappings (romcollection_id, assetmapping_id)
 
 INSERT INTO assetmappings (id, mapped_asset_type, to_asset_type)
     SELECT rc.id || 'rmpos', 'poster', substr(rc.roms_default_poster, 3)
-    FROM romcollections as rc WHERE rc.roms_default_poster != 's_poster';
+    FROM romcollections as rc WHERE rc.roms_default_poster != 's_flyer';
 
 INSERT INTO romcollection_roms_assetmappings (romcollection_id, assetmapping_id)
     SELECT rc.id, rc.id || 'rmpos'
-    FROM romcollections as rc WHERE rc.roms_default_poster != 's_poster';
+    FROM romcollections as rc WHERE rc.roms_default_poster != 's_flyer';
 
 INSERT INTO assetmappings (id, mapped_asset_type, to_asset_type)
     SELECT rc.id || 'rmlog', 'clearlogo', substr(rc.roms_default_clearlogo, 3)

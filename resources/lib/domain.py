@@ -1099,6 +1099,11 @@ class ROMCollection(MetaDataItemABC):
     def get_ROM_asset_mapping(self, asset_info: AssetInfo):
         mapped_asset = next((m for m in self.rom_asset_mappings if m.asset_info.id == asset_info.id), None)
         if not mapped_asset:
+            # exception cases
+            if asset_info.id == constants.ASSET_ICON_ID:
+                return g_assetFactory.get_asset_info(constants.ASSET_BOXFRONT_ID)
+            if asset_info.id == constants.ASSET_POSTER_ID:
+                return g_assetFactory.get_asset_info(constants.ASSET_FLYER_ID)
             return asset_info
         return mapped_asset.to_asset_info
 	

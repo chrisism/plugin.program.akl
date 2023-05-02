@@ -108,14 +108,14 @@ def cmd_set_roms_default_artwork(args):
         
         if selected_asset_info is None:
             # >> Return to parent menu.
-            logger.debug('cmd_set_roms_default_artwork() Main selected NONE. Returning to parent menu.')
+            logger.debug('Main selected NONE. Returning to parent menu.')
             AppMediator.async_cmd('ROMCOLLECTION_MANAGE_ROMS', args)
             return
         
-        logger.debug('cmd_set_roms_default_artwork() Main select() returned {0}'.format(selected_asset_info.name))    
+        logger.debug('Main select() returned {0}'.format(selected_asset_info.name))    
         mapped_asset_info = romcollection.get_ROM_asset_mapping(selected_asset_info)
         mappable_asset_list = g_assetFactory.get_asset_list_by_IDs(constants.ROM_ASSET_ID_LIST, 'image')
-        logger.debug('cmd_set_roms_default_artwork() {0} currently is mapped to {1}'.format(selected_asset_info.name, mapped_asset_info.name))
+        logger.debug(f'{selected_asset_info.name} currently is mapped to {mapped_asset_info.name}')
             
         # --- Create ListItems ---
         options = collections.OrderedDict()
@@ -124,17 +124,16 @@ def cmd_set_roms_default_artwork(args):
             options[mappable_asset_info] = mappable_asset_info.name
 
         dialog = kodi.OrdDictionaryDialog()
-        dialog_title_str = 'Edit {0} {1} mapped asset'.format(
-            romcollection.get_object_name(), selected_asset_info.name)
+        dialog_title_str = f'Edit {romcollection.get_object_name()} {selected_asset_info.name} mapped asset'
         new_selected_asset_info = dialog.select(dialog_title_str, options, mapped_asset_info)
     
         if new_selected_asset_info is None:
             # >> Return to this method recursively to previous menu.
-            logger.debug('cmd_set_roms_default_artwork() Mapable selected NONE. Returning to previous menu.')
+            logger.debug('Mapable selected NONE. Returning to previous menu.')
             AppMediator.async_cmd('ROMCOLLECTION_MANAGE_ROMS', args)
             return   
         
-        logger.debug('cmd_set_roms_default_artwork() Mapable selected {0}.'.format(new_selected_asset_info.name))
+        logger.debug(f'Mapable selected {new_selected_asset_info.name}.')
         romcollection.set_mapped_ROM_asset(selected_asset_info, new_selected_asset_info)
         kodi.notify('{0} {1} mapped to {2}'.format(
             romcollection.get_object_name(), selected_asset_info.name, new_selected_asset_info.name
