@@ -10,7 +10,7 @@ from akl import constants
 
 from resources.lib import globals
 from resources.lib import queries as qry
-from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, Asset, AssetPath, AssetMapping, VirtualCollection
+from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, Asset, AssetPath, AssetMapping, RomAssetMapping, VirtualCollection
 from resources.lib.domain import VirtualCategoryFactory, VirtualCollectionFactory, ROMLauncherAddonFactory, g_assetFactory
 from resources.lib.domain import ROMCollectionScanner, ROMLauncherAddon, AelAddon
 
@@ -688,7 +688,7 @@ class ROMCollectionRepository(object):
         rom_asset_mappings_result_set = self._uow.result_set()
         rom_asset_mappings = []
         for mapping_data in rom_asset_mappings_result_set:
-            rom_asset_mappings.append(AssetMapping(mapping_data))
+            rom_asset_mappings.append(RomAssetMapping(mapping_data))
         
         self._uow.execute(qry.SELECT_ROMCOLLECTION_LAUNCHERS, romcollection_id)
         launchers_data = self._uow.result_set()
@@ -731,7 +731,7 @@ class ROMCollectionRepository(object):
                     
             rom_asset_mappings = []
             for mapping_data in filter(lambda a: a['romcollection_id'] == romcollection_data['id'], rom_asset_mappings_result_set):
-                rom_asset_mappings.append(AssetMapping(mapping_data))
+                rom_asset_mappings.append(RomAssetMapping(mapping_data))
                     
             yield ROMCollection(romcollection_data, assets, asset_mappings=asset_mappings, rom_asset_mappings=rom_asset_mappings)
 
@@ -759,7 +759,7 @@ class ROMCollectionRepository(object):
 
             rom_asset_mappings = []
             for mapping_data in filter(lambda a: a['romcollection_id'] == romcollection_data['id'], rom_asset_mappings_result_set):
-                rom_asset_mappings.append(AssetMapping(mapping_data))
+                rom_asset_mappings.append(RomAssetMapping(mapping_data))
 
             yield ROMCollection(romcollection_data, assets, asset_mappings=asset_mappings, rom_asset_mappings=rom_asset_mappings)
 
@@ -792,7 +792,7 @@ class ROMCollectionRepository(object):
                 
             rom_asset_mappings = []
             for mapping_data in filter(lambda a: a['romcollection_id'] == romcollection_data['id'], rom_asset_mappings_result_set):
-                rom_asset_mappings.append(AssetMapping(mapping_data))
+                rom_asset_mappings.append(RomAssetMapping(mapping_data))
                 
             yield ROMCollection(romcollection_data, assets, asset_mappings=asset_mappings, rom_asset_mappings=rom_asset_mappings)
 
@@ -845,7 +845,7 @@ class ROMCollectionRepository(object):
                         
             rom_asset_mappings = []
             for mapping_data in filter(lambda a: a['romcollection_id'] == romcollection_data['id'], rom_asset_mappings_result_set):
-                rom_asset_mappings.append(AssetMapping(mapping_data))
+                rom_asset_mappings.append(RomAssetMapping(mapping_data))
                 
             launchers = []
             for launcher_data in launchers_data:
@@ -1044,14 +1044,14 @@ class ROMCollectionRepository(object):
             return
         self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())   
 
-    def _insert_rom_asset_mapping(self, mapping: AssetMapping, obj: ROMCollection):
+    def _insert_rom_asset_mapping(self, mapping: RomAssetMapping, obj: ROMCollection):
         if not mapping.is_mapped():
             return
         mapping_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET_MAPPING, mapping_db_id, mapping.get_asset_info().id, mapping.get_mapped_to_asset_info().id)
         self._uow.execute(qry.INSERT_ROMCOLLECTION_ROM_ASSET_MAPPING, obj.get_id(), mapping_db_id)   
  
-    def _update_rom_asset_mapping(self, mapping: AssetMapping, obj: MetaDataItemABC):
+    def _update_rom_asset_mapping(self, mapping: RomAssetMapping, obj: MetaDataItemABC):
         if mapping.is_mapped():
             self._uow.execute(qry.UPDATE_ASSET_MAPPING, mapping.get_asset_info().id, mapping.get_mapped_to_asset_info().id, mapping.get_id())
             return

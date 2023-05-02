@@ -302,6 +302,28 @@ class AssetMapping(EntityABC):
             return False
         return True
 
+
+class RomAssetMapping(AssetMapping):
+      
+    def is_mapped(self):
+        if self.to_asset_info is None:
+            return False
+        
+        if self.asset_info.id == constants.ASSET_ICON_ID or \
+            self.asset_info.id == constants.ASSET_POSTER_ID:
+            if self.asset_info.id == constants.ASSET_ICON_ID and \
+                self.to_asset_info.id == constants.ASSET_BOXFRONT_ID:
+                return False
+            if self.asset_info.id == constants.ASSET_POSTER_ID and \
+                self.to_asset_info.id == constants.ASSET_FLYER_ID:
+                return False
+            return True
+        
+        if self.to_asset_info.id == self.asset_info.id:
+            return False
+        return True
+
+
 # legacy
 # |----- LauncherABC (abstract class)
 #        |
@@ -822,16 +844,17 @@ class MetaDataItemABC(EntityABC):
         view_assets = {}
         for asset_id in view_asset_ids:
             asset_info = g_assetFactory.get_asset_info(asset_id)
+            applied_asset_info = asset_info
             value = ''
             fallback_str = ''
             if asset_info.id == constants.ASSET_ICON_ID:
                 fallback_str = self.get_default_icon()
                 
             if self.is_mappable_asset(asset_info):
-                asset_info = self.get_asset_mapping(asset_info)
+                applied_asset_info = self.get_asset_mapping(asset_info)
 
-            if asset_info.id in self.assets:
-                asset = self.assets[asset_id]
+            if applied_asset_info.id in self.assets:
+                asset = self.assets[applied_asset_info.id]
                 value = asset.get_path()
             
             if value == '':
@@ -855,7 +878,7 @@ class MetaDataItemABC(EntityABC):
         if not self.asset_mappings:
             return asset_info
         mapped_asset = next((m for m in self.asset_mappings if m.asset_info.id == asset_info.id), None)
-        if not mapped_asset:
+        if not mapped_asset or not mapped_asset.to_asset_info:
             return asset_info
         return mapped_asset.to_asset_info
 	
@@ -1046,7 +1069,7 @@ class ROMCollection(MetaDataItemABC):
                  assets_data: typing.List[Asset] = None,
                  asset_paths: typing.List[AssetPath] = None,
                  asset_mappings: typing.List[AssetMapping] = [],
-                 rom_asset_mappings: typing.List[AssetMapping] = [],
+                 rom_asset_mappings: typing.List[RomAssetMapping] = [],
                  launchers_data: typing.List[ROMLauncherAddon] = [], 
                  scanners_data: typing.List[ROMCollectionScanner] = []):
         # Concrete classes are responsible of creating a default entity_data dictionary
