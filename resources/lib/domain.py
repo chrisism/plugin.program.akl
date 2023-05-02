@@ -1078,9 +1078,18 @@ class ROMCollection(MetaDataItemABC):
             entity_data = _get_default_ROMCollection_data_model()
             entity_data['id'] = text.misc_generate_random_SID()
             
-        self.rom_asset_mappings = rom_asset_mappings
         self.launchers_data = launchers_data
         self.scanners_data = scanners_data
+
+        self.rom_asset_mappings = rom_asset_mappings
+        mappable_assets = self.get_ROM_mappable_asset_list()
+        if len(rom_asset_mappings) != len(mappable_assets):
+           already_mapped_assets_ids = [m.asset_info.id for m in rom_asset_mappings]
+           for asset_info in [a for a in mappable_assets if a.id not in already_mapped_assets_ids]:
+               mapping = RomAssetMapping()
+               mapping.asset_info = asset_info
+               self.rom_asset_mappings.append(mapping)
+           
         super(ROMCollection, self).__init__(entity_data, assets_data, asset_paths, asset_mappings)
 
     def get_object_name(self): return 'ROM Collection'
@@ -1382,6 +1391,14 @@ class ROM(MetaDataItemABC):
             tag_data_str = str(rom_data['rom_tags'])
             self.tags = {t: '' for t in tag_data_str.split(',')}
         
+        mappable_assets = self.get_mappable_asset_list()
+        if len(asset_mappings) != len(mappable_assets):
+           already_mapped_assets_ids = [m.asset_info.id for m in asset_mappings]
+           for asset_info in [a for a in mappable_assets if a.id not in already_mapped_assets_ids]:
+               mapping = RomAssetMapping()
+               mapping.asset_info = asset_info
+               asset_mappings.append(mapping)
+           
         super(ROM, self).__init__(rom_data, assets_data, asset_paths_data, asset_mappings)
         
     def get_object_name(self): return 'ROM'
