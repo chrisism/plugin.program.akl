@@ -2,6 +2,7 @@
 import logging
 import typing
 
+import json
 import datetime
 from distutils.version import LooseVersion
 
@@ -638,6 +639,7 @@ class CategoryRepository(object):
             category_obj.get_developer(),
             category_obj.get_rating(),
             category_obj.get_plot(),
+            json.dumps(category_obj.get_extras()),
             assets_path.getPath() if assets_path is not None else None,
             category_obj.is_finished())
 
@@ -664,6 +666,7 @@ class CategoryRepository(object):
             category_obj.get_developer(),
             category_obj.get_rating(),
             category_obj.get_plot(),
+            json.dumps(category_obj.get_extras()),
             assets_path.getPath() if assets_path is not None else None,
             category_obj.is_finished(),
             category_obj.get_custom_attribute('metadata_id'))
@@ -950,6 +953,7 @@ class ROMCollectionRepository(object):
             romcollection_obj.get_developer(),
             romcollection_obj.get_rating(),
             romcollection_obj.get_plot(),
+            json.dumps(romcollection_obj.get_extras()),
             assets_path.getPath() if assets_path is not None else None,
             romcollection_obj.is_finished())
 
@@ -1004,6 +1008,7 @@ class ROMCollectionRepository(object):
             romcollection_obj.get_developer(),
             romcollection_obj.get_rating(),
             romcollection_obj.get_plot(),
+            json.dumps(romcollection_obj.get_extras()),
             assets_path.getPath() if assets_path is not None else None,
             romcollection_obj.is_finished(),
             romcollection_obj.get_custom_attribute('metadata_id'))
@@ -1365,6 +1370,7 @@ class ROMsRepository(object):
             rom_obj.get_developer(),
             rom_obj.get_rating(),
             rom_obj.get_plot(),
+            json.dumps(rom_obj.get_extras()),
             assets_path.getPath() if assets_path is not None else None,
             rom_obj.is_finished())
 
@@ -1410,6 +1416,7 @@ class ROMsRepository(object):
             rom_obj.get_developer(),
             rom_obj.get_rating(),
             rom_obj.get_plot(),
+            json.dumps(rom_obj.get_extras()),
             assets_path.getPath() if assets_path is not None else None,
             rom_obj.is_finished(),
             rom_obj.get_custom_attribute('metadata_id'))

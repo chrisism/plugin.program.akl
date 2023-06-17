@@ -88,6 +88,11 @@ class EntityABC(object):
 
     def __init__(self, entity_data: typing.Dict[str, typing.Any]):
         self.entity_data = entity_data
+        
+        if not "extra" in self.entity_data or not self.entity_data["extra"]:
+            self.entity_data["extra"] = {}
+        elif isinstance(self.entity_data["extra"], str):
+            self.entity_data["extra"] = json.loads(self.entity_data["extra"])
 
     # --- Database ID and utilities ---------------------------------------------------------------
     def set_id(self, id: str):
@@ -610,8 +615,7 @@ class MetaDataItemABC(EntityABC):
                  entity_data: typing.Dict[str, typing.Any], 
                  assets: typing.List[Asset],
                  asset_paths_data: typing.List[AssetPath] = None,
-                 asset_mappings: typing.List[AssetMapping] = []):
-        
+                 asset_mappings: typing.List[AssetMapping] = []):     
         self.assets: typing.Dict[str, Asset] = {}
         if assets is not None:
             for asset in assets:
@@ -683,6 +687,18 @@ class MetaDataItemABC(EntityABC):
 
     def set_plot(self, plot):
         self.entity_data['m_plot'] = plot
+
+    def get_extras(self):
+        return self.entity_data["extra"]
+
+    def set_extras(self, extras: dict):
+        self.entity_data["extra"] = extras
+
+    def set_extra_data(self, key, value):
+        self.entity_data["extra"][key] = value
+
+    def get_extra_data(self, key):
+        return self.entity_data["extra"][key]
 
     #
     # Used when rendering Categories/Launchers/ROMs
@@ -1819,6 +1835,11 @@ class ROM(MetaDataItemABC):
         if constants.META_TAGS_ID in metadata_to_update and api_rom_obj.get_tags() is not None:
             for tag in api_rom_obj.get_tags():
                 self.add_tag(tag)
+
+        extra_data: dict = api_rom_obj.get_custom_attribute("extra")
+        if extra_data:
+            for key, value in extra_data.items():
+                self.set_extra_data(key, value)
                     
         if len(assets_to_update) > 0:
             for asset_id in assets_to_update:

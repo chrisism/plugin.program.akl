@@ -4,10 +4,10 @@ AKL_INSERT_MIGRATION = "INSERT OR REPLACE INTO akl_migrations (migration_file, a
 AKL_SELECT_MIGRATIONS = "SELECT * FROM akl_migrations"
 
 # Shared Queries
-INSERT_METADATA = "INSERT INTO metadata (id,year,genre,developer,rating,plot,assets_path,finished) VALUES (?,?,?,?,?,?,?,?)"
+INSERT_METADATA = "INSERT INTO metadata (id,year,genre,developer,rating,plot,extra,assets_path,finished) VALUES (?,?,?,?,?,?,?,?,?)"
 INSERT_ASSET = "INSERT INTO assets (id, filepath, asset_type) VALUES (?,?,?)"
 INSERT_ASSET_PATH = "INSERT INTO assetpaths (id, path, asset_type) VALUES (?,?,?)"
-UPDATE_METADATA = "UPDATE metadata SET year=?, genre=?, developer=?, rating=?, plot=?, assets_path=?, finished=? WHERE id=?"
+UPDATE_METADATA = "UPDATE metadata SET year=?, genre=?, developer=?, rating=?, plot=?, extra=?, assets_path=?, finished=? WHERE id=?"
 UPDATE_ASSET = "UPDATE assets SET filepath = ?, asset_type = ? WHERE id = ?"
 UPDATE_ASSET_PATH = "UPDATE assetpaths SET path = ?, asset_type = ? WHERE id = ?"
 

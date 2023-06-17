@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS metadata(
     developer TEXT,
     rating INTEGER NULL,
     plot TEXT,
+    extra TEXT,
     assets_path TEXT,
     finished INTEGER DEFAULT 0
 );
@@ -236,6 +237,7 @@ CREATE VIEW IF NOT EXISTS vw_categories AS SELECT
     m.developer AS m_developer,
     m.rating AS m_rating,
     m.plot AS m_plot,
+    m.extra AS m_extra,
     m.finished AS finished,
     m.assets_path AS assets_path,
     (SELECT COUNT(*) FROM categories AS sc WHERE sc.parent_id = c.id) AS num_categories,
@@ -253,6 +255,7 @@ CREATE VIEW IF NOT EXISTS vw_romcollections AS SELECT
     m.developer AS m_developer,
     m.rating AS m_rating,
     m.plot AS m_plot,
+    m.extra AS extra
     m.finished AS finished,
     m.assets_path AS assets_path,
     r.platform AS platform,
@@ -280,6 +283,7 @@ CREATE VIEW IF NOT EXISTS vw_roms AS SELECT
     m.developer AS m_developer,
     m.rating AS m_rating,
     m.plot AS m_plot,
+    m.extra AS extra,
     m.finished,
     r.rom_status,
     r.is_favourite,
