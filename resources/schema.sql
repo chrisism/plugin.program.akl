@@ -237,7 +237,7 @@ CREATE VIEW IF NOT EXISTS vw_categories AS SELECT
     m.developer AS m_developer,
     m.rating AS m_rating,
     m.plot AS m_plot,
-    m.extra AS m_extra,
+    m.extra AS extra,
     m.finished AS finished,
     m.assets_path AS assets_path,
     (SELECT COUNT(*) FROM categories AS sc WHERE sc.parent_id = c.id) AS num_categories,
@@ -255,7 +255,7 @@ CREATE VIEW IF NOT EXISTS vw_romcollections AS SELECT
     m.developer AS m_developer,
     m.rating AS m_rating,
     m.plot AS m_plot,
-    m.extra AS extra
+    m.extra AS extra,
     m.finished AS finished,
     m.assets_path AS assets_path,
     r.platform AS platform,
