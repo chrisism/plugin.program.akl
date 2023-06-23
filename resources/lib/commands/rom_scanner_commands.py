@@ -130,7 +130,7 @@ def cmd_edit_romcollection_scanners(args):
     # >> Execute subcommand. May be atomic, maybe a submenu.
     logger.debug('EDIT_SCANNER: cmd_edit_romcollection_scanners() Selected {}'.format(selected_option.get_id()))
     
-    kodi.notify('Preparing scanner')
+    kodi.notify(kodi.translate(40980))
     kodi.run_script(
         selected_option.addon.get_addon_id(),
         selected_option.get_configure_command(romcollection))  
@@ -208,7 +208,7 @@ def cmd_execute_rom_scanner(args):
         return    
 
     logger.info('SCAN_ROMS: selected scanner "{}"'.format(selected_scanner.get_name()))
-    kodi.notify('Preparing scanner')
+    kodi.notify(kodi.translate(40980))
     kodi.run_script(
         selected_scanner.addon.get_addon_id(),
         selected_scanner.get_scan_command(romcollection))

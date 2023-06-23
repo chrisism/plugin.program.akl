@@ -77,7 +77,7 @@ def run_plugin(addon_argv):
         router.run(argv)
     except Exception as e:
         logger.error('Exception while executing route', exc_info=e)
-        kodi.notify_error('Failed to execute route or command')
+        kodi.notify_error(kodi.translate(40960))
         
     logger.debug('Advanced Kodi Launcher run_plugin() exit')
 
@@ -106,7 +106,7 @@ def vw_route_render_collection(view_id: str):
     filter = vw_create_filter(filter_type, filter_term)
 
     if container is None:
-        kodi.notify('Current view is not rendered correctly. Re-render views first.')
+        kodi.notify(kodi.translate(40961))
     elif len(container['items']) == 0:
         if container_type == constants.OBJ_CATEGORY:
             kodi.notify('Category {} has no items. Add romcollections or categories first.'.format(container['name']))
@@ -136,7 +136,7 @@ def vw_route_render_virtual_view(view_id: str):
     filter = vw_create_filter(filter_type, filter_term)
     
     if container is None:
-        kodi.notify('Current view is not rendered correctly. Re-render views first.')
+        kodi.notify(kodi.translate(40961))
     elif len(container['items']) == 0:
         if container_type == constants.OBJ_CATEGORY_VIRTUAL:
             if kodi.dialog_yesno(f"Virtual category '{container['name']}'' has no items. Regenerate the views now?"):

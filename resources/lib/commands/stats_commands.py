@@ -60,7 +60,7 @@ def cmd_add_rom_to_favourites(args):
     rom_id: str = args['rom_id'] if 'rom_id' in args else None
     if rom_id is None:
         logger.warning('No rom id supplied.')
-        kodi.notify_warn("Invalid parameters supplied.")
+        kodi.notify_warn(kodi.translate(40951))
         return
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)

@@ -43,7 +43,7 @@ def cmd_scan_addons(args):
     kodi.notify('Scanning for AKL supported addons')
     addon_count = _check_installed_addons()
     
-    msg = 'No AKL addons found. Search and install default plugin addons for AKL?'
+    msg = kodi.translate(40963)
     if addon_count == 0 and kodi.dialog_yesno(msg):
         xbmc.executebuiltin('InstallAddon(script.akl.defaults)', True)
         addon_count = _check_installed_addons()
@@ -138,7 +138,7 @@ def cmd_addon_details(args):
                 })
                 repository.update_addon(ael_addon)
             uow.commit()
-            kodi.notify("Updated addon")
+            kodi.notify(kodi.translate(40962))
         cmd_addon_details(args)
         return
 

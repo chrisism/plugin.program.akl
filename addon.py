@@ -37,4 +37,4 @@ try:
     views.run_plugin(sys.argv)
 except Exception as ex:
     logger.fatal('Exception in plugin', exc_info=ex)
-    kodi.notify_error("General failure")
+    kodi.notify_error(kodi.translate(40956))

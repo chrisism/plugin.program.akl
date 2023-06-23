@@ -363,6 +363,107 @@ msgctxt "#40955"
 msgid "Should new platform be applied to existing ROMs in this collection?"
 msgstr ""
 
+msgctxt "#40956"
+msgid "General failure"
+msgid "General failure"
+msgstr ""
+
+msgctxt "#40957"
+msgid "Cannot launch ROM"
+msgstr ""
+
+msgctxt "#40958"
+msgid "Failed to store launchers settings"
+msgstr ""
+
+msgctxt "#40959"
+msgid "Building initial views"
+msgstr ""
+
+msgctxt "#40960"
+msgid "Failed to execute route or command"
+msgstr ""
+
+msgctxt "#40961"
+msgid "Current view is not rendered correctly. Re-render views first."
+msgstr ""
+
+msgctxt "#40962"
+msgid "Updated addon"
+msgstr ""
+
+msgctxt "#40963"
+msgid "No AKL addons found. Search and install default plugin addons for AKL?"
+msgstr ""
+
+msgctxt "#40964"
+msgid "Views rendered"
+msgstr ""
+
+msgctxt "#40965"
+msgid "Virtual views rendered"
+msgstr ""
+
+msgctxt "#40966"
+msgid "Selected views rendered"
+msgstr ""
+
+msgctxt "#40967"
+msgid "Rendering views"
+msgstr ""
+
+msgctxt "#40968"
+msgid "Rendering all views"
+msgstr ""
+
+msgctxt "#40969"
+msgid "All views rendered"
+msgstr ""
+
+msgctxt "#40970"
+msgid "Rendering virtual category '{0}'"
+msgstr ""
+
+msgctxt "#40971"
+msgid "{0} view rendered"
+msgstr ""
+
+msgctxt "#40972"
+msgid "Cannot find virtual category id#{0}"
+msgstr ""
+
+msgctxt "#40973"
+msgid "Rendering virtual collection '{0}'"
+msgstr ""
+
+msgctxt "#40974"
+msgid "Rendering romcollection views"
+msgstr ""
+
+msgctxt "#40975"
+msgid "Rendering all views containing ROM#{0}"
+msgstr ""
+
+msgctxt "#40976"
+msgid "Failed to process ROM collection {0}"
+msgstr ""
+
+msgctxt "#40977"
+msgid "Cleared ROMs from collection"
+msgstr ""
+
+msgctxt "#40978"
+msgid "Finished importing ROMS"
+msgstr ""
+
+msgctxt "#40979"
+msgid "Preparing scraper"
+msgstr ""
+
+msgctxt "#40980"
+msgid "Preparing scanner"
+msgstr ""
+
 ############################
 # Scraping settings
 ############################

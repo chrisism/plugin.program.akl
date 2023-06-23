@@ -55,7 +55,7 @@ class WebService(threading.Thread):
             s.connect((WebService.HOST, WebService.PORT))
             s.sendall("")
         except Exception as error:
-            logger.fatal('Exception in webservice.is_alive {}'.format(str(error)))
+            logger.fatal(f'Exception in webservice.is_alive {str(error)}')
             if 'Errno 61' in str(error) or 'WinError 10061' in str(error):
                 alive = False
         finally:
@@ -72,8 +72,8 @@ class WebService(threading.Thread):
         ''' Called when the thread needs to stop
         '''
         try:
-            logger.info("Stopping AKL webservice({}:{})".format(WebService.HOST, WebService.PORT))
-            conn = HTTPConnection("{}:{}".format(WebService.HOST, WebService.PORT))
+            logger.info(f"Stopping AKL webservice({WebService.HOST}:{WebService.PORT})")
+            conn = HTTPConnection(f"{WebService.HOST}:{WebService.PORT}")
             conn.request("QUIT", "/")
             conn.getresponse()
         except Exception as error:

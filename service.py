@@ -16,6 +16,6 @@ if __name__ == '__main__':
         AppService().run()
     except Exception as ex:
         logger.fatal('Exception in plugin', exc_info=ex)
-        kodi.notify_error("General failure")
+        kodi.notify_error(kodi.translate(40956))
 
     logger.debug("'%s' shutting down." % addon_id)

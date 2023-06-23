@@ -142,7 +142,7 @@ def cmd_scrape_roms_in_romcollection(args):
         _check_collection_unset_asset_dirs(collection, scraper_settings)
 
     selected_addon.set_scraper_settings(scraper_settings)
-    kodi.notify('Preparing scraper')
+    kodi.notify(kodi.translate(40979))
     kodi.run_script(
         selected_addon.addon.get_addon_id(),
         selected_addon.get_scrape_command_for_collection(collection))
@@ -194,7 +194,7 @@ def cmd_scrape_rom_with_settings(args):
 
         # >> Execute scraper
         selected_addon.set_scraper_settings(scraper_settings) 
-        kodi.notify('Preparing scraper')   
+        kodi.notify(kodi.translate(40979))   
         kodi.run_script(
             selected_addon.addon.get_addon_id(),
             selected_addon.get_scrape_command(rom))
@@ -237,7 +237,7 @@ def cmd_scrape_rom_metadata(args):
 
     # >> Execute scraper
     selected_addon.set_scraper_settings(scraper_settings)
-    kodi.notify('Preparing scraper')
+    kodi.notify(kodi.translate(40979))
     kodi.run_script(
         selected_addon.addon.get_addon_id(),
         selected_addon.get_scrape_command(rom))
@@ -273,7 +273,7 @@ def cmd_scrape_rom_asset(args):
     # >> Execute scraper
     logger.debug('SCRAPE_ROM_ASSET: Selected scraper#{}'.format(selected_addon.get_name()))
     
-    kodi.notify('Preparing scraper')
+    kodi.notify(kodi.translate(40979))
     kodi.run_script(
         selected_addon.addon.get_addon_id(),
         selected_addon.get_scrape_command(rom))    
@@ -318,7 +318,7 @@ def cmd_scrape_rom_assets(args):
         scraper_settings.overwrite_existing = kodi.dialog_yesno('Overwrite existing assets settings?')
     
     selected_addon.set_scraper_settings(scraper_settings)
-    kodi.notify('Preparing scraper')
+    kodi.notify(kodi.translate(40979))
     # >> Execute scraper    
     kodi.run_script(
         selected_addon.addon.get_addon_id(),

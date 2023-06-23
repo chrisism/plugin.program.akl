@@ -454,7 +454,7 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
         rom_file_path = rom.get_scanned_data_element_as_file('file')
         if rom_file_path is None:
             logger.warning(f'Cannot launch ROM {rom.get_rom_identifier()}. No path provided.')
-            kodi.notify_warn('Cannot launch ROM')
+            kodi.notify_warn(kodi.translate(40957))
             return
             
         # >> How to fill gameclient = string (game.libretro.fceumm) ???
@@ -479,7 +479,7 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
         }        
         is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST, globals.WEBSERVER_PORT, post_data)
         if not is_stored:
-            kodi.notify_error('Failed to store launchers settings')
+            kodi.notify_error(kodi.translate(40958))
             
     def configure_for_rom(self, rom: ROM):
         post_data = {
@@ -490,7 +490,7 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
         }        
         is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST, globals.WEBSERVER_PORT, post_data)
         if not is_stored:
-            kodi.notify_error('Failed to store launchers settings')
+            kodi.notify_error(kodi.translate(40958))
      
 class ROMCollectionScanner(ROMAddon):
     

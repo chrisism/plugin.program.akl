@@ -54,7 +54,7 @@ def qry_get_root_items():
             'obj_type': constants.OBJ_CATEGORY,
             'items': []
         }
-        kodi.notify('Building initial views')
+        kodi.notify(kodi.translate(40959))
         AppMediator.async_cmd('RENDER_VIEWS')
     
     listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()

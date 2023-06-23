@@ -43,7 +43,7 @@ def cmd_manage_roms(args):
     
     if romcollection_id is None:
         logger.warning('cmd_manage_roms(): No romcollection id supplied.')
-        kodi.notify_warn("Invalid parameters supplied.")
+        kodi.notify_warn(kodi.translate(40951))
         return
     
     selected_option = None
@@ -316,7 +316,7 @@ def cmd_import_roms_json(args):
 
     AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})
     AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})  
-    kodi.notify('Finished importing ROMS')
+    kodi.notify(kodi.translate(40978))
 
 # --- Empty Launcher ROMs ---
 @AppMediator.register('CLEAR_ROMS')
@@ -356,4 +356,4 @@ def cmd_clear_roms(args):
         
     AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})
     AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})  
-    kodi.notify('Cleared ROMs from collection')
+    kodi.notify(kodi.translate(40977))
