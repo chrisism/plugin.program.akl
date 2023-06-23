@@ -81,7 +81,7 @@ def cmd_set_launcher_args(args) -> bool:
             rom_repository.update_rom(rom)
             uow.commit()
     
-    kodi.notify(f'Configured launcher {addon.get_name()}')
+    kodi.notify(kodi.translate(41005).format(addon.get_name()))
     return True
 
 
@@ -111,7 +111,7 @@ def cmd_set_scanner_settings(args) -> bool:
         romcollection_repository.update_romcollection(romcollection)
         uow.commit()
     
-    kodi.notify('Configured ROM scanner {}'.format(addon.get_name()))
+    kodi.notify(kodi.translate(41006).format(addon.get_name()))
     
     if kodi.dialog_yesno('Scan for ROMs now?'):
         AppMediator.async_cmd('SCAN_ROMS', {'romcollection_id': romcollection_id})
@@ -147,7 +147,7 @@ def cmd_store_scanned_roms(args) -> bool:
             romcollection_repository.add_rom_to_romcollection(romcollection.get_id(), rom_obj.get_id())
         uow.commit()
     
-    kodi.notify('Stored scanned ROMS in ROMs Collection {}'.format(romcollection.get_name()))
+    kodi.notify(kodi.translate(41007).format(romcollection.get_name()))
     
     AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})
     AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})  
@@ -173,7 +173,7 @@ def cmd_remove_roms(args) -> bool:
             rom_repository.delete_rom(rom_id)
         uow.commit()
     
-    kodi.notify('Removed ROMS from ROMs Collection {}'.format(romcollection.get_name()))
+    kodi.notify(kodi.translate(41010).format(romcollection.get_name()))
     
     AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})
     AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})  
@@ -236,7 +236,7 @@ def cmd_store_scraped_roms(args) -> bool:
             rom_repository.update_rom(rom_obj)
         uow.commit()
     
-    kodi.notify('Stored scraped ROMS in ROMs Collection {}'.format(romcollection.get_name()))
+    kodi.notify(kodi.translate(41008).format(romcollection.get_name()))
     
     AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})
     if metadata_is_updated: AppMediator.async_cmd('RENDER_VCATEGORY_VIEWS')
@@ -288,7 +288,7 @@ def cmd_store_scraped_single_rom(args) -> bool:
         rom_repository.update_rom(rom)
         uow.commit()
     
-    kodi.notify('Stored scraped ROM {}'.format(rom.get_name()))
+    kodi.notify(kodi.translate(41009).format(rom.get_name()))
     
     for collection_id in rom_collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})

@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 @AppMediator.register('SCAN_FOR_ADDONS')
 def cmd_scan_addons(args):
-    kodi.notify('Scanning for AKL supported addons')
+    kodi.notify(kodi.translate(40998))
     addon_count = _check_installed_addons()
     
     msg = kodi.translate(40963)
@@ -49,7 +49,7 @@ def cmd_scan_addons(args):
         addon_count = _check_installed_addons()
         
     logger.info(f'cmd_scan_addons(): Processed {addon_count} addons')
-    kodi.notify(f'Scan completed. Found {addon_count} addons')
+    kodi.notify(kodi.translate(40999).format(addon_count))
 
 
 @AppMediator.register('SHOW_ADDONS')

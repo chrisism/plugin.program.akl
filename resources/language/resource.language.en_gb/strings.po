@@ -365,7 +365,6 @@ msgstr ""
 
 msgctxt "#40956"
 msgid "General failure"
-msgid "General failure"
 msgstr ""
 
 msgctxt "#40957"
@@ -464,6 +463,269 @@ msgctxt "#40980"
 msgid "Preparing scanner"
 msgstr ""
 
+msgctxt "#40981"
+msgid "Creating new AKL database"
+msgstr ""
+
+msgctxt "#40982"
+msgid "No scanners configured for this romcollection!"
+msgstr ""
+
+msgctxt "#40983"
+msgid "{0} {1} mapped to {2}"
+msgstr ""
+
+msgctxt "#40984"
+msgid "Changed rom asset dir for {0} to {1}"
+msgstr ""
+
+msgctxt "#40985"
+msgid "Imported {0} NFO files"
+msgstr ""
+
+msgctxt "#40986"
+msgid "{0} {1} is now {2}"
+msgstr ""
+
+msgctxt "#40987"
+msgid "{0} {1} not changed"
+msgstr ""
+
+msgctxt "#40988"
+msgid "{0} Rating not changed"
+msgstr ""
+
+msgctxt "#40989"
+msgid "{0} rating is now {1}"
+msgstr ""
+
+msgctxt "#40990"
+msgid "{0} {1} has been updated"
+msgstr ""
+
+msgctxt "#40991"
+msgid "new_asset_file and dest_asset_file are the same. Returning"
+msgstr ""
+
+msgctxt "#40992"
+msgid "Failure while copying file"
+msgstr ""
+
+msgctxt "#40993"
+msgid "{0} {1} has been unset"
+msgstr ""
+
+msgctxt "#40994"
+msgid "{0} {1} has been updated"
+msgstr ""
+
+msgctxt "#40995"
+msgid "Category {0} has no items. Add romcollections or categories first."
+msgstr ""
+
+msgctxt "#40996"
+msgid "Collection {0} has no items. Add ROMs"
+msgstr ""
+
+msgctxt "#40997"
+msgid "No field specified"
+msgstr ""
+
+msgctxt "#40998"
+msgid "Scanning for AKL supported addons"
+msgstr ""
+
+msgctxt "#40999"
+msgid "Scan completed. Found {0} addons"
+msgstr ""
+
+msgctxt "#41000"
+msgid "No ROM scanners configured."
+msgstr ""
+
+msgctxt "#41001"
+msgid "No launcher configured."
+msgstr ""
+
+msgctxt "#41002"
+msgid "No launchers configured for this ROM!"
+msgstr ""
+
+msgctxt "#41003"
+msgid "No launchers configured for this collection."
+msgstr ""
+
+msgctxt "#41004"
+msgid "Removed launcher '{0}'"
+msgstr ""
+
+msgctxt "#41005"
+msgid "Configured launcher '{0}'"
+msgstr ""
+
+msgctxt "#41006"
+msgid "Configured ROM scanner '{0}'"
+msgstr ""
+
+msgctxt "#41007"
+msgid "Stored scanned ROMS in ROMs Collection '{0}'"
+msgstr ""
+
+msgctxt "#41008"
+msgid "Stored scraped ROMS in ROMs Collection '{0}'"
+msgstr ""
+
+msgctxt "#41009"
+msgid "Stored scraped ROM '{0}'"
+msgstr ""
+
+msgctxt "#41010"
+msgid "Removed ROMS from ROMs Collection '{0}'"
+msgstr ""
+
+msgctxt "#41011"
+msgid "Cleaned up redundant files"
+msgstr ""
+
+msgctxt "#41012"
+msgid "Finished importing Categories/Launchers"
+msgstr ""
+
+msgctxt "#41013"
+msgid "Category/Launcher XML exporting cancelled"
+msgstr ""
+
+msgctxt "#41014"
+msgid "Exported AKL Categories and Collections to XML configuration"
+msgstr ""
+
+msgctxt "#41015"
+msgid "Finished resetting the database"
+msgstr ""
+
+msgctxt "#41016"
+msgid "Done running migrations on the database"
+msgstr ""
+
+msgctxt "#41017"
+msgid "ROM Collection {0} created"
+msgstr ""
+
+msgctxt "#41018"
+msgid "Deleted romcollection {0}"
+msgstr ""
+
+msgctxt "#41019"
+msgid "Imported ROMCollection NFO file {0}"
+msgstr ""
+
+msgctxt "#41020"
+msgid "Exported ROMCollection NFO file {0}"
+msgstr ""
+
+msgctxt "#41021"
+msgid "Changed category for collection"
+msgstr ""
+
+msgctxt "#41022"
+msgid "Export of ROMCollection XML cancelled"
+msgstr ""
+
+msgctxt "#41023"
+msgid "Exported ROMCollection '{0}' XML config"
+msgstr ""
+
+msgctxt "#41024"
+msgid "Deleted ROM {0}"
+msgstr ""
+
+msgctxt "#41025"
+msgid "Changed ROM NPlayers"
+msgstr ""
+
+msgctxt "#41026"
+msgid "Changed ROM NPlayers online"
+msgstr ""
+
+msgctxt "#41027"
+msgid "Removing tag {0}"
+msgstr ""
+
+msgctxt "#41028"
+msgid "Updating ROM with removed tags"
+msgstr ""
+
+msgctxt "#41029"
+msgid "Adding tag {0}"
+msgstr ""
+
+msgctxt "#41030"
+msgid "Updating ROM with added tags"
+msgstr ""
+
+msgctxt "#41031"
+msgid "Removed all tags from ROM {0}"
+msgstr ""
+
+msgctxt "#41032"
+msgid "Imported ROM Plot"
+msgstr ""
+
+msgctxt "#41033"
+msgid "Imported ROMCollection NFO file {0}"
+msgstr ""
+
+msgctxt "#41034"
+msgid "Exported ROMCollection NFO file {0}"
+msgstr ""
+
+msgctxt "#41035"
+msgid "Created new standalone ROM {0}"
+msgstr ""
+
+msgctxt "#41036"
+msgid "Category {0} created"
+msgstr ""
+
+msgctxt "#41037"
+msgid "Deleted category {0}"
+msgstr ""
+
+msgctxt "#41038"
+msgid "Imported Category NFO file {0}"
+msgstr ""
+
+msgctxt "#41039"
+msgid "Exported Category NFO file {0}"
+msgstr ""
+
+msgctxt "#41040"
+msgid "Export of Category XML cancelled"
+msgstr ""
+
+msgctxt "#41041"
+msgid "Exported Category '{0}' XML config"
+msgstr ""
+
+msgctxt "#41042"
+msgid "Failure while writing NFO file {0}"
+msgstr ""
+
+msgctxt "#41043"
+msgid "Failure processing command '{0}'"
+msgstr ""
+
+msgctxt "#41044"
+msgid "Exception reading NFO file {0}"
+msgstr ""
+
+msgctxt "#41045"
+msgid "NFO file not found {0}"
+msgstr ""
+
+msgctxt "#41046"
+msgid "Imported {0}"
+msgstr ""
 ############################
 # Scraping settings
 ############################

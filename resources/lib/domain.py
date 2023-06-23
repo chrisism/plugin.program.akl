@@ -986,11 +986,11 @@ class Category(MetaDataItemABC):
                 item_nfo = nfo_FileName.loadFileToStr()
                 item_nfo = item_nfo.replace('\r', '').replace('\n', '')
             except:
-                kodi.notify_warn('Exception reading NFO file {0}'.format(nfo_FileName.getPath()))
+                kodi.notify_warn(kodi.translate(41044).format(nfo_FileName.getPath()))
                 logger.error("Category.import_NFO_file() Exception reading NFO file '{0}'".format(nfo_FileName.getPath()))
                 return False
         else:
-            kodi.notify_warn('NFO file not found {0}'.format(nfo_FileName.getBase()))
+            kodi.notify_warn(kodi.translate(41045).format(nfo_FileName.getBase()))
             logger.error("Category.import_NFO_file() NFO file not found '{0}'".format(nfo_FileName.getPath()))
             return False
 
@@ -1276,11 +1276,11 @@ class ROMCollection(MetaDataItemABC):
                 item_nfo = nfo_FileName.loadFileToStr()
                 item_nfo = item_nfo.replace('\r', '').replace('\n', '')
             except:
-                kodi.notify_warn('Exception reading NFO file {0}'.format(nfo_FileName.getPath()))
+                kodi.notify_warn(kodi.translate(41044).format(nfo_FileName.getPath()))
                 logger.error("ROMCollection.import_NFO_file() Exception reading NFO file '{0}'".format(nfo_FileName.getPath()))
                 return False
         else:
-            kodi.notify_warn('NFO file not found {0}'.format(nfo_FileName.getBase()))
+            kodi.notify_warn(kodi.translate(41045).format(nfo_FileName.getBase()))
             logger.error("ROMCollection.import_NFO_file() NFO file not found '{0}'".format(nfo_FileName.getPath()))
             return False
 
@@ -1688,7 +1688,7 @@ class ROM(MetaDataItemABC):
         logger.debug('Rom.update_with_nfo_file() Loading "{0}"'.format(nfo_file_path.getPath()))
         if not nfo_file_path.exists():
             if verbose:
-                kodi.notify_warn('NFO file not found {0}'.format(nfo_file_path.getPath()))
+                kodi.notify_warn(kodi.translate(41045).format(nfo_file_path.getPath()))
             logger.debug("Rom.update_with_nfo_file() NFO file not found '{0}'".format(nfo_file_path.getPath()))
             return False
 
@@ -1729,7 +1729,7 @@ class ROM(MetaDataItemABC):
         if len(item_trailer) > 0:   self.set_trailer(text.unescape_XML(item_trailer[0]))
 
         if verbose:
-            kodi.notify('Imported {0}'.format(nfo_file_path.getPath()))
+            kodi.notify(kodi.translate(41046).format(nfo_file_path.getPath()))
 
         return True
         

@@ -34,7 +34,7 @@ class AppMediator(object):
                 return a_command(args)
             except Exception as ex:
                 logger.fatal('Failure processing command "{}"'.format(command), exc_info=ex)
-                kodi.notify_error('Failure processing command "{}"'.format(command))
+                kodi.notify_error(kodi.translate(41043).format(command))
             
     @classmethod
     def async_cmd(cls, command='undefined', args=None):

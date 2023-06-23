@@ -99,7 +99,7 @@ class AppService(object):
         logger.debug("AKL service stopped")
         
     def _initial_setup(self, uow:UnitOfWork):
-        kodi.notify('Creating new AKL database')
+        kodi.notify(kodi.translate(40981))
         uow.create_empty_database(globals.g_PATHS.DATABASE_SCHEMA_PATH)
         logger.info("Database created.")
         

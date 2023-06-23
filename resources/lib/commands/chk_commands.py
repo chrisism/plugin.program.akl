@@ -422,4 +422,4 @@ def cmd_delete_redundant_rom_artwork(args):
         file_to_delete.unlink()
         
     pdialog.endProgress()
-    kodi.notify('Cleaned up redundant files')
+    kodi.notify(kodi.translate(41011))

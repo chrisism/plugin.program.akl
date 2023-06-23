@@ -79,7 +79,7 @@ def cmd_add_collection(args):
         romcollection_repository.insert_romcollection(romcollection, parent_category)
         uow.commit()
         
-        kodi.notify('ROM Collection {0} created'.format(romcollection.get_name()))
+        kodi.notify(kodi.translate(41017).format(romcollection.get_name()))
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection.get_id()})
         AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': parent_category.get_id()})   
     
@@ -100,7 +100,7 @@ def cmd_edit_romcollection(args):
     
     if romcollection_id is None:
         logger.warning('cmd_edit_romcollection(): No romcollection id supplied.')
-        kodi.notify_warn("Invalid parameters supplied.")
+        kodi.notify_warn(kodi.translate(40951))
         return
     
     selected_option = None
@@ -281,7 +281,7 @@ def cmd_romcollection_delete(args):
         repository.delete_romcollection(romcollection.get_id())
         uow.commit()
         
-    kodi.notify('Deleted romcollection {0}'.format(romcollection_name))
+    kodi.notify(kodi.translate(41018).format(romcollection_name))
     AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})            
     AppMediator.async_cmd('CLEANUP_VIEWS')
     AppMediator.sync_cmd('EDIT_ROMCOLLECTION', args)
@@ -433,7 +433,7 @@ def cmd_romcollection_import_nfo_file(args):
         if romcollection.import_NFO_file(NFO_file):
             repository.update_romcollection(romcollection)
             uow.commit()
-            kodi.notify('Imported ROMCollection NFO file {0}'.format(NFO_file.getPath()))
+            kodi.notify(kodi.translate(41019).format(NFO_file.getPath()))
             AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection.get_id()})
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})
     
@@ -457,7 +457,7 @@ def cmd_romcollection_browse_import_nfo_file(args):
         if romcollection.import_NFO_file(NFO_FileName):
             repository.update_romcollection(romcollection)
             uow.commit()
-            kodi.notify('Imported ROMCollection NFO file {0}'.format(NFO_FileName.getPath()))
+            kodi.notify(kodi.translate(41019).format(NFO_FileName.getPath()))
             AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection.get_id()})
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})
     
@@ -477,11 +477,11 @@ def cmd_romcollection_save_nfo_file(args):
     try:
         romcollection.export_to_NFO_file(NFO_FileName)
     except:
-        kodi.notify_warn('Exception writing NFO file {0}'.format(NFO_FileName.getPath()))
+        kodi.notify_warn(kodi.translate(41042).format(NFO_FileName.getPath()))
         logger.error("cmd_romcollection_save_nfo_file() Exception writing'{0}'".format(NFO_FileName.getPath()))
     else:
         logger.debug("cmd_romcollection_save_nfo_file() Created '{0}'".format(NFO_FileName.getPath()))
-        kodi.notify('Exported ROMCollection NFO file {0}'.format(NFO_FileName.getPath()))
+        kodi.notify(kodi.translate(41020).format(NFO_FileName.getPath()))
     
     AppMediator.sync_cmd('ROMCOLLECTION_EDIT_METADATA', args)
 
@@ -521,7 +521,7 @@ def cmd_romcollection_change_category(args):
         repository.update_romcollection_parent_reference(romcollection, selected_category)
         uow.commit() 
         
-        kodi.notify('Changed category for collection') 
+        kodi.notify(kodi.translate(41021)) 
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection.get_id()})
         AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': selected_category.get_id()})   
         AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': previous_category_id})          
@@ -553,7 +553,7 @@ def cmd_romcollection_export_xml(args):
     if export_FN.exists():
         ret = kodi.dialog_yesno('Overwrite file {0}?'.format(export_FN.getPath()))
         if not ret:
-            kodi.notify_warn('Export of ROMCollection XML cancelled')
+            kodi.notify_warn(kodi.translate(41022))
             AppMediator.sync_cmd('ROMCOLLECTION_EDIT_METADATA', args)
             return
 
@@ -564,8 +564,8 @@ def cmd_romcollection_export_xml(args):
     try:
         romcollection.export_to_file(export_FN)
     except constants.AddonError as E:
-        kodi.notify_warn('{0}'.format(E))
+        kodi.notify_warn(str(E))
     else:
-        kodi.notify('Exported ROMCollection "{0}" XML config'.format(romcollection.get_name()))
+        kodi.notify(kodi.translate(41023).format(romcollection.get_name()))
     
     AppMediator.sync_cmd('ROMCOLLECTION_EDIT_METADATA', args)

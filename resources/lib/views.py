@@ -109,9 +109,9 @@ def vw_route_render_collection(view_id: str):
         kodi.notify(kodi.translate(40961))
     elif len(container['items']) == 0:
         if container_type == constants.OBJ_CATEGORY:
-            kodi.notify('Category {} has no items. Add romcollections or categories first.'.format(container['name']))
+            kodi.notify(kodi.translate(40995).format(container['name']))
         if container_type == constants.OBJ_ROMCOLLECTION or container_type == constants.OBJ_COLLECTION_VIRTUAL:
-            kodi.notify('Collection {} has no items. Add ROMs'.format(container['name']))
+            kodi.notify(kodi.translate(40996).format(container['name']))
     else:
         _render_list_items(container, container_context_items, filter)
         
@@ -269,7 +269,7 @@ def vw_view_rom_metadata(rom_id):
 def vw_view_rom_metadata(rom_id):
     field = router.args['field'][0] if 'field' in router.args else None
     if not field:
-        kodi.notify_warn("No field specified")
+        kodi.notify_warn(kodi.translate(40997))
         return
     container = viewqueries.qry_get_view_scanned_data(rom_id)
     requested_item = next((i for i in container['items'] if i['name'] == field), None)

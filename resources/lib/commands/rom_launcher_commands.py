@@ -174,7 +174,7 @@ def cmd_edit_romcollection_launchers(args):
     
     launchers = romcollection.get_launchers()
     if len(launchers) == 0:
-        kodi.notify('No launchers configured for this romcollection!')
+        kodi.notify(kodi.translate(41003))
         AppMediator.async_cmd('EDIT_ROMCOLLECTION_LAUNCHERS', args)
         return
     
@@ -206,7 +206,7 @@ def cmd_edit_rom_launcher(args):
         
     launchers = rom.get_launchers()
     if len(launchers) == 0:
-        kodi.notify('No launchers configured for this ROM!')
+        kodi.notify(kodi.translate(41002))
         AppMediator.async_cmd('EDIT_ROM_LAUNCHERS', args)
         return
     
@@ -238,7 +238,7 @@ def cmd_remove_romcollection_launchers(args):
     
         launchers = romcollection.get_launchers()
         if len(launchers) == 0:
-            kodi.notify('No launchers configured for this romcollection!')
+            kodi.notify(kodi.translate(41003))
             AppMediator.sync_cmd('EDIT_ROMCOLLECTION_LAUNCHERS', args)
             return
         
@@ -266,7 +266,7 @@ def cmd_remove_romcollection_launchers(args):
         logger.info(f'Removed launcher#{selected_option.get_id()}')
         uow.commit()
     
-    kodi.notify(f'Removed launcher "{selected_option.get_name()}"')
+    kodi.notify(kodi.translate(41004).format(selected_option.get_name()))
     AppMediator.sync_cmd('EDIT_ROMCOLLECTION_LAUNCHERS', args)
   
 @AppMediator.register('REMOVE_ROM_LAUNCHER')
@@ -280,7 +280,7 @@ def cmd_remove_rom_launchers(args):
     
         launchers = rom.get_launchers()
         if len(launchers) == 0:
-            kodi.notify('No launchers configured for this ROM!')
+            kodi.notify(kodi.translate(41002))
             AppMediator.sync_cmd('EDIT_ROM_LAUNCHERS', args)
             return
         
@@ -308,7 +308,7 @@ def cmd_remove_rom_launchers(args):
         logger.info(f'Removed launcher#{selected_option.get_id()}')
         uow.commit()
     
-    kodi.notify(f'Removed launcher "{selected_option.get_name()}"')
+    kodi.notify(kodi.translate(41004).format(selected_option.get_name()))
     AppMediator.sync_cmd('EDIT_ROM_LAUNCHERS', args)
       
 @AppMediator.register('SET_DEFAULT_LAUNCHER')
@@ -322,7 +322,7 @@ def cmd_set_default_romcollection_launchers(args):
     
         launchers = romcollection.get_launchers()
         if len(launchers) == 0:
-            kodi.notify('No launchers configured for this romcollection!')
+            kodi.notify(kodi.translate(41003))
             AppMediator.sync_cmd('EDIT_ROMCOLLECTION_LAUNCHERS', args)
             return
         
@@ -358,7 +358,7 @@ def cmd_set_default_rom_launchers(args):
     
         launchers = rom.get_launchers()
         if len(launchers) == 0:
-            kodi.notify('No launchers configured for this ROM!')
+            kodi.notify(kodi.translate(41002))
             AppMediator.sync_cmd('EDIT_ROM_LAUNCHERS', args)
             return
         
@@ -406,7 +406,7 @@ def cmd_execute_rom_with_launcher(args):
         if launchers is None or len(launchers) == 0:
             logger.warning(f'No launcher configured for ROM {rom.get_name()}')
             if not settings.getSettingAsBool('fallback_to_retroplayer'):
-                kodi.notify_warn('No launcher configured.')
+                kodi.notify_warn(kodi.translate(41001))
                 return
             
             logger.info('Automatic fallback to Retroplayer as launcher applied.')

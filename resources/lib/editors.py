@@ -45,10 +45,10 @@ def edit_field_by_str(obj_instance: MetaDataItemABC, metadata_name, get_method, 
     if new_value is None: return False
 
     if old_value == new_value:
-        kodi.notify('{0} {1} not changed'.format(object_name, metadata_name))
+        kodi.notify(kodi.translate(40987).format(object_name, metadata_name))
         return False
     set_method(new_value)
-    kodi.notify('{0} {1} is now {2}'.format(object_name, metadata_name, new_value))
+    kodi.notify(kodi.translate(40986).format(object_name, metadata_name, new_value))
     return True
 
 # Edits an object field which is an integer.
@@ -64,10 +64,10 @@ def edit_field_by_int(obj_instance: MetaDataItemABC, metadata_name, get_method, 
     if new_value is None: return False
 
     if old_value == new_value:
-        kodi.notify('{0} {1} not changed'.format(object_name, metadata_name))
+        kodi.notify(kodi.translate(40987).format(object_name, metadata_name))
         return False
     set_method(new_value)
-    kodi.notify('{0} {1} is now {2}'.format(object_name, metadata_name, new_value))
+    kodi.notify(kodi.translate(40986).format(object_name, metadata_name, new_value))
     return True
 
 #
@@ -90,11 +90,11 @@ def edit_field_by_list(obj_instance: MetaDataItemABC, metadata_name:str, str_lis
         return
     new_value = str_list[selected]
     if old_value == new_value:
-        kodi.notify('{0} {1} not changed'.format(object_name, metadata_name))
+        kodi.notify(kodi.translate(40987).format(object_name, metadata_name))
         return False
 
     set_method(new_value)
-    kodi.notify('{0} {1} is now {2}'.format(object_name, metadata_name, new_value))
+    kodi.notify(kodi.translate(40986).format(object_name, metadata_name, new_value))
     return True
 
 #
@@ -121,7 +121,7 @@ def edit_rating(obj_instance: MetaDataItemABC, get_method, set_method):
                                         options_list, preselect_idx = preselected_value)
     if sel_value is None: return
     if sel_value == preselected_value:
-        kodi.notify('{0} Rating not changed'.format(object_name))
+        kodi.notify(kodi.translate(40988).format(object_name))
         return False
 
     if sel_value == 0:
@@ -129,11 +129,11 @@ def edit_rating(obj_instance: MetaDataItemABC, get_method, set_method):
     elif sel_value >= 1 and sel_value <= 11:
         current_rating_str = '{0}'.format(sel_value - 1)
     elif sel_value < 0:
-        kodi.notify('{0} Rating not changed'.format(object_name))
+        kodi.notify(kodi.translate(40988).format(object_name))
         return False
 
     set_method(current_rating_str)
-    kodi.notify('{0} rating is now {1}'.format(object_name, current_rating_str))
+    kodi.notify(kodi.translate(40989).format(object_name, current_rating_str))
     return True
 
 #
@@ -317,7 +317,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
         # kodi_update_image_cache(new_asset_FN)
 
         # --- Notify user ---
-        kodi.notify('{0} {1} has been updated'.format(obj_instance.get_object_name(), asset_info.name))
+        kodi.notify(kodi.translate(40990).format(obj_instance.get_object_name(), asset_info.name))
 
     # --- Import an image ---
     # >> Copy and rename a local image into asset directory
@@ -348,7 +348,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
         logger.debug(f'edit_asset() dest_asset_file    "{dest_asset_file.getPath()}"')
         if new_asset_file.getPath() == dest_asset_file.getPath():
             logger.info('edit_asset() new_asset_file and dest_asset_file are the same. Returning.')
-            kodi.notify_warn('new_asset_file and dest_asset_file are the same. Returning')
+            kodi.notify_warn(kodi.translate(40991))
             return None
 
         # --- Kodi image cache ---
@@ -371,7 +371,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
             new_asset_file.copy(dest_asset_file)
         except constants.AddonError:
             logger.error('edit_asset() AddonException exception copying image')
-            kodi.notify_warn('AddonException exception copying image')
+            kodi.notify_warn(kodi.translate(40992))
             return None
 
         # --- Update object ---
@@ -411,13 +411,13 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
             logger.exception("Failed to delete cache")
 
         # --- Notify user ---
-        kodi.notify(f'{obj_instance.get_object_name()} {asset_info.name} has been updated')
+        kodi.notify(kodi.translate(40994).format(obj_instance.get_object_name(), asset_info.name))
 
     # --- Unset asset ---
     elif selected_option == 'UNSET':
         obj_instance.set_asset(asset_info, io.FileName(''))
         logger.info('edit_asset() Unset {0} {1}'.format(obj_instance.get_object_name(), asset_info.name))
-        kodi.notify('{0} {1} has been unset'.format(obj_instance.get_object_name(), asset_info.name))
+        kodi.notify(kodi.translate(40993).format(obj_instance.get_object_name(), asset_info.name))
     
     return selected_option
 
@@ -522,7 +522,7 @@ def edit_default_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> 
     new_selected_asset_info = asset_info_list[secondary_selected_option]
     logger.debug(f'edit_default_asset() Mapable selected {new_selected_asset_info.name}.')
     obj_instance.set_mapped_asset(asset_info, new_selected_asset_info)
-    kodi.notify('{0} {1} mapped to {2}'.format(
+    kodi.notify(kodi.translate(40983).format(
         obj_instance.get_object_name(), asset_info.name, new_selected_asset_info.name
     ))
     return True

@@ -107,7 +107,7 @@ def cmd_execute_import_launchers(args):
         uow.commit()
 
     AppMediator.async_cmd('RENDER_VIEWS')
-    kodi.notify('Finished importing Categories/Launchers')
+    kodi.notify(kodi.translate(41012))
 
 # Export AKL launcher configuration.
 # Export all Categories and Launchers.
@@ -124,7 +124,7 @@ def cmd_export_to_xml(args):
     if export_FN.exists():
         ret = kodi.dialog_yesno('AKL_configuration.xml found in the selected directory. Overwrite?')
         if not ret:
-            kodi.notify_warn('Category/Launcher XML exporting cancelled')
+            kodi.notify_warn(kodi.translate(41013))
             return
 
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
@@ -207,9 +207,9 @@ def cmd_export_to_xml(args):
             parsed_xml = minidom.parseString(result_xml)
             export_FN.saveStrToFile(parsed_xml.toprettyxml(indent="  "))
         except constants.AddonError as ex:
-            kodi.notify_warn('{}'.format(ex))
+            kodi.notify_warn(str(ex))
         else:
-            kodi.notify('Exported AKL Categories and Collections to XML configuration')
+            kodi.notify(kodi.translate(41014))
 
 @AppMediator.register('RESET_DATABASE')
 def cmd_execute_reset_db(args):
@@ -222,7 +222,7 @@ def cmd_execute_reset_db(args):
     AppMediator.async_cmd('CLEANUP_VIEWS')
     AppMediator.async_cmd('RENDER_VIEWS')
     AppMediator.async_cmd('SCAN_FOR_ADDONS')
-    kodi.notify('Finished resetting the database')
+    kodi.notify(kodi.translate(41015))
 
 @AppMediator.register('RUN_DB_MIGRATIONS')
 def cmd_execute_migrations(args):
@@ -267,7 +267,7 @@ def cmd_execute_migrations(args):
             return
         
     uow.migrate_database([migration_file], version_to_store, selected_index==1)
-    kodi.notify('Done running migrations on the database')
+    kodi.notify(kodi.translate(41016))
 
 @AppMediator.register('CHECK_DUPLICATE_ASSET_DIRS')
 def cmd_check_duplicate_asset_dirs(args):

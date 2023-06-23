@@ -135,7 +135,7 @@ def cmd_set_roms_default_artwork(args):
         
         logger.debug(f'Mapable selected {new_selected_asset_info.name}.')
         romcollection.set_mapped_ROM_asset(selected_asset_info, new_selected_asset_info)
-        kodi.notify('{0} {1} mapped to {2}'.format(
+        kodi.notify(kodi.translate(40983).format(
             romcollection.get_object_name(), selected_asset_info.name, new_selected_asset_info.name
         ))
         
@@ -195,7 +195,7 @@ def cmd_set_rom_asset_dirs(args):
     # >> Check for duplicate paths and warn user.
     AppMediator.async_cmd('CHECK_DUPLICATE_ASSET_DIRS', args)
 
-    kodi.notify('Changed rom asset dir for {0} to {1}'.format(selected_asset.name, dir_path))
+    kodi.notify(kodi.translate(40984).format(selected_asset.name, dir_path))
     AppMediator.sync_cmd('SET_ROMS_ASSET_DIRS', args)
     
 @AppMediator.register('IMPORT_ROMS')
@@ -257,7 +257,7 @@ def cmd_import_roms_nfo(args):
         uow.commit()
         pDialog.close()
         
-    kodi.notify('Imported {0} NFO files'.format(num_read_NFO_files))
+    kodi.notify(kodi.translate(40985).format(num_read_NFO_files))
     AppMediator.async_cmd('IMPORT_ROMS', args)
     
 # --- Import ROM metadata from json config file ---

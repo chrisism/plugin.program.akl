@@ -42,7 +42,7 @@ def cmd_edit_rom(args):
     
     if rom_id is None:
         logger.warning('cmd_edit_rom(): No ROM id supplied.')
-        kodi.notify_warn("Invalid parameters supplied.")
+        kodi.notify_warn(kodi.translate(40951))
         return
     
     selected_option = None
@@ -220,7 +220,7 @@ def cmd_rom_delete(args):
         AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
     AppMediator.async_cmd('RENDER_VIRTUAL_VIEWS')
     
-    kodi.notify(f'Deleted ROM {rom.get_name()}')
+    kodi.notify(kodi.translate(41024).format(rom.get_name()))
 
 # --- Atomic commands ---
 @AppMediator.register('ROM_EDIT_METADATA_TITLE')
@@ -371,7 +371,7 @@ def cmd_rom_metadata_nplayers(args):
         uow.commit()    
         AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
         AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': constants.VCATEGORY_NPLAYERS_ID})
-        kodi.notify('Changed ROM NPlayers')
+        kodi.notify(kodi.translate(41025))
         
     AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
 
@@ -409,7 +409,7 @@ def cmd_rom_metadata_nplayers_online(args):
         uow.commit()    
         AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
         AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': constants.VCATEGORY_NPLAYERS_ID})
-        kodi.notify('Changed ROM NPlayers Online')
+        kodi.notify(kodi.translate(41026))
         
     AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
 
@@ -477,12 +477,12 @@ def cmd_rom_metadata_tags(args):
 
             did_remove_tag = True
             logger.debug(f'cmd_rom_metadata_remove_tag() Remove tag {options[selected_option]}')
-            kodi.notify(f'Removing tag "{selected_option}"')
+            kodi.notify(kodi.translate(41027).format(selected_option))
             del options[selected_option]
             rom.remove_tag(selected_option)
 
         if did_remove_tag:
-            kodi.notify('Updating ROM with removed tags')
+            kodi.notify(kodi.translate(41028))
             repository.update_rom(rom)
             uow.commit()
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})   
@@ -523,17 +523,17 @@ def cmd_rom_metadata_add_tag(args):
                 if tag is not None: 
                     did_add_tag = True
                     logger.debug(f'cmd_rom_metadata_add_tag() Adding tag "{tag}"')
-                    kodi.notify(f'Adding tag "{tag}')
+                    kodi.notify(kodi.translate(41029).format(tag))
                     rom.add_tag(tag)
             else:
                 tag = options[selected_option]
                 did_add_tag = True
                 logger.debug(f'cmd_rom_metadata_add_tag() Adding tag "{tag}"')
-                kodi.notify(f'Adding tag "{tag}')
+                kodi.notify(kodi.translate(41029).format(tag))
                 rom.add_tag(tag)
 
         if did_add_tag:
-            kodi.notify('Updating ROM with added tags')
+            kodi.notify(kodi.translate(41030))
             repository.update_rom(rom)
             uow.commit()
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})       
@@ -551,7 +551,7 @@ def cmd_rom_metadata_clear_tags(args):
             rom.clear_tags()
             repository.update_rom(rom)
             uow.commit()
-            kodi.notify(f'Removed all tags from ROM "{rom.get_name()}')
+            kodi.notify(kodi.translate(41031).format(rom.get_name()))
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})        
     AppMediator.sync_cmd('ROM_EDIT_METADATA_TAGS', args)
 
@@ -590,7 +590,7 @@ def cmd_rom_load_plot(args):
         
         repository.update_rom(rom)
         uow.commit()
-        kodi.notify('Imported ROM Plot')
+        kodi.notify(kodi.translate(41032))
         AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
     
     AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
@@ -612,7 +612,7 @@ def cmd_rom_import_nfo_file(args):
         if rom.update_with_nfo_file(NFO_file):
             repository.update_rom(rom)
             uow.commit()
-            kodi.notify('Imported ROMCollection NFO file {0}'.format(NFO_file.getPath()))
+            kodi.notify(kodi.translate(41033).format(NFO_file.getPath()))
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
             AppMediator.async_cmd('RENDER_VCATEGORY_VIEWS')
     
@@ -636,7 +636,7 @@ def cmd_rom_browse_import_nfo_file(args):
         if rom.update_with_nfo_file(NFO_FileName):
             repository.update_rom(rom)
             uow.commit()
-            kodi.notify('Imported ROMCollection NFO file {0}'.format(NFO_FileName.getPath()))
+            kodi.notify(kodi.translate(41033).format(NFO_FileName.getPath()))
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
             AppMediator.async_cmd('RENDER_VCATEGORY_VIEWS')
     
@@ -656,11 +656,11 @@ def cmd_rom_save_nfo_file(args):
     try:
         rom.export_to_NFO_file(NFO_FileName)
     except:
-        kodi.notify_warn('Exception writing NFO file {0}'.format(NFO_FileName.getPath()))
+        kodi.notify_warn(kodi.translate(41042).format(NFO_FileName.getPath()))
         logger.error("cmd_rom_save_nfo_file() Exception writing'{0}'".format(NFO_FileName.getPath()))
     else:
         logger.debug("cmd_rom_save_nfo_file() Created '{0}'".format(NFO_FileName.getPath()))
-        kodi.notify('Exported ROMCollection NFO file {0}'.format(NFO_FileName.getPath()))
+        kodi.notify(kodi.translate(41034).format(NFO_FileName.getPath()))
     
     AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
 
@@ -690,7 +690,7 @@ def cmd_manage_rom_tags(args):
                 if tag is not None: 
                     did_tag_change = True
                     logger.debug(f'cmd_manage_rom_tags() Adding tag "{tag}"')
-                    kodi.notify(f'Adding tag "{tag}')
+                    kodi.notify(kodi.translate(41029).format(tag))
                     tag_id = repository.insert_tag(tag)
                     options[tag_id] = tag
                 continue
@@ -700,7 +700,7 @@ def cmd_manage_rom_tags(args):
 
             did_tag_change = True
             logger.debug(f'cmd_manage_rom_tags() Remove tag {options[selected_option]}')
-            kodi.notify(f'Removing tag "{options[selected_option]}"')
+            kodi.notify(kodi.translate(41027).format(options[selected_option]))
             del options[selected_option]
             repository.delete_tag(selected_option)
 
@@ -768,5 +768,5 @@ def cmd_add_rom(args):
         
     AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': parent_category.get_id()})
     AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': constants.VCATEGORY_TITLE_ID})
-    kodi.notify(f"Created new standalone ROM '{rom_name}'")
+    kodi.notify(kodi.translate(41035).format(rom_name))
     kodi.refresh_container()

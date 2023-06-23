@@ -93,7 +93,7 @@ def cmd_add_romcollection_scanner(args):
     logger.debug('ADD_SCANNER: cmd_add_romcollection_scanner() Selected {}'.format(selected_option.get_id()))
     
     scanner_addon = ROMCollectionScanner(selected_option, {})
-    kodi.notify('Preparing scanner')
+    kodi.notify(kodi.translate(40980))
     kodi.run_script(
         selected_option.get_addon_id(), 
         scanner_addon.get_configure_command(romcollection))
@@ -110,7 +110,7 @@ def cmd_edit_romcollection_scanners(args):
     
     scanners = romcollection.get_scanners()
     if len(scanners) == 0:
-        kodi.notify('No scanners configured for this romcollection!')
+        kodi.notify(kodi.translate(40982))
         AppMediator.async_cmd('EDIT_ROMCOLLECTION_SCANNERS', args)
         return
     
@@ -146,7 +146,7 @@ def cmd_remove_romcollection_scanner(args):
     
         scanners = romcollection.get_scanners()
         if len(scanners) == 0:
-            kodi.notify('No scanners configured for this romcollection!')
+            kodi.notify(kodi.translate(40982))
             AppMediator.async_cmd('EDIT_ROMCOLLECTION_SCANNERS', args)
             return
         
@@ -190,7 +190,7 @@ def cmd_execute_rom_scanner(args):
 
     scanners = romcollection.get_scanners()
     if scanners is None or len(scanners) == 0:
-        kodi.notify_warn('No ROM scanners configured.')
+        kodi.notify_warn(kodi.translate(41000))
         return
 
     selected_scanner = scanners[0]

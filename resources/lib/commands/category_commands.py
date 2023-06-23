@@ -59,7 +59,7 @@ def cmd_add_category(args):
         repository.insert_category(category, parent_category)
         uow.commit()
         
-        kodi.notify('Category {0} created'.format(category.get_name()))
+        kodi.notify(kodi.translate(41036).format(category.get_name()))
         AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': parent_category.get_id()})
         AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
 
@@ -238,7 +238,7 @@ def cmd_category_delete(args):
         repository.delete_category(category_id)
         uow.commit()
         
-    kodi.notify(f'Deleted category {category_name}')
+    kodi.notify(kodi.translate(41037).format(category_name))
     AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})            
     AppMediator.async_cmd('CLEANUP_VIEWS')
     AppMediator.sync_cmd('EDIT_CATEGORY', args)
@@ -351,7 +351,7 @@ def cmd_category_import_nfo_file(args):
         if category.import_NFO_file(NFO_file):
             repository.update_category(category)
             uow.commit()
-            kodi.notify('Imported Category NFO file {0}'.format(NFO_file.getPath()))
+            kodi.notify(kodi.translate(41038).format(NFO_file.getPath()))
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
     
@@ -375,7 +375,7 @@ def cmd_category_browse_import_nfo_file(args):
         if category.import_NFO_file(NFO_FileName):
             repository.update_category(category)
             uow.commit()
-            kodi.notify('Imported Category NFO file {0}'.format(NFO_FileName.getPath()))
+            kodi.notify(kodi.translate(41038).format(NFO_FileName.getPath()))
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
     
@@ -395,11 +395,11 @@ def cmd_category_save_nfo_file(args):
     try:
         category.export_to_NFO_file(NFO_FileName)
     except:
-        kodi.notify_warn('Exception writing NFO file {0}'.format(NFO_FileName.getPath()))
+        kodi.notify_warn(kodi.translate(41042).format(NFO_FileName.getPath()))
         logger.error("cmd_category_save_nfo_file() Exception writing'{0}'".format(NFO_FileName.getPath()))
     else:
         logger.debug("cmd_category_save_nfo_file() Created '{0}'".format(NFO_FileName.getPath()))
-        kodi.notify('Exported Category NFO file {0}'.format(NFO_FileName.getPath()))
+        kodi.notify(kodi.translate(41039).format(NFO_FileName.getPath()))
     
     AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
 
@@ -430,7 +430,7 @@ def cmd_category_export_xml(args):
     if export_FN.exists():
         ret = kodi.dialog_yesno('Overwrite file {0}?'.format(export_FN.getPath()))
         if not ret:
-            kodi.notify_warn('Export of Category XML cancelled')
+            kodi.notify_warn(kodi.translate(41040))
             AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
             return
 
@@ -441,8 +441,8 @@ def cmd_category_export_xml(args):
     try:
         category.export_to_file(export_FN)
     except constants.AddonError as E:
-        kodi.notify_warn('{0}'.format(E))
+        kodi.notify_warn(str(E))
     else:
-        kodi.notify('Exported Category "{0}" XML config'.format(category.get_name()))
+        kodi.notify(kodi.translate(41041).format(category.get_name()))
     
     AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
