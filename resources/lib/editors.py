@@ -147,8 +147,7 @@ def import_TXT_file(text_file: io.FileName):
     file_size = statinfo.st_size
     logger.debug('import_TXT_file() File size is {0}'.format(file_size))
     if file_size > 16384:
-        ret = kodi.dialog_yesno('File "{0}" has {1} bytes and it is very big.'.format(text_file.getPath(), file_size) +
-                                'Are you sure this is the correct file?')
+        ret = kodi.dialog_yesno(kodi.translate(41070).format(text_file.getPath(), file_size))
         if not ret: return ''
 
     # Import file
@@ -222,7 +221,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
     # --- Get asset object information ---
     assets_directory = obj_instance.get_assets_root_path()        
     if not assets_directory:
-        if kodi.dialog_yesno("No local assets path configured. Configure now?\n Else we will use addon default directories."):
+        if kodi.dialog_yesno(kodi.translate(41047)):
             path_str = kodi.dialog_get_directory(f"Assets root path for entry '{obj_instance.get_name()}'")
             assets_directory = io.FileName(path_str, True)
             obj_instance.set_assets_root_path(assets_directory, None, create_default_subdirectories=True)

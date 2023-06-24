@@ -165,7 +165,7 @@ def cmd_remove_romcollection_scanner(args):
         
         # >> Execute subcommand. May be atomic, maybe a submenu.
         logger.debug('REMOVE_SCANNER: cmd_remove_romcollection_scanner() Selected {}'.format(selected_option.get_id()))
-        if not kodi.dialog_yesno('Are you sure to delete ROM scanner "{}"'.format(selected_option.get_name())):
+        if not kodi.dialog_yesno(kodi.translate(41060).format(selected_option.get_name())):
             logger.debug('REMOVE_SCANNER: cmd_remove_romcollection_scanner() Cancelled operation.')
             AppMediator.async_cmd('EDIT_ROMCOLLECTION_SCANNERS', args)
             return

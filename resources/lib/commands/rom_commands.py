@@ -201,7 +201,7 @@ def cmd_rom_delete(args):
         
         rom = roms_repository.find_rom(rom_id)
 
-        question = f'Are you sure you want to delete "{rom.get_name()}"?\nThis will delete the ROM from all views.'
+        question = kodi.translate(41056).format(rom.get_name())
         ret = kodi.dialog_yesno(question)
         if not ret: 
             AppMediator.sync_cmd('EDIT_ROM', args)
@@ -472,7 +472,7 @@ def cmd_rom_metadata_tags(args):
                 selected_option == 'ROM_CLEAR_METADATA_TAGS':
                 break               
             
-            if not kodi.dialog_yesno(f'Remove tag "{selected_option}"?'):
+            if not kodi.dialog_yesno(kodi.translate(41057).format(selected_option)):
                 continue
 
             did_remove_tag = True
@@ -547,7 +547,7 @@ def cmd_rom_metadata_clear_tags(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
 
-        if kodi.dialog_yesno(f'Clear all tags from ROM "{rom.get_name()}"?'):
+        if kodi.dialog_yesno(kodi.translate(41058).format(rom.get_name())):
             rom.clear_tags()
             repository.update_rom(rom)
             uow.commit()
@@ -695,7 +695,7 @@ def cmd_manage_rom_tags(args):
                     options[tag_id] = tag
                 continue
                            
-            if not kodi.dialog_yesno(f'Remove tag "{options[selected_option]}"?'):
+            if not kodi.dialog_yesno(kodi.translate(41057).format(options[selected_option])):
                 continue
 
             did_tag_change = True

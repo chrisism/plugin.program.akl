@@ -269,10 +269,10 @@ def cmd_romcollection_delete(args):
         romcollection_name = romcollection.get_name()
         
         if romcollection.num_roms() > 0:
-            question = 'ROMCollection "{0}" has {1} ROMs. '.format(romcollection_name, romcollection.num_roms()) + \
-                        'Are you sure you want to delete it?'
+            question = kodi.translate(41069).format(romcollection_name, romcollection.num_roms()) + \
+                       kodi.translate(41066).format(romcollection_name)
         else:
-            question = 'Are you sure you want to delete "{}"?'.format(romcollection_name)
+            question = kodi.translate(41066).format(romcollection_name)
     
         ret = kodi.dialog_yesno(question)
         if not ret: return
@@ -512,7 +512,7 @@ def cmd_romcollection_change_category(args):
             return
         
         selected_category:Category = selected_option
-        if not kodi.dialog_yesno(f'Move "{romcollection.get_name()}" to category "{selected_category.get_name()}"?'):
+        if not kodi.dialog_yesno(kodi.translate(41065).format(romcollection.get_name(), selected_category.get_name())):
             logger.debug('cmd_romcollection_change_category(): Cancelled')
             AppMediator.sync_cmd('EDIT_ROMCOLLECTION', args)
             return
@@ -551,7 +551,7 @@ def cmd_romcollection_export_xml(args):
     # --- If XML exists then warn user about overwriting it ---
     export_FN = io.FileName(dir_path).pjoin(romcollection_fn_str)
     if export_FN.exists():
-        ret = kodi.dialog_yesno('Overwrite file {0}?'.format(export_FN.getPath()))
+        ret = kodi.dialog_yesno(kodi.translate(41052).format(export_FN.getPath()))
         if not ret:
             kodi.notify_warn(kodi.translate(41022))
             AppMediator.sync_cmd('ROMCOLLECTION_EDIT_METADATA', args)

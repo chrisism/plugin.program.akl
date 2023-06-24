@@ -179,7 +179,7 @@ def cmd_set_rom_asset_dirs(args):
                 return
             
             root_path = io.FileName(dir_path)
-            apply_to_all = kodi.dialog_yesno('Apply new path to all current asset paths?')
+            apply_to_all = kodi.dialog_yesno(kodi.translate(41062))
             romcollection.set_assets_root_path(root_path, constants.ROM_ASSET_ID_LIST, create_default_subdirectories=apply_to_all)            
         else:
             selected_asset_path = romcollection.get_asset_path(selected_asset)
@@ -293,12 +293,12 @@ def cmd_import_roms_json(args):
                 if imported_rom.get_id() in existing_rom_ids:
                      # >> ROM exists (by id). Overwrite?
                     logger.debug('ROM found. Edit existing category.')
-                    if kodi.dialog_yesno('ROM "{}" found in AKL database. Overwrite?'.format(imported_rom.get_name())):
+                    if kodi.dialog_yesno(kodi.translate(41063).format(imported_rom.get_name())):
                         roms_to_update.append(imported_rom)
                 elif imported_rom.get_name() in existing_rom_names:
                      # >> ROM exists (by name). Overwrite?
                     logger.debug('ROM found. Edit existing category.')
-                    if kodi.dialog_yesno('ROM "{}" found in AKL database. Overwrite?'.format(imported_rom.get_name())):
+                    if kodi.dialog_yesno(kodi.translate(41063).format(imported_rom.get_name())):
                         roms_to_update.append(imported_rom)
                 else:
                     logger.debug('Add new ROM {}'.format(imported_rom.get_name()))
@@ -347,7 +347,7 @@ def cmd_clear_roms(args):
         # romcollection.reset_nointro_xmldata()
 
         # Confirm if the user wants to remove the ROMs also when linked to other collections.
-        delete_completely = kodi.dialog_yesno("Delete the ROMs completely from the AKL database and not collection only?")
+        delete_completely = kodi.dialog_yesno(kodi.translate(41064))
         if not delete_completely: 
             collection_repository.remove_all_roms_in_launcher(romcollection_id)
         else:

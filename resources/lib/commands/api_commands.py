@@ -61,7 +61,7 @@ def cmd_set_launcher_args(args) -> bool:
                 launcher.set_settings(launcher_settings)
                 
             if 'romcollection' in launcher_settings \
-                and kodi.dialog_yesno('Do you want to overwrite collection metadata properties with values from the launcher?'):
+                and kodi.dialog_yesno(kodi.translate(41050)):
                 romcollection.import_data_dic(launcher_settings['romcollection'])
                 metadata_updated = True
                 
@@ -113,7 +113,7 @@ def cmd_set_scanner_settings(args) -> bool:
     
     kodi.notify(kodi.translate(41006).format(addon.get_name()))
     
-    if kodi.dialog_yesno('Scan for ROMs now?'):
+    if kodi.dialog_yesno(kodi.translate(41051)):
         AppMediator.async_cmd('SCAN_ROMS', {'romcollection_id': romcollection_id})
     else:
         AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id})

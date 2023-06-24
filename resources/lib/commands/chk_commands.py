@@ -411,7 +411,7 @@ def cmd_delete_redundant_rom_artwork(args):
     pdialog.endProgress()
 
     kodi.display_text_window_mono('ROM redundant artwork report', output_table)
-    do_delete = kodi.dialog_yesno(f'Delete {len(files_to_be_removed)} files marked as redundant?\nWarning! This will actually delete the files!\m Backup filesnow if needed.')
+    do_delete = kodi.dialog_yesno(kodi.translate(41071).format(len(files_to_be_removed)))
     if not do_delete:
         return
 

@@ -139,10 +139,10 @@ def vw_route_render_virtual_view(view_id: str):
         kodi.notify(kodi.translate(40961))
     elif len(container['items']) == 0:
         if container_type == constants.OBJ_CATEGORY_VIRTUAL:
-            if kodi.dialog_yesno(f"Virtual category '{container['name']}'' has no items. Regenerate the views now?"):
+            if kodi.dialog_yesno(kodi.translate(41048).format(container['name'])):
                 AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': container['id']})
         if container_type == constants.OBJ_COLLECTION_VIRTUAL:
-            if kodi.dialog_yesno(f"Virtual collection {container['name']} has no items. Regenerate the views now?"):
+            if kodi.dialog_yesno(kodi.translate(41049).format(container['name'])):
                 AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': container['parent_id']})
     else:
         _render_list_items(container, container_context_items, filter)

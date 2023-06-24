@@ -223,13 +223,12 @@ def cmd_category_delete(args):
         category = repository.find_category(category_id)
         category_name = category.get_name()
         
+        del_q = kodi.translate(41066).format(category_name)
         if category.has_items():
-            question = (f'Category "{category_name}" has {category.num_categories()} sub-categories and '
-                        f'{category.num_romcollections()} romcollections. Deleting it will also delete related items. '
-                        f'Are you sure you want to delete "{category_name}"?')
+            question = kodi.translate(41067).format(category_name, category.num_categories(), category.num_romcollections()) \
+                + kodi.translate(41066).format(category_name)
         else:
-            question = (f'Category "{category_name}" has no categories or romcollections. '
-                        f'Are you sure you want to delete "{category_name}"?')
+            question = kodi.translate(41068).format(category_name) + kodi.translate(41066).format(category_name)
     
         ret = kodi.dialog_yesno(question)
         if not ret: return
@@ -428,7 +427,7 @@ def cmd_category_export_xml(args):
     # --- If XML exists then warn user about overwriting it ---
     export_FN = io.FileName(dir_path).pjoin(category_fn_str)
     if export_FN.exists():
-        ret = kodi.dialog_yesno('Overwrite file {0}?'.format(export_FN.getPath()))
+        ret = kodi.dialog_yesno(kodi.translate(41052).format(export_FN.getPath()))
         if not ret:
             kodi.notify_warn(kodi.translate(41040))
             AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)

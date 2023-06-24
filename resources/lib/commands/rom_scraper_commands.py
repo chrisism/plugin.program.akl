@@ -315,7 +315,7 @@ def cmd_scrape_rom_assets(args):
         if selected_options is not None:
             scraper_settings.asset_IDs_to_scrape = selected_options 
 
-        scraper_settings.overwrite_existing = kodi.dialog_yesno('Overwrite existing assets settings?')
+        scraper_settings.overwrite_existing_assets = kodi.dialog_yesno(kodi.translate(41061))
     
     selected_addon.set_scraper_settings(scraper_settings)
     kodi.notify(kodi.translate(40979))

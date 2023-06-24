@@ -73,7 +73,7 @@ def cmd_execute_import_launchers(args):
                 if category_to_import.get_id() in existing_category_ids:
                      # >> Category exists (by name). Overwrite?
                     logger.debug('Category found. Edit existing category.')
-                    if kodi.dialog_yesno(f'Category "{category_to_import.get_name()}" found in AKL database. Overwrite?'):
+                    if kodi.dialog_yesno(kodi.translate(41072).format(category_to_import.get_name())):
                         categories_to_update.append(category_to_import)
                 else:
                     categories_to_insert.append(category_to_import)
@@ -83,7 +83,7 @@ def cmd_execute_import_launchers(args):
                 if launcher_to_import.get_id() in existing_romcollection_ids:
                      # >> Romset exists (by name). Overwrite?
                     logger.debug('ROMCollection found. Edit existing ROMCollection.')
-                    if kodi.dialog_yesno(f'ROMCollection "{launcher_to_import.get_name()}" found in AKL database. Overwrite?'):
+                    if kodi.dialog_yesno(kodi.translate(41073).format(launcher_to_import.get_name())):
                         romcollections_to_update.append(launcher_to_import)
                 else:
                     romcollections_to_insert.append(launcher_to_import)
@@ -122,7 +122,7 @@ def cmd_export_to_xml(args):
     # --- If XML exists then warn user about overwriting it ---
     export_FN = io.FileName(dir_path).pjoin('AKL_configuration.xml')
     if export_FN.exists():
-        ret = kodi.dialog_yesno('AKL_configuration.xml found in the selected directory. Overwrite?')
+        ret = kodi.dialog_yesno(kodi.translate(41054))
         if not ret:
             kodi.notify_warn(kodi.translate(41013))
             return
@@ -213,7 +213,7 @@ def cmd_export_to_xml(args):
 
 @AppMediator.register('RESET_DATABASE')
 def cmd_execute_reset_db(args):
-    if not kodi.dialog_yesno('Are you sure you want to reset the database?'):
+    if not kodi.dialog_yesno(kodi.translate(41053)):
         return
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
@@ -263,7 +263,7 @@ def cmd_execute_migrations(args):
         return
     
     if selected_index == 0:
-        if not kodi.dialog_yesno(f"Run migration {migration_file.getBaseNoExt()}?"):
+        if not kodi.dialog_yesno(kodi.translate(41055).format(migration_file.getBaseNoExt())):
             return
         
     uow.migrate_database([migration_file], version_to_store, selected_index==1)

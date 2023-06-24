@@ -257,7 +257,7 @@ def cmd_remove_romcollection_launchers(args):
         
         # >> Execute subcommand. May be atomic, maybe a submenu.
         logger.debug('REMOVE_LAUNCHER: cmd_remove_romcollection_launchers() Selected {}'.format(selected_option.get_id()))
-        if not kodi.dialog_yesno('Are you sure to delete launcher "{}"'.format(selected_option.get_name())):
+        if not kodi.dialog_yesno(kodi.translate(41059).format(selected_option.get_name())):
             logger.debug('REMOVE_LAUNCHER: cmd_remove_romcollection_launchers() Cancelled operation.')
             AppMediator.async_cmd('EDIT_ROMCOLLECTION_LAUNCHERS', args)
             return
@@ -299,7 +299,7 @@ def cmd_remove_rom_launchers(args):
         
         # >> Execute subcommand. May be atomic, maybe a submenu.
         logger.debug(f'Selected {selected_option.get_id()}')
-        if not kodi.dialog_yesno(f'Are you sure to delete launcher "{selected_option.get_name()}"'):
+        if not kodi.dialog_yesno(kodi.translate(41059).format(selected_option.get_name())):
             logger.debug('Cancelled operation.')
             AppMediator.async_cmd('EDIT_ROM_LAUNCHERS', args)
             return

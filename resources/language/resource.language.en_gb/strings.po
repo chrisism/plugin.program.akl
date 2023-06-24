@@ -337,7 +337,7 @@ msgid "Edit Release Year"
 msgstr ""
 
 ############################
-# Headers and texts / notifications
+# Headers and texts / notifications / dialogs
 ############################
 msgctxt "#40950"
 msgid "Select action for Category"
@@ -726,6 +726,115 @@ msgstr ""
 msgctxt "#41046"
 msgid "Imported {0}"
 msgstr ""
+
+msgctxt "#41047"
+msgid "No local assets path configured. Configure now?\n Else we will use addon default directories."
+msgstr ""
+
+msgctxt "#41048"
+msgid "Virtual category '{0}' has no items. Regenerate the views now?"
+msgstr ""
+
+msgctxt "#41049"
+msgid "Virtual collection '{0}' has no items. Regenerate the views now?"
+msgstr ""
+
+msgctxt "#41050"
+msgid "Do you want to overwrite collection metadata properties with values from the launcher?"
+msgstr ""
+
+msgctxt "#41051"
+msgid "Scan for ROMs now?"
+msgstr ""
+
+msgctxt "#41052"
+msgid "Overwrite file {0}?"
+msgstr ""
+
+msgctxt "#41053"
+msgid "Are you sure you want to reset the database?"
+msgstr ""
+
+msgctxt "#41054"
+msgid "AKL_configuration.xml found in the selected directory. Overwrite?"
+msgstr ""
+
+msgctxt "#41055"
+msgid "Run migration {0}?"
+msgstr ""
+
+msgctxt "#41056"
+msgid "Are you sure you want to delete '{0}'?\nThis will delete the ROM from all views."
+msgstr ""
+
+msgctxt "#41057"
+msgid "Remove tag '{0}'?"
+msgstr ""
+
+msgctxt "#41058"
+msgid "Clear all tags from ROM '{0}'?"
+msgstr ""
+
+msgctxt "#41059"
+msgid "Are you sure to delete launcher '{}'?"
+msgstr ""
+
+msgctxt "#41060"
+msgid "Are you sure to delete ROM scanner '{}'?"
+msgstr ""
+
+msgctxt "#41061"
+msgid "Overwrite existing assets?"
+msgstr ""
+
+msgctxt "#41062"
+msgid "Apply new path to all current asset paths?"
+msgstr ""
+
+msgctxt "#41063"
+msgid "ROM '{}' found in AKL database. Overwrite?"
+msgstr ""
+
+msgctxt "#41064"
+msgid "Delete the ROMs completely from the AKL database and not collection only?"
+msgstr ""
+
+msgctxt "#41065"
+msgid "Move '{0}' to category '{1}'?"
+msgstr ""
+
+msgctxt "#41066"
+msgid "Are you sure you want to delete '{}'?"
+msgstr ""
+
+msgctxt "#41067"
+msgid "Category '{0}' has {1} sub-categories and {2} romcollections. Deleting it will also delete related items."
+msgstr ""
+
+msgctxt "#41068"
+msgid "Category '{0}' has no categories or romcollections."
+msgstr "" 
+
+msgctxt "#41069"
+msgid "ROMCollection '{0}' has {1} ROMs."
+msgstr "" 
+
+msgctxt "#41070"
+msgid "File "{0}" has {1} bytes and it is very big. Are you sure this is the correct file?"
+msgstr "" 
+
+msgctxt "#41071"
+msgid "Delete {0} files marked as redundant?\nWarning! This will actually delete the files!\m Backup filesnow if needed."
+msgstr "" 
+
+msgctxt "#41072"
+msgid "Category '{0}' found in AKL database. Overwrite?"
+msgstr "" 
+
+msgctxt "#41073"
+msgid "ROMCollection '{0}' found in AKL database. Overwrite?"
+msgstr "" 
+
 ############################
 # Scraping settings
 ############################
