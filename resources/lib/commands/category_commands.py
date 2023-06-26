@@ -44,12 +44,12 @@ def cmd_add_category(args):
         
         if grand_parent_category is not None:
             options_dialog = kodi.ListDialog()
-            selected_option = options_dialog.select('Add category in?',[parent_category.get_name(), grand_parent_category.get_name()])
+            selected_option = options_dialog.select(kodi.translate(41084),[parent_category.get_name(), grand_parent_category.get_name()])
             if selected_option > 0:
                 parent_category = grand_parent_category
     
         # --- Get new Category name ---
-        name = kodi.dialog_keyboard('New Category Name')
+        name = kodi.dialog_keyboard(kodi.translate(41085))
         if name is None: return
         
         category = Category()
@@ -126,7 +126,7 @@ def cmd_edit_metadata_category(args):
         options['CATEGORY_IMPORT_NFO_FILE_BROWSE']    = 'Import NFO file (browse NFO file) ...'
         options['CATEGORY_SAVE_NFO_FILE']             = 'Save NFO file (default location)'
             
-        s = 'Edit Category "{}" metadata'.format(category.get_name())
+        s = kodi.translate(41086).format(category.get_name())
         selected_option = kodi.OrdDictionaryDialog().select(s, options)
         
     if selected_option is None:

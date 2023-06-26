@@ -44,7 +44,7 @@ def cmd_add_collection(args):
         
         if grand_parent_category is not None:
             options_dialog = kodi.ListDialog()
-            selected_option = options_dialog.select('Add ROM collection in?', [
+            selected_option = options_dialog.select(kodi.translate(41125), [
                 parent_category.get_name(), 
                 grand_parent_category.get_name()
             ])
@@ -128,7 +128,7 @@ def cmd_edit_romcollection(args):
     options['EXPORT_ROMCOLLECTION'] = 'Export ROM Collection XML configuration ...'
     options['DELETE_ROMCOLLECTION'] = 'Delete ROM Collection'
 
-    s = 'Select action for ROM Collection "{}"'.format(romcollection.get_name())
+    s = kodi.translate(41126).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu
@@ -170,7 +170,7 @@ def cmd_romcollection_metadata(args):
     options['ROMCOLLECTION_IMPORT_NFO_FILE_BROWSE']    = 'Import NFO file (browse NFO file) ...'
     options['ROMCOLLECTION_SAVE_NFO_FILE_DEFAULT']     = 'Save NFO file (default location)'
 
-    s = 'Edit Launcher "{0}" metadata'.format(romcollection.get_name())
+    s = kodi.translate(41127).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Return recursively to parent menu.
@@ -504,7 +504,7 @@ def cmd_romcollection_change_category(args):
         options[root_category] = root_category.get_name()
         options.update({category:category.get_name() for category in all_categories})
 
-        selected_option = kodi.OrdDictionaryDialog().select('Move to category', options)
+        selected_option = kodi.OrdDictionaryDialog().select(kodi.translate(41128), options)
         if selected_option is None:
             # >> Return recursively to parent menu.
             logger.debug('cmd_romcollection_change_category(): Selected NONE')

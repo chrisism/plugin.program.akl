@@ -68,7 +68,7 @@ def cmd_show_addons(args):
             name = f"{addon.get_name()} v{addon.get_version()}"
             options[addon.get_addon_id()] = name
 
-        s = 'Addons'
+        s = kodi.translate(41080)
         selected_option = kodi.OrdDictionaryDialog().select(s, options)
         if selected_option is None:
             return
@@ -93,7 +93,7 @@ def cmd_addon_details(args):
     options["SETTINGS"] = "Plugin settings"
     
     addon = xbmcaddon.Addon(addon_id)
-    title = f"Addon: {addon.getAddonInfo('name')}"
+    title = kodi.translate(41081).format(addon.getAddonInfo('name'))
     
     selected_option = kodi.OrdDictionaryDialog().select(title, options)
     if selected_option is None:
@@ -145,7 +145,7 @@ def cmd_addon_details(args):
     if selected_option == "METADATA":
         supported_metadata_str = addon.getSetting('akl.scraper.supported_metadata')
         options = { m: constants.METADATA_DESCRIPTIONS[m] for m in supported_metadata_str.split('|') }
-        kodi.OrdDictionaryDialog().select(f"Supported metadata: {addon.getAddonInfo('name')}", options)
+        kodi.OrdDictionaryDialog().select(kodi.translate(41082).format(addon.getAddonInfo('name')), options)
         cmd_addon_details(args)
         return
 
@@ -153,7 +153,7 @@ def cmd_addon_details(args):
         supported_assets_str = addon.getSetting('akl.scraper.supported_assets')
         assets = g_assetFactory.get_asset_list_by_IDs(supported_assets_str.split('|'))
         options = { a.id: a.name for a in assets }
-        kodi.OrdDictionaryDialog().select(f"Supported assets: {addon.getAddonInfo('name')}", options)
+        kodi.OrdDictionaryDialog().select(kodi.translate(41083).format(addon.getAddonInfo('name')), options)
         cmd_addon_details(args)
         return
     

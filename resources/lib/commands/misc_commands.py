@@ -241,7 +241,7 @@ def cmd_execute_migrations(args):
         options[migration_file.getPath()] = f"{migration_file.getBase()} [{state}]"
             
     dialog = kodi.OrdDictionaryDialog()
-    selected_file = dialog.select(f"Select migrations to execute (Current version {db_version})", options)
+    selected_file = dialog.select(kodi.translate(41088).format(db_version), options)
 
     if selected_file is None:
         return
@@ -255,9 +255,9 @@ def cmd_execute_migrations(args):
         version_to_store = db_version
     
     dialog = kodi.ListDialog()
-    selected_index = dialog.select(f"Migration {migration_file.getBaseNoExt()}",[
-        "Run migration",
-        "Mark as executed without running"
+    selected_index = dialog.select(kodi.translate(41089).format(migration_file.getBaseNoExt()),[
+        kodi.translate(41090),
+        kodi.translate(41091)
     ])
     if not selected_index:
         return

@@ -55,7 +55,7 @@ def cmd_manage_romcollection_launchers(args):
     options['REMOVE_LAUNCHER']      = 'Remove launcher'
     options['SET_DEFAULT_LAUNCHER'] = 'Set default launcher: "{}"'.format(default_launcher_name)
         
-    s = 'Manage Launchers for "{}"'.format(romcollection.get_name())
+    s = kodi.translate(41100).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu
@@ -88,7 +88,7 @@ def cmd_manage_rom_launchers(args):
     options['REMOVE_ROM_LAUNCHER']      = 'Remove launcher'
     options['SET_DEFAULT_ROM_LAUNCHER'] = f'Set default launcher: "{default_launcher_name}"'
         
-    s = f'Manage Launchers for "{rom.get_name()}"'
+    s = kodi.translate(41100).format(rom.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu
@@ -117,7 +117,7 @@ def cmd_add_rom_launchers(args):
         for addon in addons:
             options[addon] = addon.get_name()
     
-    s = 'Choose launcher to associate'
+    s = kodi.translate(41101)
     selected_option:AelAddon = kodi.OrdDictionaryDialog().select(s, options)
     
     if selected_option is None:
@@ -148,7 +148,7 @@ def cmd_add_romcollection_launchers(args):
         for addon in addons:
             options[addon] = addon.get_name()
     
-    s = 'Choose launcher to associate'
+    s = kodi.translate(41101)
     selected_option:AelAddon = kodi.OrdDictionaryDialog().select(s, options)
     
     if selected_option is None:
@@ -182,7 +182,7 @@ def cmd_edit_romcollection_launchers(args):
     for launcher in launchers:
         options[launcher] = launcher.get_name()
     
-    s = 'Choose launcher to edit'
+    s = kodi.translate(41102)
     selected_option:ROMLauncherAddon = kodi.OrdDictionaryDialog().select(s, options)
     
     if selected_option is None:
@@ -214,7 +214,7 @@ def cmd_edit_rom_launcher(args):
     for launcher in launchers:
         options[launcher] = launcher.get_name()
     
-    s = 'Choose launcher to edit'
+    s = kodi.translate(41102)
     selected_option:ROMLauncherAddon = kodi.OrdDictionaryDialog().select(s, options)
     
     if selected_option is None:
@@ -246,7 +246,7 @@ def cmd_remove_romcollection_launchers(args):
         for launcher in launchers:
             options[launcher] = launcher.get_name()
         
-        s = 'Choose launcher to remove'
+        s = kodi.translate(41103)
         selected_option:ROMLauncherAddon = kodi.OrdDictionaryDialog().select(s, options)
         
         if selected_option is None:
@@ -288,7 +288,7 @@ def cmd_remove_rom_launchers(args):
         for launcher in launchers:
             options[launcher] = launcher.get_name()
         
-        s = 'Choose launcher to remove'
+        s = kodi.translate(41103)
         selected_option:ROMLauncherAddon = kodi.OrdDictionaryDialog().select(s, options)
         
         if selected_option is None:
@@ -330,7 +330,7 @@ def cmd_set_default_romcollection_launchers(args):
         for launcher in launchers:
             options[launcher.get_id()] = launcher.get_name()
         
-        s = 'Choose launcher to set as default'
+        s = kodi.translate(41104)
         selected_option = kodi.OrdDictionaryDialog().select(s, options)
         
         if selected_option is None:
@@ -366,7 +366,7 @@ def cmd_set_default_rom_launchers(args):
         for launcher in launchers:
             options[launcher.get_id()] = launcher.get_name()
         
-        s = 'Choose launcher to set as default'
+        s = kodi.translate(41104)
         selected_option = kodi.OrdDictionaryDialog().select(s, options)
         
         if selected_option is None:
@@ -423,7 +423,7 @@ def cmd_execute_rom_with_launcher(args):
             if launcher.is_default():
                 preselected = launcher
         dialog = kodi.OrdDictionaryDialog()
-        selected_launcher = dialog.select('Choose launcher', launcher_options,preselect=preselected)
+        selected_launcher = dialog.select(kodi.translate(41105), launcher_options,preselect=preselected)
 
     if selected_launcher is None:
         return

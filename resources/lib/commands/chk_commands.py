@@ -292,7 +292,7 @@ def cmd_delete_redundant_rom_artwork(args):
             options[collection] = collection.get_name()
             
         dialog = kodi.MultiSelectDialog()
-        selected_collections:typing.List[ROMCollection] = dialog.select('Collections to process', options, preselected=romcollections)
+        selected_collections:typing.List[ROMCollection] = dialog.select(kodi.translate(41087), options, preselected=romcollections)
         
         main_slist = []
         detailed_slist = []

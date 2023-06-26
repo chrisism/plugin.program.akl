@@ -41,7 +41,7 @@ def cmd_search(args):
     options['SEARCH_BY_DEVELOPER']   = 'By Developer'
     options['SEARCH_BY_RATING']      = 'By Rating'
     
-    selected_option = kodi.OrdDictionaryDialog().select('Search ROMs...',options)
+    selected_option = kodi.OrdDictionaryDialog().select(kodi.translate(41131),options)
     AppMediator.sync_cmd(selected_option, args)
 
 @AppMediator.register('SEARCH_BY_TITLE')
@@ -61,22 +61,22 @@ def cmd_search_by_title(args):
 @AppMediator.register('SEARCH_BY_GENRE')
 def cmd_search_by_genre(args):
     romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
-    _apply_search_query_by_options(romcollection_id, constants.META_GENRE_ID, 'Select a Genre...')
+    _apply_search_query_by_options(romcollection_id, constants.META_GENRE_ID, kodi.translate(41133))
     
 @AppMediator.register('SEARCH_BY_RELEASEYEAR')
 def cmd_search_by_year(args):
     romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
-    _apply_search_query_by_options(romcollection_id, constants.META_YEAR_ID, 'Select a Release year...')
+    _apply_search_query_by_options(romcollection_id, constants.META_YEAR_ID, kodi.translate(41134))
 
 @AppMediator.register('SEARCH_BY_DEVELOPER')
 def cmd_search_by_developer(args):
     romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
-    _apply_search_query_by_options(romcollection_id, constants.META_DEVELOPER_ID, 'Select a Developer...')
+    _apply_search_query_by_options(romcollection_id, constants.META_DEVELOPER_ID, kodi.translate(41135))
     
 @AppMediator.register('SEARCH_BY_RATING')
 def cmd_search_by_rating(args):
     romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
-    _apply_search_query_by_options(romcollection_id, constants.META_RATING_ID, 'Select a Rating...')
+    _apply_search_query_by_options(romcollection_id, constants.META_RATING_ID, kodi.translate(41132))
 
 def _apply_search_query_by_options(romcollection_id:str, filter_type:str, dialog_title: str):
     

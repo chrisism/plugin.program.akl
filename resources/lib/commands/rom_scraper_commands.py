@@ -45,7 +45,7 @@ def cmd_scrape_romcollection(args):
     
         scraper_settings:ScraperSettings = ScraperSettings.from_addon_settings()
         
-        dialog_title    = f'Scrape collection "{collection.get_name()}" ROMs'
+        dialog_title    = kodi.translate(41124).format(collection.get_name())
         selected_addon  = _select_scraper(uow, dialog_title, scraper_settings)
         if selected_addon is None:
             # >> Exits context menu
@@ -76,7 +76,7 @@ def cmd_scrape_rom(args):
          
         scraper_settings:ScraperSettings = ScraperSettings.from_addon_settings()
         
-        dialog_title = f'Scrape ROM "{rom.get_name()}"'
+        dialog_title = kodi.translate(41123).format(rom.get_name())
         selected_addon = _select_scraper(uow, dialog_title, scraper_settings)
         if selected_addon is None:
             # >> Exits context menu
@@ -126,7 +126,7 @@ def cmd_scrape_roms_in_romcollection(args):
         options['SCRAPER_IGNORE_TITLES_MODE'] = 'Ignore scraped titles: "{}"'.format('Yes' if scraper_settings.ignore_scrap_title else 'No')
         options['SCRAPE'] = 'Scrape'
         
-        dialog_title    = f'Scrape collection "{collection.get_name()}" ROMs with "{selected_addon.get_name()}"'
+        dialog_title    = kodi.translate(41111).format(collection.get_name(), selected_addon.get_name())
         selected_option = kodi.OrdDictionaryDialog().select(dialog_title, options, preselect='SCRAPE')
         if selected_option is None:
             logger.debug('cmd_scrape_roms_in_romcollection() Selected None. Closing context menu')
@@ -179,7 +179,7 @@ def cmd_scrape_rom_with_settings(args):
         options['SCRAPER_IGNORE_TITLES_MODE'] = 'Ignore scraped titles: "{}"'.format('Yes' if scraper_settings.ignore_scrap_title else 'No')
         options['SCRAPE'] = 'Scrape'
         
-        s = f'Scrape ROM "{rom.get_name()}" with "{selected_addon.get_name()}'
+        s = kodi.translate(41112).format(rom.get_name(),selected_addon.get_name())
         selected_option = kodi.OrdDictionaryDialog().select(s, options, preselect='SCRAPE')
         if selected_option is None:
             logger.debug('cmd_scrape_rom_with_settings() Selected None. Closing context menu')
@@ -215,7 +215,7 @@ def cmd_scrape_rom_metadata(args):
         scraper_settings.game_selection_mode = constants.SCRAPE_MANUAL
         scraper_settings.overwrite_existing_meta = True
         
-        selected_addon = _select_scraper(uow, 'Scrape ROM metadata', scraper_settings)
+        selected_addon = _select_scraper(uow, kodi.translate(41122), scraper_settings)
         if selected_addon is None:
             # >> Exits context menu
             logger.debug('SCRAPE_ROM_METADATA: Selected None. Closing context menu')
@@ -230,7 +230,7 @@ def cmd_scrape_rom_metadata(args):
             if selected_addon.is_metadata_supported(metadata_id):
                 options[metadata_id] = constants.METADATA_DESCRIPTIONS[metadata_id]
         
-        selected_options = kodi.MultiSelectDialog().select('Metadata to scrape', options, preselected=scraper_settings.metadata_IDs_to_scrape)
+        selected_options = kodi.MultiSelectDialog().select(kodi.translate(41113), options, preselected=scraper_settings.metadata_IDs_to_scrape)
             
         if selected_options is not None:
             scraper_settings.metadata_IDs_to_scrape = selected_options 
@@ -263,7 +263,7 @@ def cmd_scrape_rom_asset(args):
         scraper_settings.asset_IDs_to_scrape = [asset_id]
         scraper_settings.overwrite_existing_assets = True
         
-        selected_addon = _select_scraper(uow, 'Scrape ROM {} asset'.format(asset_to_scrape.name), scraper_settings)
+        selected_addon = _select_scraper(uow, kodi.translate(41121).format(asset_to_scrape.name), scraper_settings)
         if selected_addon is None:
             # >> Exits context menu
             logger.debug('SCRAPE_ROM_ASSET: cmd_scrape_rom_asset() Selected None. Closing context menu')
@@ -293,7 +293,7 @@ def cmd_scrape_rom_assets(args):
         scraper_settings.search_term_mode = constants.SCRAPE_MANUAL
         scraper_settings.asset_selection_mode = constants.SCRAPE_MANUAL
     
-        selected_addon = _select_scraper(uow, 'Scrape ROM assets', scraper_settings)
+        selected_addon = _select_scraper(uow, kodi.translate(41120), scraper_settings)
         if selected_addon is None:
             # >> Exits context menu
             logger.debug('SCRAPE_ROM_ASSETS: Selected None. Closing context menu')
@@ -310,7 +310,7 @@ def cmd_scrape_rom_assets(args):
                 options[asset_option.id] = asset_option.name
         
         selected_options = kodi.MultiSelectDialog().select(
-            'Assets to scrape', options, preselected=scraper_settings.asset_IDs_to_scrape)
+            kodi.translate(41114), options, preselected=scraper_settings.asset_IDs_to_scrape)
     
         if selected_options is not None:
             scraper_settings.asset_IDs_to_scrape = selected_options 
@@ -337,7 +337,7 @@ def cmd_configure_scraper_metadata_policy(args):
     options[constants.SCRAPE_POLICY_LOCAL_AND_SCRAPE] = kodi.translate(constants.SCRAPE_POLICY_LOCAL_AND_SCRAPE)
     options[constants.SCRAPE_POLICY_SCRAPE_ONLY]      = kodi.translate(constants.SCRAPE_POLICY_SCRAPE_ONLY)
     
-    s = 'Metadata scan policy "{}"'.format(kodi.translate(scraper_settings.scrape_metadata_policy))
+    s = kodi.translate(41115).format(kodi.translate(scraper_settings.scrape_metadata_policy))
     selected_option = kodi.OrdDictionaryDialog().select(s, options, preselect=scraper_settings.scrape_metadata_policy)
     
     if selected_option is None:
@@ -360,7 +360,7 @@ def cmd_configure_scraper_asset_policy(args):
     options[constants.SCRAPE_POLICY_LOCAL_AND_SCRAPE] = kodi.translate(constants.SCRAPE_POLICY_LOCAL_AND_SCRAPE)
     options[constants.SCRAPE_POLICY_SCRAPE_ONLY]      = kodi.translate(constants.SCRAPE_POLICY_SCRAPE_ONLY)
     
-    s = 'Asset scan policy "{}"'.format(kodi.translate(scraper_settings.scrape_assets_policy))
+    s = kodi.translate(41116).format(kodi.translate(scraper_settings.scrape_assets_policy))
     selected_option = kodi.OrdDictionaryDialog().select(s, options, preselect=scraper_settings.scrape_assets_policy)
     
     if selected_option is None:
@@ -379,7 +379,7 @@ def cmd_configure_scraper_search_term_mode(args):
     options = collections.OrderedDict()
     options[constants.SCRAPE_MANUAL]    = kodi.translate(constants.SCRAPE_MANUAL)
     options[constants.SCRAPE_AUTOMATIC] = kodi.translate(constants.SCRAPE_AUTOMATIC)
-    s = 'Game search term mode "{}"'.format(kodi.translate(scraper_settings.search_term_mode))
+    s = kodi.translate(41117).format(kodi.translate(scraper_settings.search_term_mode))
     selected_option = kodi.OrdDictionaryDialog().select(s, options, preselect=scraper_settings.search_term_mode)
     
     if selected_option is None:
@@ -399,7 +399,7 @@ def cmd_configure_scraper_game_selection_mode(args):
     options = collections.OrderedDict()
     options[constants.SCRAPE_MANUAL]    = kodi.translate(constants.SCRAPE_MANUAL)
     options[constants.SCRAPE_AUTOMATIC] = kodi.translate(constants.SCRAPE_AUTOMATIC)
-    s = 'Game selection mode "{}"'.format(kodi.translate(scraper_settings.game_selection_mode))
+    s = kodi.translate(41118).format(kodi.translate(scraper_settings.game_selection_mode))
     selected_option = kodi.OrdDictionaryDialog().select(s, options, preselect=scraper_settings.game_selection_mode)
     
     if selected_option is None:
@@ -419,7 +419,7 @@ def cmd_configure_scraper_asset_selection_mode(args):
     options = collections.OrderedDict()
     options[constants.SCRAPE_MANUAL]    = kodi.translate(constants.SCRAPE_MANUAL)
     options[constants.SCRAPE_AUTOMATIC] = kodi.translate(constants.SCRAPE_AUTOMATIC)
-    s = 'Game selection mode "{}"'.format(kodi.translate(scraper_settings.asset_selection_mode))
+    s = kodi.translate(41119).format(kodi.translate(scraper_settings.asset_selection_mode))
     selected_option = kodi.OrdDictionaryDialog().select(s, options, preselect=scraper_settings.asset_selection_mode)
     
     if selected_option is None:
@@ -442,7 +442,7 @@ def cmd_configure_scraper_metadata_to_scrape(args):
         if scraper_supported_metadata is None or metadata_id in scraper_supported_metadata:
             options[metadata_id] = constants.METADATA_DESCRIPTIONS[metadata_id]
     
-    selected_options = kodi.MultiSelectDialog().select('Metadata to scrape', options, preselected=scraper_settings.metadata_IDs_to_scrape)
+    selected_options = kodi.MultiSelectDialog().select(kodi.translate(41113), options, preselected=scraper_settings.metadata_IDs_to_scrape)
     
     if selected_options is None:
         AppMediator.sync_cmd(args['ret_cmd'], args)
@@ -465,7 +465,7 @@ def cmd_configure_scraper_assets_to_scrape(args):
         if supported_assets is None or asset_option.id in supported_assets:
             options[asset_option.id] = asset_option.name
     
-    selected_options = kodi.MultiSelectDialog().select('Assets to scrape', options, preselected=scraper_settings.asset_IDs_to_scrape)
+    selected_options = kodi.MultiSelectDialog().select(kodi.translate(41114), options, preselected=scraper_settings.asset_IDs_to_scrape)
     
     if selected_options is None:
         AppMediator.sync_cmd(args['ret_cmd'], args)

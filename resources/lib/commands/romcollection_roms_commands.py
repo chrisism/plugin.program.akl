@@ -71,7 +71,7 @@ def cmd_manage_roms(args):
         options['DELETE_ROMS_NFO']       = 'Delete ROMs NFO files'
         options['CLEAR_ROMS']            = 'Clear ROMs from ROMCollection'
 
-    s = 'Manage ROM Collection "{}" ROMs'.format(romcollection.get_name())
+    s = kodi.translate(41128).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu
@@ -104,7 +104,7 @@ def cmd_set_roms_default_artwork(args):
             options[default_asset_info] = 'Choose asset for {0} (currently {1})'.format(default_asset_info.name, mapped_asset_info.name)
         
         dialog = kodi.OrdDictionaryDialog()
-        selected_asset_info = dialog.select('Edit ROMs default Assets/Artwork', options)
+        selected_asset_info = dialog.select(kodi.translate(41077).format("ROM"), options)
         
         if selected_asset_info is None:
             # >> Return to parent menu.
@@ -124,7 +124,7 @@ def cmd_set_roms_default_artwork(args):
             options[mappable_asset_info] = mappable_asset_info.name
 
         dialog = kodi.OrdDictionaryDialog()
-        dialog_title_str = f'Edit {romcollection.get_object_name()} {selected_asset_info.name} mapped asset'
+        dialog_title_str = kodi.translate(41078).format(romcollection.get_object_name(), selected_asset_info.name)
         new_selected_asset_info = dialog.select(dialog_title_str, options, mapped_asset_info)
     
         if new_selected_asset_info is None:
@@ -165,7 +165,7 @@ def cmd_set_rom_asset_dirs(args):
             if path: list_items[asset_info] = "Change {} path: '{}'".format(asset_info.plural, path.getPath())
 
         dialog = kodi.OrdDictionaryDialog()
-        selected_asset: AssetInfo = dialog.select('ROM Asset directories ', list_items)
+        selected_asset: AssetInfo = dialog.select(kodi.translate(41129), list_items)
 
         if selected_asset is None:
             AppMediator.sync_cmd('ROMCOLLECTION_MANAGE_ROMS', args)
@@ -213,7 +213,7 @@ def cmd_import_roms(args):
     options['IMPORT_ROMS_NFO']      = 'Import ROMs metadata from NFO files'
     options['IMPORT_ROMS_JSON']     = 'Import ROMs data from JSON files'
 
-    s = 'Import ROMs in ROMCollection "{}"'.format(romcollection.get_name())
+    s = kodi.translate(41130).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu

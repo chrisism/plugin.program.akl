@@ -62,7 +62,7 @@ def cmd_edit_rom(args):
     options['DELETE_ROM']              = 'Delete ROM'
     options['SCRAPE_ROM']              = kodi.translate(40855)
 
-    s = f'Edit ROM "{rom.get_name()}"'
+    s = kodi.translate(41092).format(rom.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu
@@ -109,7 +109,7 @@ def cmd_rom_metadata(args):
     options['ROM_SAVE_NFO_FILE_DEFAULT'] = 'Save NFO file (default location)'
     options['SCRAPE_ROM_METADATA'] = 'Scrape Metadata'
 
-    s = 'Edit ROM "{0}" metadata'.format(rom.get_name())
+    s = kodi.translate(41093).format(rom.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Return recursively to parent menu.
@@ -347,7 +347,7 @@ def cmd_rom_metadata_nplayers(args):
         
         default_options = list(constants.NPLAYERS_LIST.keys())
         menu_list = ['Not set', 'Manual entry'] + default_options
-        selected_option = kodi.ListDialog().select('Edit ROM NPlayers', menu_list)
+        selected_option = kodi.ListDialog().select(kodi.translate(41094), menu_list)
         
         if selected_option is None or selected_option < 0:
             AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
@@ -385,7 +385,7 @@ def cmd_rom_metadata_nplayers_online(args):
         
         default_options = list(constants.NPLAYERS_LIST.keys())
         menu_list = ['Not set', 'Manual entry'] + default_options
-        selected_option = kodi.ListDialog().select('Edit ROM NPlayers online', menu_list)
+        selected_option = kodi.ListDialog().select(kodi.translate(41095), menu_list)
         
         if selected_option is None or selected_option < 0:
             AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
@@ -463,7 +463,7 @@ def cmd_rom_metadata_tags(args):
             options[tag] = tag
 
         while selected_option is not None:
-            s = 'Edit Tags'
+            s = kodi.translate(40866)
             selected_option = kodi.OrdDictionaryDialog().select(s, options)
             if selected_option is None:
                 continue
@@ -514,7 +514,7 @@ def cmd_rom_metadata_add_tag(args):
         did_add_tag = False
 
         while selected_option is not None:
-            selected_option = kodi.OrdDictionaryDialog().select('Tag to add', options)
+            selected_option = kodi.OrdDictionaryDialog().select(kodi.translate(41096), options)
                 
             if selected_option is None: break
             
@@ -680,7 +680,7 @@ def cmd_manage_rom_tags(args):
         selected_option = 'ADD_TAG'
         did_tag_change = False
         while selected_option is not None:
-            s = 'Manage Tags'
+            s = kodi.translate(41097)
             selected_option = kodi.OrdDictionaryDialog().select(s, options)
             if selected_option is None:
                 continue
@@ -725,7 +725,7 @@ def cmd_add_rom(args):
         
         if grand_parent_category is not None:
             options_dialog = kodi.ListDialog()
-            selected_option = options_dialog.select('Add ROM in?',[parent_category.get_name(), grand_parent_category.get_name()])
+            selected_option = options_dialog.select(kodi.translate(41098),[parent_category.get_name(), grand_parent_category.get_name()])
             if selected_option > 0:
                 parent_category = grand_parent_category
         
@@ -743,7 +743,7 @@ def cmd_add_rom(args):
             return
         
         dialog = kodi.ListDialog()
-        selected_idx = dialog.select('Select the platform', platforms.AKL_platform_list)
+        selected_idx = dialog.select(kodi.translate(41099), platforms.AKL_platform_list)
         platform = platforms.AKL_platform_list[selected_idx]
         
         rom_obj = ROM()

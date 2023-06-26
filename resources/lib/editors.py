@@ -84,7 +84,7 @@ def edit_field_by_list(obj_instance: MetaDataItemABC, metadata_name:str, str_lis
         preselect_idx = str_list.index(old_value)
     else:
         preselect_idx = 0
-    dialog_title = 'Edit {0} {1}'.format(object_name, metadata_name)
+    dialog_title = kodi.translate(41075).format(object_name, metadata_name)
     selected = kodi.ListDialog().select(dialog_title, str_list, preselect_idx)
     if selected is None:
         return
@@ -117,7 +117,7 @@ def edit_rating(obj_instance: MetaDataItemABC, get_method, set_method):
         preselected_value = 0
     else:
         preselected_value = int(current_rating_str) + 1
-    sel_value = kodi.ListDialog().select('Select the {0} Rating'.format(object_name),
+    sel_value = kodi.ListDialog().select(kodi.translate(41079).format(object_name),
                                         options_list, preselect_idx = preselected_value)
     if sel_value is None: return
     if sel_value == preselected_value:
@@ -192,9 +192,8 @@ def edit_object_assets(obj_instance:MetaDataItemABC, preselected_asset = None) -
         options[SCRAPE_CMD] = 'Scrape ROM assets'
     
     # --- Customize function for each object type ---
-    dialog_title_str = 'Edit {0} Assets/Artwork'. format(obj_instance.get_object_name())
+    dialog_title_str = kodi.translate(41076). format(obj_instance.get_object_name())
     dialog = kodi.OrdDictionaryDialog()
-    # >> Use Krypton Dialog().select(useDetails = True) to display label2 on dialog.
     selected_option = dialog.select(dialog_title_str, options, preselect = preselected_asset, use_details = True)
 
     if selected_option is None:
@@ -255,7 +254,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
                        'Configure it before you can edit artwork.')
         return None
 
-    dialog_title = f'Change {obj_instance.get_name()} {asset_info.name}'
+    dialog_title = kodi.translate(41074).format(obj_instance.get_name(), asset_info.name)
     
     # --- Show image editing options ---
     options = collections.OrderedDict()
@@ -430,7 +429,7 @@ def edit_object_default_assets(obj_instance: MetaDataItemABC, preselected_asset_
     logger.debug('edit_object_default_assets() preselected_asset_id {0}'.format(preselected_asset_id))
     
     pre_select_idx = 0
-    dialog_title_str = f'Edit {obj_instance.get_object_name()} default Assets/Artwork'
+    dialog_title_str = kodi.translate(41077).format(obj_instance.get_object_name())
 
     # --- Build Dialog.select() list ---
     default_assets_list = obj_instance.get_mappable_asset_list()
@@ -509,7 +508,7 @@ def edit_default_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> 
             secondary_pre_select_idx = counter
         counter += 1
     
-    dialog_title_str = 'Edit {0} {1} mapped asset'.format(obj_instance.get_object_name(), asset_info.name)
+    dialog_title_str = kodi.translate(41078).format(obj_instance.get_object_name(), asset_info.name)
     secondary_selected_option = xbmcgui.Dialog().select(
             dialog_title_str, list = list_items, useDetails = True, preselect = secondary_pre_select_idx)
     logger.debug('edit_default_asset() Mapable select() returned {0}'.format(secondary_selected_option))

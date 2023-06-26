@@ -336,6 +336,10 @@ msgctxt "#40865"
 msgid "Edit Release Year"
 msgstr ""
 
+msgctxt "#40866"
+msgid "Edit Tags"
+msgstr ""
+
 ############################
 # Headers and texts / notifications / dialogs
 ############################
@@ -834,6 +838,263 @@ msgstr ""
 msgctxt "#41073"
 msgid "ROMCollection '{0}' found in AKL database. Overwrite?"
 msgstr "" 
+
+msgctxt "#41074"
+msgid "Change {0} {1}"
+msgstr "" 
+
+msgctxt "#41075"
+msgid "Edit {0} {1}"
+msgstr "" 
+
+msgctxt "#41076"
+msgid "Edit {0} Assets/Artwork"
+msgstr "" 
+
+msgctxt "#41077"
+msgid "Edit {0} default Assets/Artwork"
+msgstr "" 
+
+msgctxt "#41078"
+msgid "Edit {0} {1} mapped Assets/Artwork"
+msgstr "" 
+
+msgctxt "#41079"
+msgid "Select the {0} Rating"
+msgstr "" 
+
+msgctxt "#41080"
+msgid "Addons"
+msgstr "" 
+
+msgctxt "#41081"
+msgid "Addon: {0}"
+msgstr "" 
+
+msgctxt "#41082"
+msgid "Supported metadata: {0}"
+msgstr "" 
+
+msgctxt "#41083"
+msgid "Supported assets: {0}"
+msgstr "" 
+
+msgctxt "#41084"
+msgid "Add category in?"
+msgstr "" 
+
+msgctxt "#41085"
+msgid "New Category Name"
+msgstr "" 
+
+msgctxt "#41086"
+msgid "Edit Category '{0}' metadata"
+msgstr "" 
+
+msgctxt "#41087"
+msgid "Collections to process"
+msgstr "" 
+
+msgctxt "#41088"
+msgid "Select migrations to execute (Current version {0})"
+msgstr "" 
+
+msgctxt "#41089"
+msgid "Migration {0}"
+msgstr "" 
+
+msgctxt "#41090"
+msgid "Run migration"
+msgstr "" 
+
+msgctxt "#41091"
+msgid "Mark as executed without running"
+msgstr "" 
+
+msgctxt "#41092"
+msgid "Edit ROM '{0}'"
+msgstr "" 
+
+msgctxt "#41093"
+msgid "Edit ROM '{0}' metadata"
+msgstr "" 
+
+msgctxt "#41094"
+msgid "Edit ROM NPlayers"
+msgstr "" 
+
+msgctxt "#41095"
+msgid "Edit ROM NPlayers online"
+msgstr "" 
+
+msgctxt "#41096"
+msgid "Tag to add"
+msgstr "" 
+
+msgctxt "#41097"
+msgid "Manage tags"
+msgstr "" 
+
+msgctxt "#41098"
+msgid "Add ROM in?"
+msgstr "" 
+
+msgctxt "#41099"
+msgid "Select the platform?"
+msgstr "" 
+
+msgctxt "#41100"
+msgid "Manage Launchers for '{}'"
+msgstr "" 
+
+msgctxt "#41101"
+msgid "Choose launcher to associate"
+msgstr "" 
+
+msgctxt "#41102"
+msgid "Choose launcher to edit"
+msgstr "" 
+
+msgctxt "#41103"
+msgid "Choose launcher to remove"
+msgstr "" 
+
+msgctxt "#41104"
+msgid "Choose launcher to set as default"
+msgstr "" 
+
+msgctxt "#41105"
+msgid "Choose launcher"
+msgstr "" 
+
+msgctxt "#41106"
+msgid "Manage ROM scanners for {}"
+msgstr "" 
+
+msgctxt "#41107"
+msgid "Choose scanner to associate"
+msgstr "" 
+
+msgctxt "#41108"
+msgid "Choose scanner to edit"
+msgstr "" 
+
+msgctxt "#41109"
+msgid "Choose scanner to remove"
+msgstr "" 
+
+msgctxt "#41110"
+msgid "Choose ROM scanner"
+msgstr "" 
+
+msgctxt "#41111"
+msgid "Scrape collection '{0}' ROMs with '{1}'"
+msgstr "" 
+
+msgctxt "#41112"
+msgid "Scrape ROM '{0}' with '{1}'"
+msgstr ""
+
+msgctxt "#41113"
+msgid "Metadata to scrape"
+msgstr ""
+
+msgctxt "#41114"
+msgid "Assets to scrape"
+msgstr ""
+
+msgctxt "#41115"
+msgid "Metadata scan policy '{}'"
+msgstr ""
+
+msgctxt "#41116"
+msgid "Asset scan policy '{}'"
+msgstr ""
+
+msgctxt "#41117"
+msgid "Game search mode '{}'"
+msgstr ""
+
+msgctxt "#41118"
+msgid "Game selection mode '{}'"
+msgstr ""
+
+msgctxt "#41119"
+msgid "Asset selection mode '{}'"
+msgstr ""
+
+msgctxt "#41120"
+msgid "Scrape ROM assets"
+msgstr ""
+
+msgctxt "#41121"
+msgid "Scrape ROM {0} assets"
+msgstr ""
+
+msgctxt "#41122"
+msgid "Scrape ROM metadata"
+msgstr ""
+
+msgctxt "#41123"
+msgid "Scrape ROM {0}"
+msgstr ""
+
+msgctxt "#41124"
+msgid "Scrape collection '{0}' ROMs"
+msgstr ""
+
+msgctxt "#41125"
+msgid "Add ROM collection in?"
+msgstr ""
+
+msgctxt "#41126"
+msgid "Select action for ROM Collection {0}"
+msgstr ""
+
+msgctxt "#41127"
+msgid "Edit Launcher '{0}' metadata"
+msgstr ""
+
+msgctxt "#41128"
+msgid "Move to category"
+msgstr ""
+
+msgctxt "#41128"
+msgid "Manage ROM Collection '{}' ROMs"
+msgstr ""
+
+msgctxt "#41129"
+msgid "ROM Asset directories"
+msgstr ""
+
+msgctxt "#41130"
+msgid "Import ROMs in ROMCollection '{}'"
+msgstr ""
+
+msgctxt "#41131"
+msgid "Search ROMs..."
+msgstr ""
+
+msgctxt "#41132"
+msgid "Select a Rating..."
+msgstr ""
+
+msgctxt "#41133"
+msgid "Select a Genre..."
+msgstr ""
+
+msgctxt "#41134"
+msgid "Select a Release year..."
+msgstr ""
+
+msgctxt "#41135"
+msgid "Select a Developer..."
+msgstr ""
+
+############################
+# List options
+############################
+# 42000 ->
 
 ############################
 # Scraping settings
