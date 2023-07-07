@@ -130,7 +130,7 @@ def cmd_check_ROM_artwork_integrity(args):
             ['Launcher', 'ROMs', 'Images', 'Missing', 'Problematic'],
         ]
         pdialog = kodi.ProgressDialog()
-        d_msg = 'Checking ROM artwork integrity...'
+        d_msg = kodi.translate(41152)
         pdialog.startProgress(d_msg, len(romcollections))
         total_images = 0
         missing_images = 0
@@ -296,7 +296,7 @@ def cmd_delete_redundant_rom_artwork(args):
         
         main_slist = []
         detailed_slist = []
-        d_msg = 'Checking ROM artwork integrity...'
+        d_msg = kodi.translate(41152)
         pdialog.startProgress(d_msg, len(selected_collections))
 
         all_unique_paths = []

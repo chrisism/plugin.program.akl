@@ -1213,6 +1213,82 @@ msgctxt "#41136"
 msgid "Enter the ROM Title search string..."
 msgstr ""
 
+msgctxt "#41137"
+msgid "Edit {0} '{1}' {2}"
+msgstr ""
+
+msgctxt "#41138"
+msgid "Assets root path for entry '{0}'"
+msgstr ""
+
+msgctxt "#41139"
+msgid "Directory to store artwork not found.\nConfigure it before you can edit artwork."
+msgstr ""
+
+msgctxt "#41140"
+msgid "Unknown obj_instance.get_assets_kind() {}.\nThis is a bug, please report it."
+msgstr ""
+
+msgctxt "#41141"
+msgid "Select {0} {1}"
+msgstr ""
+
+msgctxt "#41142"
+msgid "Collection '{0}' has {1} ROMs. Are you sure you want to clear them from this collection?"
+msgstr ""
+
+msgctxt "#41143"
+msgid "Select NFO description file"
+msgstr ""
+
+msgctxt "#41144"
+msgid "Select directory to export XML"
+msgstr ""
+
+msgctxt "#41145"
+msgid "Select XML category/launcher configuration file"
+msgstr ""
+
+msgctxt "#41146"
+msgid "Category "{}" status is now {}"
+msgstr ""
+
+msgctxt "#41147"
+msgid "Duplicated asset directories: {0}.\nAKL will refuse to add/edit ROMs if there are duplicate asset directories."
+msgstr ""
+
+msgctxt "#41148"
+msgid "No NFO file available"
+msgstr ""
+
+msgctxt "#41149"
+msgid "Assets directories not set: {0}.\nAsset scanner will be disabled for this/those."
+msgstr ""
+
+msgctxt "#41150"
+msgid "ROMCollection "{}" status is now {}"
+msgstr ""
+
+msgctxt "#41151"
+msgid "Collection has no ROMs. Nothing to do."
+msgstr ""
+
+msgctxt "#41152"
+msgid "Checking ROM artwork integrity..."
+msgstr ""
+
+msgctxt "#41153"
+msgid "Processing NFO files"
+msgstr ""
+
+msgctxt "#41154"
+msgid "Saving ROM JSON database ..."
+msgstr ""
+
+msgctxt "#41155"
+msgid "Select ROMs JSON file"
+msgstr ""
+
 ############################
 # List/Action options
 ############################

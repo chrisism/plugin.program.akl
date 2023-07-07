@@ -614,7 +614,7 @@ def cmd_rom_import_nfo_file(args):
         NFO_file = rom.get_nfo_file()
         
         if not NFO_file:
-            kodi.dialog_OK('No NFO file available')
+            kodi.dialog_OK(kodi.translate(41148))
             return
         
         if rom.update_with_nfo_file(NFO_file):

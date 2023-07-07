@@ -37,7 +37,7 @@ from resources.lib.domain import Category, ROMCollection, AelAddon
 logger = logging.getLogger(__name__)
 @AppMediator.register('IMPORT_LAUNCHERS')
 def cmd_execute_import_launchers(args):
-    file_list = kodi.browse(text='Select XML category/launcher configuration file',mask='.xml', multiple=True)
+    file_list = kodi.browse(text=kodi.translate(41145),mask='.xml', multiple=True)
 
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
@@ -116,8 +116,9 @@ def cmd_export_to_xml(args):
     logger.debug('_command_exec_utils_export_launchers() Exporting Category/Launcher XML configuration')
 
     # --- Ask path to export XML configuration ---
-    dir_path = kodi.dialog_get_directory('Select XML export directory')
-    if not dir_path: return
+    dir_path = kodi.dialog_get_directory(kodi.translate(41144))
+    if not dir_path:
+        return
 
     # --- If XML exists then warn user about overwriting it ---
     export_FN = io.FileName(dir_path).pjoin('AKL_configuration.xml')
@@ -282,8 +283,7 @@ def cmd_check_duplicate_asset_dirs(args):
     duplicated_name_list = romcollection.get_duplicated_asset_dirs()
     if duplicated_name_list:
         duplicated_asset_srt = ', '.join(duplicated_name_list)
-        kodi.dialog_OK('Duplicated asset directories: {0}. '.format(duplicated_asset_srt) +
-                        'AKL will refuse to add/edit ROMs if there are duplicate asset directories.')
+        kodi.dialog_OK(kodi.translate(41147).format(duplicated_asset_srt))
 
 def _apply_addon_launcher_for_legacy_launcher(collection: ROMCollection, available_addons: typing.Dict[str, AelAddon]):
     launcher_type = collection.get_custom_attribute('type')

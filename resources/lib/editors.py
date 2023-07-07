@@ -40,9 +40,10 @@ logger = logging.getLogger(__name__)
 def edit_field_by_str(obj_instance: MetaDataItemABC, metadata_name, get_method, set_method) -> bool:
     object_name = obj_instance.get_object_name()
     old_value = get_method()
-    s = 'Edit {0} "{1}" {2}'.format(object_name, old_value, metadata_name)
+    s = kodi.translate(41137).format(object_name, old_value, metadata_name)
     new_value = kodi.dialog_keyboard(s, old_value)
-    if new_value is None: return False
+    if new_value is None:
+        return False
 
     if old_value == new_value:
         kodi.notify(kodi.translate(40987).format(object_name, metadata_name))
@@ -59,7 +60,7 @@ def edit_field_by_str(obj_instance: MetaDataItemABC, metadata_name, get_method, 
 def edit_field_by_int(obj_instance: MetaDataItemABC, metadata_name, get_method, set_method) -> bool:
     object_name = obj_instance.get_object_name()
     old_value = get_method()
-    s = 'Edit {0} "{1}" {2}'.format(object_name, old_value, metadata_name)
+    s = kodi.translate(41137).format(object_name, old_value, metadata_name)
     new_value = kodi.dialog_numeric(s, old_value)
     if new_value is None: return False
 
@@ -230,7 +231,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
     assets_directory = obj_instance.get_assets_root_path()        
     if not assets_directory:
         if kodi.dialog_yesno(kodi.translate(41047)):
-            path_str = kodi.dialog_get_directory(f"Assets root path for entry '{obj_instance.get_name()}'")
+            path_str = kodi.dialog_get_directory(kodi.translate(41138).format(obj_instance.get_name()))
             assets_directory = io.FileName(path_str, True)
             obj_instance.set_assets_root_path(assets_directory, None, create_default_subdirectories=True)
         else:
@@ -247,8 +248,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
                 assets_directory = io.FileName(settings.getSetting('launchers_asset_dir'), isdir = True)
                 obj_instance.set_assets_root_path(assets_directory, None, create_default_subdirectories=True)
             else:
-                kodi.dialog_OK('Unknown obj_instance.get_assets_kind() {}. '.format(obj_instance.get_assets_kind()) +
-                            'This is a bug, please report it.')
+                kodi.dialog_OK(kodi.translate(41140).format(obj_instance.get_assets_kind()))
                 return None
 
     asset_type_directory = obj_instance.get_asset_path(asset_info, False)    
@@ -259,8 +259,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
     logger.debug(f'edit_asset() asset_type_directory  "{asset_type_directory.getPath()}"')
     if not assets_directory.exists():
         logger.error(f'Directory not found "{assets_directory.getPath()}"')
-        kodi.dialog_OK('Directory to store artwork not found. '
-                       'Configure it before you can edit artwork.')
+        kodi.dialog_OK(kodi.translate(41139))
         return None
 
     dialog_title = kodi.translate(41074).format(obj_instance.get_name(), asset_info.name)
@@ -297,7 +296,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
             current_image_dir = io.FileName('/')
         
         logger.debug(f'edit_asset() Asset initial dir "{current_image_dir.getPath()}"')
-        title_str = 'Select {0} {1}'.format(obj_instance.get_object_name(), asset_info.name)
+        title_str = kodi.translate(41141).format(obj_instance.get_object_name(), kodi.translate(asset_info.name_id))
         ext_list = asset_info.exts_dialog
         if asset_info.id == constants.ASSET_MANUAL_ID or asset_info.id == constants.ASSET_TRAILER_ID:
             new_asset_file = kodi.browse(text=title_str, mask=ext_list, preselected_path=current_image_dir.getPath())
@@ -334,7 +333,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
             logger.info("No local asset type path configured. Reverting to root.")
             current_image_dir = obj_instance.get_assets_root_path()
         
-        title_str = f'Select {obj_instance.get_object_name()} {asset_info.name}'
+        title_str = kodi.translate(41141).format(obj_instance.get_object_name(), kodi.translate(asset_info.name_id))
         ext_list = asset_info.exts_dialog
         if asset_info.id == constants.ASSET_MANUAL_ID or asset_info.id == constants.ASSET_TRAILER_ID:
             new_asset_file_str = kodi.browse(text=title_str, mask=ext_list, preselected_path=current_image_dir.getPath())

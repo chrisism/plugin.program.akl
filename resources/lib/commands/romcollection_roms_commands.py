@@ -245,7 +245,7 @@ def cmd_import_roms_nfo(args):
         roms = repository.find_roms_by_romcollection(collection)
     
         pDialog = kodi.ProgressDialog()
-        pDialog.startProgress('Processing NFO files', num_steps=len(roms))
+        pDialog.startProgress(kodi.translate(41153), num_steps=len(roms))
         num_read_NFO_files = 0
 
         step = 0
@@ -258,7 +258,7 @@ def cmd_import_roms_nfo(args):
                 repository.update_rom(rom)
                 
         # >> Save ROMs XML file / Launcher/timestamp saved at the end of function
-        pDialog.updateProgress(len(roms), 'Saving ROM JSON database ...')
+        pDialog.updateProgress(len(roms), kodi.translate(41154))
         uow.commit()
         pDialog.close()
         
@@ -269,7 +269,7 @@ def cmd_import_roms_nfo(args):
 @AppMediator.register('IMPORT_ROMS_JSON')
 def cmd_import_roms_json(args):
     romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
-    file_list = kodi.browse(text='Select ROMs JSON file',mask='.json',multiple=True)
+    file_list = kodi.browse(text=kodi.translate(41155),mask='.json',multiple=True)
 
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
@@ -339,13 +339,13 @@ def cmd_clear_roms(args):
         # If collection is empty (no ROMs) do nothing
         num_roms = len([*roms])
         if num_roms == 0:
-            kodi.dialog_OK('Collection has no ROMs. Nothing to do.')
+            kodi.dialog_OK(kodi.translate(41151))
             return
 
         # Confirm user wants to delete ROMs    
-        ret = kodi.dialog_yesno("Collection '{0}' has {1} ROMs. Are you sure you want to clear them "
-                                "from this collection?".format(romcollection.get_name(), num_roms))
-        if not ret: return
+        ret = kodi.dialog_yesno(kodi.translate(41142).format(romcollection.get_name(), num_roms))
+        if not ret:
+            return
 
         # --- If there is a No-Intro XML DAT configured remove it ---
         # TODO fix

@@ -248,7 +248,7 @@ def cmd_romcollection_status(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
         romcollection.change_finished_status()
-        kodi.dialog_OK('ROMCollection "{}" status is now {}'.format(romcollection.get_name(), romcollection.get_finished_str_code()))
+        kodi.dialog_OK(kodi.translate(41150).format(romcollection.get_name(), kodi.translate(romcollection.get_finished_str_code())))
         repository.update_romcollection(romcollection)
         uow.commit()
         

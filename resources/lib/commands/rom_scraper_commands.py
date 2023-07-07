@@ -533,8 +533,7 @@ def _check_collection_unset_asset_dirs(romcollection: ROMCollection, scraper_set
     scraper_settings.asset_IDs_to_scrape = enabled_asset_list
     if unconfigured_name_list:
         unconfigured_asset_srt = ', '.join(unconfigured_name_list)
-        msg = 'Assets directories not set: {0}. '.format(unconfigured_asset_srt)
-        msg = msg + 'Asset scanner will be disabled for this/those.'                                
+        msg = kodi.translate(41149).format(unconfigured_asset_srt)
         logger.debug(msg)
         kodi.dialog_OK(msg)
         return False

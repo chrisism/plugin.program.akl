@@ -50,7 +50,8 @@ def cmd_add_category(args):
     
         # --- Get new Category name ---
         name = kodi.dialog_keyboard(kodi.translate(41085))
-        if name is None: return
+        if name is None:
+            return
         
         category = Category()
         category.set_name(name)
@@ -203,7 +204,7 @@ def cmd_category_status(args):
         repository = CategoryRepository(uow)
         category = repository.find_category(category_id)
         category.change_finished_status()
-        kodi.dialog_OK('Category "{}" status is now {}'.format(category.get_name(), category.get_finished_str_code()))
+        kodi.dialog_OK(kodi.translate(41146).format(category.get_name(), kodi.translate(category.get_finished_str_code())))
         repository.update_category(category)
         uow.commit()
         
@@ -360,11 +361,13 @@ def cmd_category_import_nfo_file(args):
 def cmd_category_browse_import_nfo_file(args):    
     category_id = args['category_id'] if 'category_id' in args else None
     
-    NFO_file = kodi.browse(text='Select NFO description file', mask='.nfo')
+    NFO_file = kodi.browse(text=kodi.translate(41143), mask='.nfo')
     logger.debug('cmd_category_browse_import_nfo_file() Dialog().browse returned "{0}"'.format(NFO_file))
-    if not NFO_file: return
+    if not NFO_file:
+        return
     NFO_FileName = io.FileName(NFO_file)
-    if not NFO_FileName.exists(): return
+    if not NFO_FileName.exists():
+        return
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
@@ -419,7 +422,7 @@ def cmd_category_export_xml(args):
     logger.debug('cmd_export_category_xml() l_fn_str "{0}"'.format(category_fn_str))
 
     # --- Ask user for a path to export the launcher configuration ---
-    dir_path = kodi.browse(type=0, text='Select directory to export XML')
+    dir_path = kodi.browse(type=0, text=kodi.translate(41144))
     if not dir_path: 
         AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
         return
