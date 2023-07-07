@@ -57,12 +57,14 @@ class Test_cmd_scan_addons(unittest.TestCase):
         
     def repository_empty(): return []
     
+    @patch('akl.utils.kodi.translate')
     @patch('xbmcaddon.Addon', side_effect = mocked_addons)
     @patch('resources.lib.repositories.AelAddonRepository.insert_addon', side_effect = repository_save)
     @patch('resources.lib.repositories.AelAddonRepository.update_addon', side_effect = repository_update)
     @patch('resources.lib.repositories.AelAddonRepository.find_all', side_effect = repository_empty)
     @patch('akl.utils.kodi.jsonrpc_query')
-    def test_saving_new_addons(self, jsonrpc_response_mock, find_all_mock, repo_update_mock, repo_save_mock, addon_mock):        
+    def test_saving_new_addons(self, jsonrpc_response_mock, find_all_mock, repo_update_mock, 
+                               repo_save_mock, addon_mock, translate_mock):        
         # arrange
         Test_cmd_scan_addons.mocked_addons_collection = {
             'plugin.mock.A': tests.fakes.FakeAddon({ 'version': '1.2.3', 'akl.enabled': 'true', 'akl.plugin_types': 'SCANNER', 'akl.scanner.friendlyname': 'MockA' }),
