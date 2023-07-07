@@ -255,8 +255,9 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
 
     logger.info(f'edit_asset() Editing {obj_instance.get_object_name()} {asset_info.name}')
     logger.info(f'edit_asset() Object ID {obj_instance.get_id()}')
-    logger.debug(f'edit_asset() assets_directory  "{assets_directory.getPath()}"')
-    logger.debug(f'edit_asset() asset_type_directory  "{asset_type_directory.getPath()}"')
+    logger.debug(f'edit_asset() assets_directory "{assets_directory.getPath()}"')
+    logger.debug(f'edit_asset() asset_type_directory "{asset_type_directory.getPath() if asset_type_directory else "None"}"')
+
     if not assets_directory.exists():
         logger.error(f'Directory not found "{assets_directory.getPath()}"')
         kodi.dialog_OK(kodi.translate(41139))

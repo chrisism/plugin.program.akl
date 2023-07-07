@@ -25,7 +25,7 @@ SELECT_ALL_CATEGORY_ASSETS = "SELECT * FROM vw_category_assets"
 SELECT_ALL_CATEGORY_ASSET_MAPPINGS = """
                                     SELECT am.*, mm.metadata_id FROM assetmappings AS am 
                                     INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
-                                    INNER JOIN category AS c ON mm.metadata_id = c.metadata_id
+                                    INNER JOIN categories AS c ON mm.metadata_id = c.metadata_id
                                     """
 SELECT_ROOT_CATEGORIES = "SELECT * FROM vw_categories WHERE parent_id IS NULL ORDER BY m_name"
 SELECT_ROOT_CATEGORY_ASSETS = "SELECT * FROM vw_category_assets WHERE parent_id IS NULL"
