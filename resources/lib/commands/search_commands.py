@@ -35,11 +35,11 @@ logger = logging.getLogger(__name__)
 def cmd_search(args):
     
     options = collections.OrderedDict()
-    options['SEARCH_BY_TITLE']       = 'By ROM Title'
-    options['SEARCH_BY_RELEASEYEAR'] = 'By Release Year'
-    options['SEARCH_BY_GENRE']       = 'By Genre'
-    options['SEARCH_BY_DEVELOPER']   = 'By Developer'
-    options['SEARCH_BY_RATING']      = 'By Rating'
+    options['SEARCH_BY_TITLE'] = kodi.translate(42058)
+    options['SEARCH_BY_RELEASEYEAR'] = kodi.translate(42059)
+    options['SEARCH_BY_GENRE'] = kodi.translate(42060)
+    options['SEARCH_BY_DEVELOPER'] = kodi.translate(42061)
+    options['SEARCH_BY_RATING'] = kodi.translate(42062)
     
     selected_option = kodi.OrdDictionaryDialog().select(kodi.translate(41131),options)
     AppMediator.sync_cmd(selected_option, args)
@@ -48,7 +48,7 @@ def cmd_search(args):
 def cmd_search_by_title(args):
     romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
     
-    search_string = kodi.dialog_keyboard('Enter the ROM Title search string...')
+    search_string = kodi.dialog_keyboard(kodi.translate(41136))
     if search_string is None: return None
     
     params = {
@@ -90,14 +90,17 @@ def _apply_search_query_by_options(romcollection_id:str, filter_type:str, dialog
         filter_values = repository.find_all_filter_values_in_romcollection(romcollection, constants.META_YEAR_ID)
         
         options = []
-        options.append('[ Not Set ]')
+        options.append(f'[ {kodi.translate(42001)} ]')
         options.extend(filter_values)
         
         selected_index = kodi.ListDialog().select(dialog_title, options)
-        if selected_index is None: return None
+        if selected_index is None:
+            return None
         
-        if selected_index == 0: search_string = 'UNDEFINED'
-        else: search_string = options[selected_index]
+        if selected_index == 0:
+            search_string = 'UNDEFINED'
+        else:
+            search_string = options[selected_index]
         
     params = {
         'filter': filter_type,

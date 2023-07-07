@@ -55,21 +55,21 @@ def cmd_manage_roms(args):
     has_roms = romcollection.has_roms()
 
     options = collections.OrderedDict()
-    options['SET_ROMS_DEFAULT_ARTWORK']  = 'Choose ROMs default artwork ...'
-    options['SET_ROMS_ASSET_DIRS']       = 'Manage ROMs asset directories ...'
+    options['SET_ROMS_DEFAULT_ARTWORK'] = kodi.translate(42044)
+    options['SET_ROMS_ASSET_DIRS'] = kodi.translate(42045)
     
     if romcollection.has_scanners(): 
-        options['SCAN_ROMS']                    = 'Scan for new ROMs'
-        options['REMOVE_DEAD_ROMS']             = 'Remove dead/missing ROMs'
-        options['EDIT_ROMCOLLECTION_SCANNERS']  = 'Configure ROM scanners'
-    else: options['ADD_SCANNER']                = 'Add new ROM scanner' 
+        options['SCAN_ROMS'] = kodi.translate(42046)
+        options['REMOVE_DEAD_ROMS'] = kodi.translate(42047)
+        options['EDIT_ROMCOLLECTION_SCANNERS'] = kodi.translate(42048)
+    else: options['ADD_SCANNER'] = kodi.translate(42049)
     
-    options['IMPORT_ROMS']               = 'Import ROMs (files/metadata)'
+    options['IMPORT_ROMS'] = kodi.translate(42050)
     if has_roms:
-        options['EXPORT_ROMS']           = 'Export ROMs metadata to NFO files'
-        options['SCRAPE_ROMS']           = 'Scrape ROMs'
-        options['DELETE_ROMS_NFO']       = 'Delete ROMs NFO files'
-        options['CLEAR_ROMS']            = 'Clear ROMs from ROMCollection'
+        options['EXPORT_ROMS'] = kodi.translate(42051)
+        options['SCRAPE_ROMS'] = kodi.translate(42052)
+        options['DELETE_ROMS_NFO'] = kodi.translate(42053)
+        options['CLEAR_ROMS'] = kodi.translate(42054)
 
     s = kodi.translate(41128).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
@@ -101,7 +101,9 @@ def cmd_set_roms_default_artwork(args):
             # >> Label is the string 'Choose asset for XXXX (currently YYYYY)'
             mapped_asset_info = romcollection.get_ROM_asset_mapping(default_asset_info)
             # --- Append to list of ListItems ---
-            options[default_asset_info] = 'Choose asset for {0} (currently {1})'.format(default_asset_info.name, mapped_asset_info.name)
+            options[default_asset_info] = kodi.translate(42055).format(
+                kodi.translate(default_asset_info.name_id), 
+                kodi.translate(mapped_asset_info.name_id))
         
         dialog = kodi.OrdDictionaryDialog()
         selected_asset_info = dialog.select(kodi.translate(41077).format("ROM"), options)
@@ -121,10 +123,11 @@ def cmd_set_roms_default_artwork(args):
         options = collections.OrderedDict()
         for mappable_asset_info in mappable_asset_list:
             # >> Label is the asset name (Icon, Fanart, etc.)
-            options[mappable_asset_info] = mappable_asset_info.name
+            options[mappable_asset_info] = kodi.translate(mappable_asset_info.name_id)
 
         dialog = kodi.OrdDictionaryDialog()
-        dialog_title_str = kodi.translate(41078).format(romcollection.get_object_name(), selected_asset_info.name)
+        dialog_title_str = kodi.translate(41078).format(romcollection.get_object_name(), 
+                                                        kodi.translate(selected_asset_info.name_id))
         new_selected_asset_info = dialog.select(dialog_title_str, options, mapped_asset_info)
     
         if new_selected_asset_info is None:
@@ -136,7 +139,9 @@ def cmd_set_roms_default_artwork(args):
         logger.debug(f'Mapable selected {new_selected_asset_info.name}.')
         romcollection.set_mapped_ROM_asset(selected_asset_info, new_selected_asset_info)
         kodi.notify(kodi.translate(40983).format(
-            romcollection.get_object_name(), selected_asset_info.name, new_selected_asset_info.name
+            romcollection.get_object_name(), 
+            kodi.translate(selected_asset_info.name_id), 
+            kodi.translate(new_selected_asset_info.name_id)
         ))
         
         repository.update_romcollection(romcollection)
@@ -210,8 +215,8 @@ def cmd_import_roms(args):
         romcollection = repository.find_romcollection(romcollection_id)
 
     options = collections.OrderedDict()
-    options['IMPORT_ROMS_NFO']      = 'Import ROMs metadata from NFO files'
-    options['IMPORT_ROMS_JSON']     = 'Import ROMs data from JSON files'
+    options['IMPORT_ROMS_NFO'] = kodi.translate(42056)
+    options['IMPORT_ROMS_JSON'] = kodi.translate(42057)
 
     s = kodi.translate(41130).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)

@@ -205,6 +205,52 @@ msgid "Automatic fallback to Retroplayer"
 msgstr "settings.xml"
 
 ############################
+# Scraping settings
+############################
+msgctxt "#20000"
+msgid "Skip"
+msgstr "settings.xml"
+
+msgctxt "#20010"
+msgid "None"
+msgstr "settings.xml"
+
+msgctxt "#20030"
+msgid "Local files"
+msgstr "settings.xml"
+
+msgctxt "#20050"
+msgid "Local files + Scrapers"
+msgstr "settings.xml"
+
+msgctxt "#20060"
+msgid "Scrapers"
+msgstr "settings.xml"
+
+############################
+# Scraping mode
+############################
+
+msgctxt "#20510"
+msgid "Manual"
+msgstr "settings.xml"
+
+msgctxt "#20520"
+msgid "Automatic"
+msgstr "settings.xml"
+
+############################
+# ROM Audit options
+############################
+msgctxt "#20530"
+msgid "Parents"
+msgstr "settings.xml"
+
+msgctxt "#20531"
+msgid "Clones"
+msgstr "settings.xml"
+
+############################
 # Setting options - Addons
 ############################
 
@@ -272,6 +318,14 @@ msgctxt "#40813"
 msgid "Identifier"
 msgstr ""
 
+msgctxt "#40814"
+msgid "Tag"
+msgstr ""
+
+msgctxt "#40815"
+msgid "Name"
+msgstr ""
+
 ############################
 # Actions
 ############################
@@ -325,19 +379,83 @@ msgid "Delete Category"
 msgstr ""
 
 msgctxt "#40863"
-msgid "Edit Title"
+msgid "Edit Title: '{}'"
 msgstr ""
 
 msgctxt "#40864"
-msgid "Edit Platform"
+msgid "Edit Platform: '{}'"
 msgstr ""
 
 msgctxt "#40865"
-msgid "Edit Release Year"
+msgid "Edit Release Year: '{}'"
 msgstr ""
 
 msgctxt "#40866"
 msgid "Edit Tags"
+msgstr ""
+
+msgctxt "#40867"
+msgid "Edit Genre: '{}'"
+msgstr ""
+
+msgctxt "#40868"
+msgid "Edit Developer: '{}'"
+msgstr ""
+
+msgctxt "#40869"
+msgid "Edit Rating: '{}'"
+msgstr ""
+
+msgctxt "#40870"
+msgid "Edit Plot: '{}'"
+msgstr ""
+
+msgctxt "#40871"
+msgid "Edit NPlayers: '{}'"
+msgstr ""
+
+msgctxt "#40872"
+msgid "Edit NPlayers online: '{}'"
+msgstr ""
+
+msgctxt "#40873"
+msgid "Edit PEGI Rating: '{}'"
+msgstr ""
+
+msgctxt "#40874"
+msgid "Edit ESRB Rating: '{}'"
+msgstr ""
+
+msgctxt "#40875"
+msgid "Edit Box Size: '{}'"
+msgstr ""
+
+msgctxt "#40876"
+msgid "Import NFO file (default, {})"
+msgstr ""
+
+msgctxt "#40877"
+msgid "Import NFO file (browse NFO file) ..."
+msgstr ""
+
+msgctxt "#40878"
+msgid "Save NFO file (default location)"
+msgstr ""
+
+msgctxt "#40879"
+msgid "Save NFO file (default location)"
+msgstr ""
+
+msgctxt "#40879"
+msgid "Load Plot from TXT file ..."
+msgstr ""
+
+msgctxt "#40880"
+msgid "Load Plot from TXT file ..."
+msgstr ""
+
+msgctxt "#40881"
+msgid "Scrape"
 msgstr ""
 
 ############################
@@ -940,7 +1058,7 @@ msgid "Add ROM in?"
 msgstr "" 
 
 msgctxt "#41099"
-msgid "Select the platform?"
+msgid "Select the platform"
 msgstr "" 
 
 msgctxt "#41100"
@@ -1091,56 +1209,329 @@ msgctxt "#41135"
 msgid "Select a Developer..."
 msgstr ""
 
-############################
-# List options
-############################
-# 42000 ->
+msgctxt "#41136"
+msgid "Enter the ROM Title search string..."
+msgstr ""
 
 ############################
-# Scraping settings
-############################
-msgctxt "#20000"
-msgid "Skip"
-msgstr "settings.xml"
-
-msgctxt "#20010"
-msgid "None"
-msgstr "settings.xml"
-
-msgctxt "#20030"
-msgid "Local files"
-msgstr "settings.xml"
-
-msgctxt "#20050"
-msgid "Local files + Scrapers"
-msgstr "settings.xml"
-
-msgctxt "#20060"
-msgid "Scrapers"
-msgstr "settings.xml"
-
-############################
-# Scraping mode
+# List/Action options
 ############################
 
-msgctxt "#20510"
+msgctxt "#42001"
+msgid "Not set"
+msgstr ""
+
+msgctxt "#42002"
+msgid "Rating {0}"
+msgstr ""
+
+msgctxt "#42003"
+msgid "Edit {0} ..."
+msgstr ""
+
+msgctxt "#42004"
+msgid "Link to local {0} image"
+msgstr ""
+
+msgctxt "#42005"
+msgid "Import local {0} (copy and rename)"
+msgstr ""
+
+msgctxt "#42006"
+msgid "Unset artwork/asset"
+msgstr ""
+
+msgctxt "#42007"
+msgid "Scrape {0}"
+msgstr ""
+
+msgctxt "#42008"
+msgid "> Scan for new or updated addons"
+msgstr ""
+
+msgctxt "#42009"
+msgid "Refresh/update addon"
+msgstr ""
+
+msgctxt "#42010"
+msgid "Supported metadata"
+msgstr ""
+
+msgctxt "#42011"
+msgid "Supported assets"
+msgstr ""
+
+msgctxt "#42012"
+msgid "Plugin settings"
+msgstr ""
+
+msgctxt "#42013"
+msgid "ROM status: {0}"
+msgstr ""
+
+msgctxt "#42014"
+msgid "Finished"
+msgstr ""
+
+msgctxt "#42015"
+msgid "Unfinished"
+msgstr ""
+
+msgctxt "#42016"
+msgid "Manage associated launchers"
+msgstr ""
+
+msgctxt "#42017"
+msgid "Add new launcher to ROM"
+msgstr ""
+
+msgctxt "#42018"
+msgid "Delete ROM"
+msgstr ""
+
+msgctxt "#42019"
+msgid "NFO found"
+msgstr ""
+
+msgctxt "#42020"
+msgid "NFO not found"
+msgstr ""
+
+msgctxt "#42021"
+msgid "not rated"
+msgstr ""
+
+msgctxt "#42022"
+msgid "Manual entry"
+msgstr ""
+
+msgctxt "#42023"
+msgid "[Add tag]"
+msgstr ""
+
+msgctxt "#42024"
+msgid "[Clear all tags]"
+msgstr ""
+
+msgctxt "#42025"
+msgid "[Manual insert tag]"
+msgstr ""
+
+msgctxt "#42026"
+msgid "Add new launcher"
+msgstr ""
+
+msgctxt "#42027"
+msgid "Edit launcher"
+msgstr ""
+
+msgctxt "#42028"
+msgid "Remove launcher"
+msgstr ""
+
+msgctxt "#42029"
+msgid "Set default launcher: '{}'"
+msgstr ""
+
+msgctxt "#42030"
+msgid "Metadata to scrape: '{}'"
+msgstr ""
+
+msgctxt "#42031"
+msgid "Assets to scrape: '{}'"
+msgstr ""
+
+msgctxt "#42032"
+msgid "Overwrite existing metadata: '{}'"
+msgstr ""
+
+msgctxt "#42033"
+msgid "Overwrite existing assets/files: '{}'"
+msgstr ""
+
+msgctxt "#42034"
+msgid "Ignore scraped titles: '{}'"
+msgstr ""
+
+msgctxt "#42035"
+msgid "Yes"
+msgstr ""
+
+msgctxt "#42036"
+msgid "No"
+msgstr ""
+
+msgctxt "#42037"
+msgid "Set the title of the launcher"
+msgstr ""
+
+msgctxt "#42038"
+msgid "Select asset/artwork directory"
+msgstr ""
+
+msgctxt "#42039"
+msgid "Manage ROMs ..."
+msgstr ""
+
+msgctxt "#42040"
+msgid "Change Category: '{}'"
+msgstr ""
+
+msgctxt "#42041"
+msgid "ROM Collection status: '{}'"
+msgstr ""
+
+msgctxt "#42042"
+msgid "Export ROM Collection XML configuration ..."
+msgstr ""
+
+msgctxt "#42043"
+msgid "Delete ROM Collection"
+msgstr ""
+
+msgctxt "#42044"
+msgid "Choose ROMs default artwork ..."
+msgstr ""
+
+msgctxt "#42045"
+msgid "Manage ROMs asset directories ..."
+msgstr ""
+
+msgctxt "#42046"
+msgid "Scan for new ROMs"
+msgstr ""
+
+msgctxt "#42047"
+msgid "Remove dead/missing ROMs"
+msgstr ""
+
+msgctxt "#42048"
+msgid "Configure ROM scanners"
+msgstr ""
+
+msgctxt "#42049"
+msgid "Add new ROM scanner"
+msgstr ""
+
+msgctxt "#42050"
+msgid "Import ROMs (files/metadata)"
+msgstr ""
+
+msgctxt "#42051"
+msgid "Export ROMs metadata to NFO files"
+msgstr ""
+
+msgctxt "#42052"
+msgid "Scrape ROMs"
+msgstr ""
+
+msgctxt "#42053"
+msgid "Delete ROMs NFO files"
+msgstr ""
+
+msgctxt "#42054"
+msgid "Clear ROMs from ROMCollection"
+msgstr ""
+
+msgctxt "#42055"
+msgid "Choose asset for {0} (currently {1})"
+msgstr ""
+
+msgctxt "#42056"
+msgid "Import ROMs metadata from NFO files"
+msgstr ""
+
+msgctxt "#42057"
+msgid "Import ROMs data from JSON files"
+msgstr ""
+
+msgctxt "#42058"
+msgid "By ROM Title"
+msgstr ""
+
+msgctxt "#42059"
+msgid "By Release Year"
+msgstr ""
+
+msgctxt "#42060"
+msgid "By Genre"
+msgstr ""
+
+msgctxt "#42061"
+msgid "By Developer"
+msgstr ""
+
+msgctxt "#42062"
+msgid "By Rating"
+msgstr ""
+
+############################
+# Constant Enum values
+############################
+
+msgctxt "#43001"
+msgid "Icon"
+msgstr "Assets"
+
+msgctxt "#43002"
+msgid "Fanart"
+msgstr "Assets"
+
+msgctxt "#43003"
+msgid "Banner"
+msgstr "Assets"
+
+msgctxt "#43004"
+msgid "Poster"
+msgstr "Assets"
+
+msgctxt "#43005"
+msgid "Clearlogo"
+msgstr "Assets"
+
+msgctxt "#43006"
+msgid "Controller"
+msgstr "Assets"
+
+msgctxt "#43007"
+msgid "Trailer"
+msgstr "Assets"
+
+msgctxt "#43008"
+msgid "Title"
+msgstr "Assets"
+
+msgctxt "#43009"
+msgid "Snap"
+msgstr "Assets"
+
+msgctxt "#43010"
+msgid "Boxfront"
+msgstr "Assets"
+
+msgctxt "#43011"
+msgid "Boxback"
+msgstr "Assets"
+
+msgctxt "#43012"
+msgid "Cartridge"
+msgstr "Assets"
+
+msgctxt "#43013"
+msgid "Flyer"
+msgstr "Assets"
+
+msgctxt "#43014"
+msgid "Map"
+msgstr "Assets"
+
+msgctxt "#43015"
 msgid "Manual"
-msgstr "settings.xml"
+msgstr "Assets"
 
-msgctxt "#20520"
-msgid "Automatic"
-msgstr "settings.xml"
-
-############################
-# ROM Audit options
-############################
-msgctxt "#20530"
-msgid "Parents"
-msgstr "settings.xml"
-
-msgctxt "#20531"
-msgid "Clones"
-msgstr "settings.xml"
+msgctxt "#43016"
+msgid "3D Box"
+msgstr "Assets"
 
 ############################
 # Advanced Enum values

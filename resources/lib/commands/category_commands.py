@@ -80,12 +80,12 @@ def cmd_edit_category(args):
         category = repository.find_category(category_id)
         
         options = collections.OrderedDict()
-        options['CATEGORY_EDIT_METADATA']       = kodi.translate(40853)
-        options['CATEGORY_EDIT_ASSETS']         = kodi.translate(40854)
+        options['CATEGORY_EDIT_METADATA'] = kodi.translate(40853)
+        options['CATEGORY_EDIT_ASSETS'] = kodi.translate(40854)
         options['CATEGORY_EDIT_DEFAULT_ASSETS'] = kodi.translate(40859)
-        options['CATEGORY_STATUS']              = f'{kodi.translate(40859)} {category.get_finished_str()}'
-        options['EXPORT_CATEGORY_XML']          = kodi.translate(40861)
-        options['DELETE_CATEGORY']              = kodi.translate(40862)
+        options['CATEGORY_STATUS'] = f'{kodi.translate(40859)} {category.get_finished_str_code()}'
+        options['EXPORT_CATEGORY_XML'] = kodi.translate(40861)
+        options['DELETE_CATEGORY'] = kodi.translate(40862)
         
         s = f'{kodi.translate(40950)} "{category.get_name}"'
         selected_option = kodi.OrdDictionaryDialog().select(s, options)    
@@ -112,19 +112,19 @@ def cmd_edit_metadata_category(args):
         category = repository.find_category(category_id)
         
         NFO_FileName  = category.get_NFO_name()
-        NFO_found_str = 'NFO found' if NFO_FileName.exists() else 'NFO not found'
+        NFO_found_str = kodi.translate(42019) if NFO_FileName.exists() else kodi.translate(42020)
         plot_str      = text.limit_string(category.get_plot(), constants.PLOT_STR_MAXSIZE)
 
         options = collections.OrderedDict()
-        options['CATEGORY_EDIT_METADATA_TITLE']       = "Edit Title: '{}'".format(category.get_name())
-        options['CATEGORY_EDIT_METADATA_RELEASEYEAR'] = "Edit Release Year: '{}'".format(category.get_releaseyear())
-        options['CATEGORY_EDIT_METADATA_GENRE']       = "Edit Genre: '{}'".format(category.get_genre())
-        options['CATEGORY_EDIT_METADATA_DEVELOPER']   = "Edit Developer: '{}'".format(category.get_developer())
-        options['CATEGORY_EDIT_METADATA_RATING']      = "Edit Rating: '{}'".format(category.get_rating())
-        options['CATEGORY_EDIT_METADATA_PLOT']        = "Edit Plot: '{}'".format(plot_str)
-        options['CATEGORY_IMPORT_NFO_FILE']           = 'Import NFO file (default, {})'.format(NFO_found_str)
-        options['CATEGORY_IMPORT_NFO_FILE_BROWSE']    = 'Import NFO file (browse NFO file) ...'
-        options['CATEGORY_SAVE_NFO_FILE']             = 'Save NFO file (default location)'
+        options['CATEGORY_EDIT_METADATA_TITLE'] = kodi.translate(40863).format(category.get_name())
+        options['CATEGORY_EDIT_METADATA_RELEASEYEAR'] = kodi.translate(40865).format(category.get_releaseyear())
+        options['CATEGORY_EDIT_METADATA_GENRE'] = kodi.translate(40867).format(category.get_genre())
+        options['CATEGORY_EDIT_METADATA_DEVELOPER'] = kodi.translate(40868).format(category.get_developer())
+        options['CATEGORY_EDIT_METADATA_RATING'] = kodi.translate(40869).format(category.get_rating())
+        options['CATEGORY_EDIT_METADATA_PLOT'] = kodi.translate(40870).format(plot_str)
+        options['CATEGORY_IMPORT_NFO_FILE'] = kodi.translate(40876).format(NFO_found_str)
+        options['CATEGORY_IMPORT_NFO_FILE_BROWSE'] = kodi.translate(40877)
+        options['CATEGORY_SAVE_NFO_FILE'] = kodi.translate(40878)
             
         s = kodi.translate(41086).format(category.get_name())
         selected_option = kodi.OrdDictionaryDialog().select(s, options)
@@ -203,7 +203,7 @@ def cmd_category_status(args):
         repository = CategoryRepository(uow)
         category = repository.find_category(category_id)
         category.change_finished_status()
-        kodi.dialog_OK('Category "{}" status is now {}'.format(category.get_name(), category.get_finished_str()))
+        kodi.dialog_OK('Category "{}" status is now {}'.format(category.get_name(), category.get_finished_str_code()))
         repository.update_category(category)
         uow.commit()
         

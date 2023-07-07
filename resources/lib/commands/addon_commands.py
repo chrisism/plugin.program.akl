@@ -60,7 +60,7 @@ def cmd_show_addons(args):
         addons = repository.find_all()
 
         options = collections.OrderedDict()
-        options["cmd_SCAN_FOR_ADDONS"] = "> Scan for new or updated addons"
+        options["cmd_SCAN_FOR_ADDONS"] = kodi.translate(42008)
         for addon in addons:
             logger.info(f"Installed Addon {addon.get_addon_id()} v{addon.get_version()} {addon.get_addon_type()}")
             if addon.get_addon_id() in options:
@@ -87,10 +87,10 @@ def cmd_addon_details(args):
     addon_id:str = args['addon_id'] if 'addon_id' in args else None
     
     options = collections.OrderedDict()
-    options["UPDATE"] = "Refresh/update addon"
-    options["METADATA"] = "Supported metadata"
-    options["ASSETS"] = "Supported assets"
-    options["SETTINGS"] = "Plugin settings"
+    options["UPDATE"] = kodi.translate(42009)
+    options["METADATA"] = kodi.translate(42010)
+    options["ASSETS"] = kodi.translate(42011)
+    options["SETTINGS"] = kodi.translate(42012)
     
     addon = xbmcaddon.Addon(addon_id)
     title = kodi.translate(41081).format(addon.getAddonInfo('name'))
@@ -144,7 +144,7 @@ def cmd_addon_details(args):
 
     if selected_option == "METADATA":
         supported_metadata_str = addon.getSetting('akl.scraper.supported_metadata')
-        options = { m: constants.METADATA_DESCRIPTIONS[m] for m in supported_metadata_str.split('|') }
+        options = { m: kodi.translate(constants.METADATA_DESCRIPTIONS[m]) for m in supported_metadata_str.split('|') }
         kodi.OrdDictionaryDialog().select(kodi.translate(41082).format(addon.getAddonInfo('name')), options)
         cmd_addon_details(args)
         return

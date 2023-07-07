@@ -52,15 +52,17 @@ def cmd_edit_rom(args):
         rom = repository.find_rom(rom_id)
 
     options = collections.OrderedDict()
-    options['ROM_EDIT_METADATA']       = kodi.translate(40853)
-    options['ROM_EDIT_ASSETS']         = kodi.translate(40854)
+    options['ROM_EDIT_METADATA'] = kodi.translate(40853)
+    options['ROM_EDIT_ASSETS'] = kodi.translate(40854)
     options['ROM_EDIT_DEFAULT_ASSETS'] = kodi.translate(40859)
-    options['EDIT_ROM_STATUS']         = f'ROM status: {rom.get_finished_str()}'
+    options['EDIT_ROM_STATUS'] = kodi.translate(42013).format(
+                                    kodi.translate(rom.get_finished_str_code()))
     if rom.has_launchers():
-        options['EDIT_ROM_LAUNCHERS']  = 'Manage associated launchers'
-    else: options['ADD_ROM_LAUNCHER']  = 'Add new launcher to ROM'    
-    options['DELETE_ROM']              = 'Delete ROM'
-    options['SCRAPE_ROM']              = kodi.translate(40855)
+        options['EDIT_ROM_LAUNCHERS'] = kodi.translate(42016)
+    else:
+        options['ADD_ROM_LAUNCHER'] = kodi.translate(42017)
+    options['DELETE_ROM'] = kodi.translate(42018)
+    options['SCRAPE_ROM'] = kodi.translate(40855)
 
     s = kodi.translate(41092).format(rom.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
@@ -77,37 +79,37 @@ def cmd_edit_rom(args):
 @AppMediator.register('ROM_EDIT_METADATA')
 def cmd_rom_metadata(args):
     rom_id: str = args['rom_id'] if 'rom_id' in args else None
-    selected_option = None
     
+    selected_option = None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
         
     plot_str = text.limit_string(rom.get_plot(), constants.PLOT_STR_MAXSIZE)
-    rating = rom.get_rating() if rom.get_rating() != -1 else 'not rated'
+    rating = rom.get_rating() if rom.get_rating() != -1 else kodi.translate(42021)
     NFO_FileName = rom.get_nfo_file()
-    NFO_found_str = 'NFO found' if NFO_FileName and NFO_FileName.exists() else 'NFO not found'
+    NFO_found_str = kodi.translate(42019) if NFO_FileName and NFO_FileName.exists() else kodi.translate(42020)
 
     options = collections.OrderedDict()
-    options['ROM_EDIT_METADATA_TITLE'] = f"{kodi.translate(40863)}: '{rom.get_name()}'"
-    options['ROM_EDIT_METADATA_PLATFORM'] = f"{kodi.translate(40864)}: {rom.get_platform()}"
-    options['ROM_EDIT_METADATA_RELEASEYEAR'] = f"{kodi.translate(40865)}: {rom.get_releaseyear()}"
-    options['ROM_EDIT_METADATA_GENRE'] = "Edit Genre: '{}'".format(rom.get_genre())
-    options['ROM_EDIT_METADATA_DEVELOPER'] = "Edit Developer: '{}'".format(rom.get_developer())
-    options['ROM_EDIT_METADATA_NPLAYERS'] = "Edit NPlayers: '{}'".format(rom.get_number_of_players())
-    options['ROM_EDIT_METADATA_NPLAYERS_ONL'] = "Edit NPlayers online: '{}'".format(rom.get_number_of_players_online())
-    options['ROM_EDIT_METADATA_ESRB'] = "Edit ESRB rating: '{}'".format(rom.get_esrb_rating())
-    options['ROM_EDIT_METADATA_PEGI'] = "Edit PEGI rating: '{}'".format(rom.get_pegi_rating())
-    options['ROM_EDIT_METADATA_RATING'] = "Edit Rating: '{}'".format(rating)
-    options['ROM_EDIT_METADATA_PLOT'] = "Edit Plot: '{}'".format(plot_str)
-    options['ROM_EDIT_METADATA_TAGS'] = "Edit Tags"
-    options['ROM_EDIT_METADATA_BOXSIZE'] = "Edit Box Size: '{}'".format(rom.get_box_sizing())
-    options['ROM_LOAD_PLOT'] = "Load Plot from TXT file ..."
-    options['ROM_IMPORT_NFO_FILE_DEFAULT'] = 'Import NFO file (default {})'.format(NFO_found_str)
-    options['ROM_IMPORT_NFO_FILE_BROWSE'] = 'Import NFO file (browse NFO file) ...'
-    options['ROM_SAVE_NFO_FILE_DEFAULT'] = 'Save NFO file (default location)'
-    options['SCRAPE_ROM_METADATA'] = 'Scrape Metadata'
+    options['ROM_EDIT_METADATA_TITLE'] = kodi.translate(40863).format(rom.get_name)
+    options['ROM_EDIT_METADATA_PLATFORM'] = kodi.translate(40864).format(rom.get_platform())
+    options['ROM_EDIT_METADATA_RELEASEYEAR'] = kodi.translate(40865).format(rom.get_releaseyear())
+    options['ROM_EDIT_METADATA_GENRE'] = kodi.translate(40867).format(rom.get_genre())
+    options['ROM_EDIT_METADATA_DEVELOPER'] = kodi.translate(40868).format(rom.get_developer())
+    options['ROM_EDIT_METADATA_NPLAYERS'] = kodi.translate(40871).format(rom.get_number_of_players())
+    options['ROM_EDIT_METADATA_NPLAYERS_ONL'] = kodi.translate(40872).format(rom.get_number_of_players_online())
+    options['ROM_EDIT_METADATA_ESRB'] = kodi.translate(40874).format(rom.get_esrb_rating())
+    options['ROM_EDIT_METADATA_PEGI'] = kodi.translate(40873).format(rom.get_pegi_rating())
+    options['ROM_EDIT_METADATA_RATING'] = kodi.translate(40869).format(rating)
+    options['ROM_EDIT_METADATA_PLOT'] = kodi.translate(40870).format(plot_str)
+    options['ROM_EDIT_METADATA_TAGS'] =  kodi.translate(40866)
+    options['ROM_EDIT_METADATA_BOXSIZE'] = kodi.translate(40875).format(rom.get_box_sizing())
+    options['ROM_LOAD_PLOT'] = kodi.translate(40879)
+    options['ROM_IMPORT_NFO_FILE_DEFAULT'] = kodi.translate(40876).format(NFO_found_str)
+    options['ROM_IMPORT_NFO_FILE_BROWSE'] = kodi.translate(40877)
+    options['ROM_SAVE_NFO_FILE_DEFAULT'] = kodi.translate(40878)
+    options['SCRAPE_ROM_METADATA'] = kodi.translate(40880)
 
     s = kodi.translate(41093).format(rom.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
@@ -346,7 +348,10 @@ def cmd_rom_metadata_nplayers(args):
         rom = repository.find_rom(rom_id)
         
         default_options = list(constants.NPLAYERS_LIST.keys())
-        menu_list = ['Not set', 'Manual entry'] + default_options
+        menu_list = [
+            kodi.translate(42001), 
+            kodi.translate(42022)
+        ] + default_options
         selected_option = kodi.ListDialog().select(kodi.translate(41094), menu_list)
         
         if selected_option is None or selected_option < 0:
@@ -358,7 +363,7 @@ def cmd_rom_metadata_nplayers(args):
     
         if selected_option == 1:
             # >> Manual entry. Open a text entry dialog.
-            if not editors.edit_field_by_int(rom, 'NPlayers', rom.get_number_of_players, rom.set_number_of_players):
+            if not editors.edit_field_by_int(rom, kodi.translate(40808), rom.get_number_of_players, rom.set_number_of_players):
                 AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
                 return
 
@@ -384,7 +389,10 @@ def cmd_rom_metadata_nplayers_online(args):
         rom = repository.find_rom(rom_id)
         
         default_options = list(constants.NPLAYERS_LIST.keys())
-        menu_list = ['Not set', 'Manual entry'] + default_options
+        menu_list = [
+                kodi.translate(42001), 
+                kodi.translate(42022)
+            ] + default_options
         selected_option = kodi.ListDialog().select(kodi.translate(41095), menu_list)
         
         if selected_option is None or selected_option < 0:
@@ -396,7 +404,7 @@ def cmd_rom_metadata_nplayers_online(args):
     
         if selected_option == 1:
             # >> Manual entry. Open a number entry dialog.
-            if not editors.edit_field_by_int(rom, 'NPlayers', rom.get_number_of_players, rom.set_number_of_players):
+            if not editors.edit_field_by_int(rom, kodi.translate(40809), rom.get_number_of_players, rom.set_number_of_players):
                 AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
                 return
 
@@ -438,7 +446,7 @@ def cmd_rom_metadata_plot(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
         
-        if editors.edit_field_by_str(rom, 'Plot', rom.get_plot, rom.set_plot):
+        if editors.edit_field_by_str(rom, kodi.translate(40811), rom.get_plot, rom.set_plot):
             repository.update_rom(rom)
             uow.commit()
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
@@ -456,8 +464,8 @@ def cmd_rom_metadata_tags(args):
         did_remove_tag = False
 
         options = collections.OrderedDict()
-        options['ROM_ADD_METADATA_TAGS']    = "[Add tag]"
-        options['ROM_CLEAR_METADATA_TAGS']  = "[Clear all tags]"
+        options['ROM_ADD_METADATA_TAGS'] = kodi.translate(42023)
+        options['ROM_CLEAR_METADATA_TAGS'] = kodi.translate(42024)
 
         for tag in rom.get_tags():
             options[tag] = tag
@@ -506,7 +514,7 @@ def cmd_rom_metadata_add_tag(args):
         available_tags = repository.find_all_tags()
 
         options = collections.OrderedDict()
-        options['MANUAL'] = '[Manual insert tag]'
+        options['MANUAL'] = kodi.translate(42025)
         if available_tags is not None and len(available_tags) > 0:
             options.update({value:key for key, value in available_tags.items()})
         
@@ -519,7 +527,7 @@ def cmd_rom_metadata_add_tag(args):
             if selected_option is None: break
             
             if selected_option == 'MANUAL':
-                tag = kodi.dialog_keyboard('Tag')
+                tag = kodi.dialog_keyboard(kodi.translate(40814))
                 if tag is not None: 
                     did_add_tag = True
                     logger.debug(f'cmd_rom_metadata_add_tag() Adding tag "{tag}"')
@@ -673,7 +681,7 @@ def cmd_manage_rom_tags(args):
         available_tags = repository.find_all_tags()
 
         options = collections.OrderedDict()
-        options['ADD_TAG'] = "[Add tag]"
+        options['ADD_TAG'] = kodi.translate(42023)
         if available_tags is not None and len(available_tags) > 0:
             options.update({value: key for key, value in available_tags.items()})
 
@@ -686,7 +694,7 @@ def cmd_manage_rom_tags(args):
                 continue
             
             if selected_option == 'ADD_TAG':
-                tag = kodi.dialog_keyboard('Tag')
+                tag = kodi.dialog_keyboard(kodi.translate(40814))
                 if tag is not None: 
                     did_tag_change = True
                     logger.debug(f'cmd_manage_rom_tags() Adding tag "{tag}"')
@@ -738,7 +746,7 @@ def cmd_add_rom(args):
                 path = io.FileName(file_path)
                 rom_name = path.getBaseNoExt()
             
-        rom_name = kodi.dialog_keyboard("Name", rom_name)
+        rom_name = kodi.dialog_keyboard(kodi.translate(40815), rom_name)
         if rom_name is None:
             return
         

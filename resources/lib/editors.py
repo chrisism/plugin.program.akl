@@ -107,9 +107,18 @@ def edit_field_by_list(obj_instance: MetaDataItemABC, metadata_name:str, str_lis
 #
 def edit_rating(obj_instance: MetaDataItemABC, get_method, set_method):
     options_list = [
-        'Not set',
-        'Rating 0', 'Rating 1', 'Rating 2', 'Rating 3', 'Rating 4', 'Rating 5',
-        'Rating 6', 'Rating 7', 'Rating 8', 'Rating 9', 'Rating 10'
+        kodi.translate(42001),
+        kodi.translate(42002).format('0'),
+        kodi.translate(42002).format('1'),
+        kodi.translate(42002).format('2'),
+        kodi.translate(42002).format('3'),
+        kodi.translate(42002).format('4'),
+        kodi.translate(42002).format('5'),
+        kodi.translate(42002).format('6'),
+        kodi.translate(42002).format('7'),
+        kodi.translate(42002).format('8'),
+        kodi.translate(42002).format('9'),
+        kodi.translate(42002).format('10')
     ]
     object_name = obj_instance.get_object_name()
     current_rating_str = get_method()
@@ -173,7 +182,7 @@ def edit_object_assets(obj_instance:MetaDataItemABC, preselected_asset = None) -
         # >> Label1 is the asset name (Icon, Fanart, etc.)
         # >> Label2 is the asset filename str as in the database or 'Not set'
         # >> setArt('icon') is the asset picture.
-        label1_str = 'Edit {0} ...'.format(asset_info_obj.name)
+        label1_str = kodi.translate(42003).format(asset_info_obj.name)
         label2_stt = asset_fname_str if asset_fname_str else 'Not set'
         list_item = xbmcgui.ListItem(label = label1_str, label2 = label2_stt)
         if asset_fname_str:
@@ -189,7 +198,7 @@ def edit_object_assets(obj_instance:MetaDataItemABC, preselected_asset = None) -
 
     # if ROM then add scrape option
     if obj_instance.get_object_name() == 'ROM':
-        options[SCRAPE_CMD] = 'Scrape ROM assets'
+        options[SCRAPE_CMD] = kodi.translate(41120)
     
     # --- Customize function for each object type ---
     dialog_title_str = kodi.translate(41076). format(obj_instance.get_object_name())
@@ -258,11 +267,11 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
     
     # --- Show image editing options ---
     options = collections.OrderedDict()
-    options['LINK_LOCAL']   = f'Link to local {asset_info.name} image'
-    options['IMPORT_LOCAL'] = f'Import local {asset_info.name} (copy and rename)'
-    options['UNSET']        = 'Unset artwork/asset'
+    options['LINK_LOCAL']   = kodi.translate(42004).format(asset_info.name)
+    options['IMPORT_LOCAL'] = kodi.translate(42005).format(asset_info.name)
+    options['UNSET']        = kodi.translate(42006)
     if obj_instance.get_assets_kind() == constants.KIND_ASSET_ROM:
-        options['SCRAPE_ASSET'] = f'Scrape {asset_info.name}'
+        options['SCRAPE_ASSET'] = kodi.translate(42007).format(asset_info.name)
         
     selected_option = kodi.OrdDictionaryDialog().select(dialog_title, options)
     

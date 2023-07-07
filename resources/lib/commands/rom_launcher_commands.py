@@ -50,10 +50,10 @@ def cmd_manage_romcollection_launchers(args):
     default_launcher_name = default_launcher.get_name() if default_launcher is not None else 'None'
     
     options = collections.OrderedDict()
-    options['ADD_LAUNCHER']         = 'Add new launcher'
-    options['EDIT_LAUNCHER']        = 'Edit launcher'
-    options['REMOVE_LAUNCHER']      = 'Remove launcher'
-    options['SET_DEFAULT_LAUNCHER'] = 'Set default launcher: "{}"'.format(default_launcher_name)
+    options['ADD_LAUNCHER'] = kodi.translate(42026)
+    options['EDIT_LAUNCHER'] = kodi.translate(42027)
+    options['REMOVE_LAUNCHER'] = kodi.translate(42028)
+    options['SET_DEFAULT_LAUNCHER'] = kodi.translate(42029).format(default_launcher_name)
         
     s = kodi.translate(41100).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
@@ -83,10 +83,10 @@ def cmd_manage_rom_launchers(args):
     default_launcher_name = default_launcher.get_name() if default_launcher is not None else 'None'
     
     options = collections.OrderedDict()
-    options['ADD_ROM_LAUNCHER']         = 'Add new launcher'
-    options['EDIT_ROM_LAUNCHER']        = 'Edit launcher'
-    options['REMOVE_ROM_LAUNCHER']      = 'Remove launcher'
-    options['SET_DEFAULT_ROM_LAUNCHER'] = f'Set default launcher: "{default_launcher_name}"'
+    options['ADD_ROM_LAUNCHER'] = kodi.translate(42026)
+    options['EDIT_ROM_LAUNCHER'] = kodi.translate(42027)
+    options['REMOVE_ROM_LAUNCHER'] = kodi.translate(42028)
+    options['SET_DEFAULT_ROM_LAUNCHER'] = kodi.translate(42029).format(default_launcher_name)
         
     s = kodi.translate(41100).format(rom.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)

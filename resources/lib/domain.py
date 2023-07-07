@@ -55,17 +55,17 @@ def _is_empty_or_default(input: any, default: any):
 # Returns an object with all the information
 # -------------------------------------------------------------------------------------------------
 class AssetInfo(object):
-    id              = ''
-    key             = ''
-    
-    name            = ''
-    description     = name
-    plural          = ''
-    fname_infix     = '' # Used only when searching assets when importing XML
-    kind_str        = ''
-    exts            = []
-    exts_dialog     = ''
-    path_key        = ''
+    id = ''
+    key = ''
+    name_id = '' 
+    name = ''
+    description = name
+    plural = ''
+    fname_infix = '' # Used only when searching assets when importing XML
+    kind_str = ''
+    exts = []
+    exts_dialog = ''
+    path_key = ''
 
     def get_description(self):
         if self.description == '': return self.name
@@ -723,9 +723,9 @@ class MetaDataItemABC(EntityABC):
     def is_finished(self):
         return 'finished' in self.entity_data and self.entity_data['finished']
 
-    def get_finished_str(self):
+    def get_finished_str_code(self):
         finished = self.is_finished()
-        finished_display = 'Finished' if finished == True else 'Unfinished'
+        finished_display = 42014 if finished == True else 42015
 
         return finished_display
 
@@ -1107,9 +1107,11 @@ class ROMCollection(MetaDataItemABC):
            
         super(ROMCollection, self).__init__(entity_data, assets_data, asset_paths, asset_mappings)
 
-    def get_object_name(self): return 'ROM Collection'
+    def get_object_name(self):
+        return 'ROM Collection'
 
-    def get_assets_kind(self): return constants.KIND_ASSET_LAUNCHER
+    def get_assets_kind(self):
+        return constants.KIND_ASSET_LAUNCHER
     
     def get_type(self): return constants.OBJ_ROMCOLLECTION
     
@@ -2085,6 +2087,7 @@ class AssetInfoFactory(object):
         # >> These are used very frequently so I think it is better to have a cached list.
         a = AssetInfo()
         a.id                            = constants.ASSET_ICON_ID
+        a.name_id                       = 43001
         a.name                          = 'Icon'
         a.plural                        = 'Icons'
         a.fname_infix                   = 'icon'
@@ -2096,6 +2099,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_FANART_ID
+        a.name_id                       = 43002
         a.name                          = 'Fanart'
         a.plural                        = 'Fanarts'
         a.fname_infix                   = 'fanart'
@@ -2107,6 +2111,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_BANNER_ID
+        a.name_id                       = 43003
         a.name                          = 'Banner'
         a.description                   = 'Banner / Marquee'
         a.plural                        = 'Banners'
@@ -2119,6 +2124,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()        
         a.id                            = constants.ASSET_POSTER_ID
+        a.name_id                       = 43004
         a.name                          = 'Poster'
         a.plural                        = 'Posters'
         a.fname_infix                   = 'poster'
@@ -2130,6 +2136,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_CLEARLOGO_ID
+        a.name_id                       = 43005
         a.name                          = 'Clearlogo'
         a.plural                        = 'Clearlogos'
         a.fname_infix                   = 'clearlogo'
@@ -2141,6 +2148,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_CONTROLLER_ID
+        a.name_id                       = 43006
         a.name                          = 'Controller'
         a.plural                        = 'Controllers'
         a.fname_infix                   = 'controller'
@@ -2152,6 +2160,7 @@ class AssetInfoFactory(object):
         
         a = AssetInfo()
         a.id                            = constants.ASSET_TRAILER_ID
+        a.name_id                       = 43007
         a.name                          = 'Trailer'
         a.plural                        = 'Trailers'
         a.fname_infix                   = 'trailer'
@@ -2163,6 +2172,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_TITLE_ID
+        a.name_id                       = 43008
         a.name                          = 'Title'
         a.plural                        = 'Titles'
         a.fname_infix                   = 'title'
@@ -2174,6 +2184,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_SNAP_ID
+        a.name_id                       = 43009
         a.name                          = 'Snap'
         a.plural                        = 'Snaps'
         a.fname_infix                   = 'snap'
@@ -2185,6 +2196,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_BOXFRONT_ID
+        a.name_id                       = 43010
         a.name                          = 'Boxfront'
         a.description                   = 'Boxfront / Cabinet'
         a.plural                        = 'Boxfronts'
@@ -2197,6 +2209,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_BOXBACK_ID
+        a.name_id                       = 43011
         a.name                          = 'Boxback'
         a.description                   = 'Boxback / CPanel'
         a.plural                        = 'Boxbacks'
@@ -2209,6 +2222,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_CARTRIDGE_ID
+        a.name_id                       = 43012
         a.name                          = 'Cartridge'
         a.description                   = 'Cartridge / PCB'
         a.plural                        = 'Cartridges'
@@ -2221,6 +2235,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_FLYER_ID
+        a.name_id                       = 43013
         a.name                          = 'Flyer'
         a.plural                        = 'Flyers'
         a.fname_infix                   = 'flyer'
@@ -2233,6 +2248,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_MAP_ID
+        a.name_id                       = 43014
         a.name                          = 'Map'
         a.plural                        = 'Maps'
         a.fname_infix                   = 'map'
@@ -2244,6 +2260,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_MANUAL_ID
+        a.name_id                       = 43015
         a.name                          = 'Manual'
         a.plural                        = 'Manuals'
         a.fname_infix                   = 'manual'
@@ -2255,6 +2272,7 @@ class AssetInfoFactory(object):
 
         a = AssetInfo()
         a.id                            = constants.ASSET_3DBOX_ID
+        a.name_id                       = 43016
         a.name                          = '3D Box'
         a.plural                        = '3D Boxes'
         a.fname_infix                   = '3dbox'

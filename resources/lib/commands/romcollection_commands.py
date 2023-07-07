@@ -53,10 +53,10 @@ def cmd_add_collection(args):
             if selected_option > 0:
                 parent_category = grand_parent_category
     
-        wizard = kodi.WizardDialog_Selection(None, 'platform', 'Select the platform', platforms.AKL_platform_list)
+        wizard = kodi.WizardDialog_Selection(None, 'platform', kodi.translate(41099), platforms.AKL_platform_list)
         wizard = kodi.WizardDialog_Dummy(wizard, 'm_name', '', _get_name_from_platform)
-        wizard = kodi.WizardDialog_Keyboard(wizard, 'm_name', 'Set the title of the launcher')
-        wizard = kodi.WizardDialog_FileBrowse(wizard, 'assets_path', 'Select asset/artwork directory', 0, '')
+        wizard = kodi.WizardDialog_Keyboard(wizard, 'm_name', kodi.translate(42037))
+        wizard = kodi.WizardDialog_FileBrowse(wizard, 'assets_path', kodi.translate(42038), 0, '')
         
         romcollection = ROMCollection()
         entity_data = romcollection.get_data_dic()
@@ -112,21 +112,21 @@ def cmd_edit_romcollection(args):
         cat_repository = CategoryRepository(uow)
         parent_id = romcollection.get_parent_id()
         category = cat_repository.find_category(romcollection.get_parent_id()) if parent_id is not None else None 
-        category_name = 'None' if category is None else category.get_name()
+        category_name = kodi.translate(20010) if category is None else category.get_name()
 
     options = collections.OrderedDict()
     options['ROMCOLLECTION_EDIT_METADATA'] = kodi.translate(40853)
     options['ROMCOLLECTION_EDIT_ASSETS'] = kodi.translate(40854)
     options['ROMCOLLECTION_EDIT_DEFAULT_ASSETS'] = kodi.translate(40859)
     if romcollection.has_launchers():
-        options['EDIT_ROMCOLLECTION_LAUNCHERS'] = 'Manage associated launchers'
+        options['EDIT_ROMCOLLECTION_LAUNCHERS'] = kodi.translate(42016)
     else: 
-        options['ADD_LAUNCHER'] = 'Add new launcher'    
-    options['ROMCOLLECTION_MANAGE_ROMS'] = 'Manage ROMs ...'
-    options['EDIT_ROMCOLLECTION_CATEGORY'] = f"Change Category: '{category_name}'"
-    options['EDIT_ROMCOLLECTION_STATUS'] = f'ROM Collection status: {romcollection.get_finished_str()}'
-    options['EXPORT_ROMCOLLECTION'] = 'Export ROM Collection XML configuration ...'
-    options['DELETE_ROMCOLLECTION'] = 'Delete ROM Collection'
+        options['ADD_LAUNCHER'] = kodi.translate(42026)  
+    options['ROMCOLLECTION_MANAGE_ROMS'] = kodi.translate(42039)
+    options['EDIT_ROMCOLLECTION_CATEGORY'] = kodi.translate(42040).format(category_name)
+    options['EDIT_ROMCOLLECTION_STATUS'] = kodi.translate(42041).format(kodi.translate(romcollection.get_finished_str_code()))
+    options['EXPORT_ROMCOLLECTION'] = kodi.translate(42042)
+    options['DELETE_ROMCOLLECTION'] = kodi.translate(42043)
 
     s = kodi.translate(41126).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
@@ -153,22 +153,22 @@ def cmd_romcollection_metadata(args):
         romcollection = repository.find_romcollection(romcollection_id)
 
     plot_str = text.limit_string(romcollection.get_plot(), constants.PLOT_STR_MAXSIZE)
-    rating = romcollection.get_rating() if romcollection.get_rating() != -1 else 'not rated'
+    rating = romcollection.get_rating() if romcollection.get_rating() != -1 else kodi.translate(42021)
     NFO_FileName = romcollection.get_NFO_name()
-    NFO_found_str = 'NFO found' if NFO_FileName.exists() else 'NFO not found'
+    NFO_found_str = kodi.translate(42019) if NFO_FileName.exists() else kodi.translate(42020)
 
     options = collections.OrderedDict()
-    options['ROMCOLLECTION_EDIT_METADATA_TITLE']       = "Edit Title: '{0}'".format(romcollection.get_name())
-    options['ROMCOLLECTION_EDIT_METADATA_PLATFORM']    = "Edit Platform: {}".format(romcollection.get_platform())
-    options['ROMCOLLECTION_EDIT_METADATA_RELEASEYEAR'] = "Edit Release Year: {}".format(romcollection.get_releaseyear())
-    options['ROMCOLLECTION_EDIT_METADATA_GENRE']       = "Edit Genre: '{0}'".format(romcollection.get_genre())
-    options['ROMCOLLECTION_EDIT_METADATA_DEVELOPER']   = "Edit Developer: '{}'".format(romcollection.get_developer())
-    options['ROMCOLLECTION_EDIT_METADATA_RATING']      = "Edit Rating: '{0}'".format(rating)
-    options['ROMCOLLECTION_EDIT_METADATA_PLOT']        = "Edit Plot: '{0}'".format(plot_str)
-    options['ROMCOLLECTION_EDIT_METADATA_BOXSIZE']     = "Edit Box Size: '{}'".format(romcollection.get_box_sizing())
-    options['ROMCOLLECTION_IMPORT_NFO_FILE_DEFAULT']   = 'Import NFO file (default {0})'.format(NFO_found_str)
-    options['ROMCOLLECTION_IMPORT_NFO_FILE_BROWSE']    = 'Import NFO file (browse NFO file) ...'
-    options['ROMCOLLECTION_SAVE_NFO_FILE_DEFAULT']     = 'Save NFO file (default location)'
+    options['ROMCOLLECTION_EDIT_METADATA_TITLE'] = kodi.translate(40863).format(romcollection.get_name())
+    options['ROMCOLLECTION_EDIT_METADATA_PLATFORM'] = kodi.translate(40864).format(romcollection.get_platform())
+    options['ROMCOLLECTION_EDIT_METADATA_RELEASEYEAR'] = kodi.translate(40865).format(romcollection.get_releaseyear())
+    options['ROMCOLLECTION_EDIT_METADATA_GENRE'] = kodi.translate(40867).format(romcollection.get_genre())
+    options['ROMCOLLECTION_EDIT_METADATA_DEVELOPER'] = kodi.translate(40868).format(romcollection.get_developer())
+    options['ROMCOLLECTION_EDIT_METADATA_RATING'] = kodi.translate(40869).format(rating)
+    options['ROMCOLLECTION_EDIT_METADATA_PLOT'] = kodi.translate(40870).format(plot_str)
+    options['ROMCOLLECTION_EDIT_METADATA_BOXSIZE'] = kodi.translate(40875).format(romcollection.get_box_sizing())
+    options['ROMCOLLECTION_IMPORT_NFO_FILE_DEFAULT'] = kodi.translate(40876).format(NFO_found_str)
+    options['ROMCOLLECTION_IMPORT_NFO_FILE_BROWSE'] = kodi.translate(40877)
+    options['ROMCOLLECTION_SAVE_NFO_FILE_DEFAULT'] = kodi.translate(40878)
 
     s = kodi.translate(41127).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
@@ -248,7 +248,7 @@ def cmd_romcollection_status(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
         romcollection.change_finished_status()
-        kodi.dialog_OK('ROMCollection "{}" status is now {}'.format(romcollection.get_name(), romcollection.get_finished_str()))
+        kodi.dialog_OK('ROMCollection "{}" status is now {}'.format(romcollection.get_name(), romcollection.get_finished_str_code()))
         repository.update_romcollection(romcollection)
         uow.commit()
         
