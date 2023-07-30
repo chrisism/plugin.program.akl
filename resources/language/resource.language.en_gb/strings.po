@@ -428,6 +428,10 @@ msgctxt "#42504"
 msgid "Virtual Collection"
 msgstr "domain"
 
+msgctxt "#42505"
+msgid "ROM"
+msgstr "domain"
+
 ############################
 # Advanced Enum values
 ############################
