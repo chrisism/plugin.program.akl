@@ -24,14 +24,14 @@ import xbmcaddon
 from akl.utils import io
 
 # --- Addon object (used to access settings) ---
-addon           = xbmcaddon.Addon()
-addon_id        = addon.getAddonInfo('id')
-addon_name      = addon.getAddonInfo('name')
-addon_version   = addon.getAddonInfo('version')
-addon_author    = addon.getAddonInfo('author')
-addon_profile   = addon.getAddonInfo('profile')
-addon_type      = addon.getAddonInfo('type')
-addon_path      = addon.getAddonInfo('path')
+addon = xbmcaddon.Addon()
+addon_id = addon.getAddonInfo('id')
+addon_name = addon.getAddonInfo('name')
+addon_version = addon.getAddonInfo('version')
+addon_author = addon.getAddonInfo('author')
+addon_profile = addon.getAddonInfo('profile')
+addon_type = addon.getAddonInfo('type')
+addon_path = addon.getAddonInfo('path')
 
 # --- Addon paths and constant definition ---
 # _PATH is a filename | _DIR is a directory.
@@ -87,17 +87,26 @@ class AKL_Paths(object):
 
     def build(self):
         # --- Addon data paths creation ---
-        if not self.ADDON_DATA_DIR.exists():            self.ADDON_DATA_DIR.makedirs()
-        if not self.SCRAPER_CACHE_DIR.exists():         self.SCRAPER_CACHE_DIR.makedirs()
-        if not self.REPORTS_DIR.exists():               self.REPORTS_DIR.makedirs()
+        if not self.ADDON_DATA_DIR.exists():
+            self.ADDON_DATA_DIR.makedirs()
+        if not self.SCRAPER_CACHE_DIR.exists():
+            self.SCRAPER_CACHE_DIR.makedirs()
+        if not self.REPORTS_DIR.exists():
+            self.REPORTS_DIR.makedirs()
         
-        if not self.DEFAULT_CAT_ASSET_DIR.exists():     self.DEFAULT_CAT_ASSET_DIR.makedirs()
-        if not self.DEFAULT_COL_ASSET_DIR.exists():     self.DEFAULT_COL_ASSET_DIR.makedirs()
-        if not self.DEFAULT_LAUN_ASSET_DIR.exists():    self.DEFAULT_LAUN_ASSET_DIR.makedirs()
-        if not self.DEFAULT_FAV_ASSET_DIR.exists():     self.DEFAULT_FAV_ASSET_DIR.makedirs()
+        if not self.DEFAULT_CAT_ASSET_DIR.exists():
+            self.DEFAULT_CAT_ASSET_DIR.makedirs()
+        if not self.DEFAULT_COL_ASSET_DIR.exists():
+            self.DEFAULT_COL_ASSET_DIR.makedirs()
+        if not self.DEFAULT_LAUN_ASSET_DIR.exists():
+            self.DEFAULT_LAUN_ASSET_DIR.makedirs()
+        if not self.DEFAULT_FAV_ASSET_DIR.exists():
+            self.DEFAULT_FAV_ASSET_DIR.makedirs()
         
-        if not self.GENERATED_VIEWS_DIR.exists():       self.GENERATED_VIEWS_DIR.makedirs()
-        if not self.VIEWS_DIR.exists():                 self.VIEWS_DIR.makedirs()
+        if not self.GENERATED_VIEWS_DIR.exists():
+            self.GENERATED_VIEWS_DIR.makedirs()
+        if not self.VIEWS_DIR.exists():
+            self.VIEWS_DIR.makedirs()
 
         return self
   

@@ -60,7 +60,7 @@ def qry_get_root_items():
     listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()
     
     if not settings.getSettingAsBool('display_hide_utilities'): 
-        listitem_name   = 'Utilities'
+        listitem_name   = kodi.translate(40897)
         container['items'].append({
             'name': listitem_name,
             'url': globals.router.url_for_path('utilities'),
@@ -68,7 +68,7 @@ def qry_get_root_items():
             'type': 'video',
             'info': {
                 'title': listitem_name,
-                'plot': 'Execute several [COLOR orange]Utilities[/COLOR].',
+                'plot': kodi.translate(42001),
                 'overlay': 4
             },
             'art': { 
@@ -80,7 +80,7 @@ def qry_get_root_items():
         })
         
     if not settings.getSettingAsBool('display_hide_g_reports'): 
-        listitem_name   = 'Global Reports'
+        listitem_name   = kodi.translate(40898)
         container['items'].append({
             'name': listitem_name,
             'url': globals.router.url_for_path('globalreports'), #SHOW_GLOBALREPORTS_VLAUNCHERS'
@@ -88,7 +88,7 @@ def qry_get_root_items():
             'type': 'video',
             'info': {
                 'title': listitem_name,
-                'plot': 'Generate and view [COLOR orange]Global Reports[/COLOR].',
+                'plot': kodi.translate(42002),
                 'overlay': 4
             },
             'art': { 
@@ -219,12 +219,12 @@ def qry_get_view_assets(rom_id: str):
                 'id': asset_id,
                 'is_folder': False,
                 'type': 'pictures',
-                'name': asset_info.name,
+                'name': kodi.translate(asset_info.name_id),
                 'name2': asset.get_path() if asset else None,
                 'url': asset.get_path() if asset else globals.router.url_for_path(
                     f'/execute/command/rom_edit_assets/?rom_id={rom_id}&selected_asset={asset_id}'),
                 'info': {
-                    'title': asset_info.name,
+                    'title': kodi.translate(asset_info.name_id),
                     'picturepath': asset.get_path() if asset else None,
                 },
                 'art': { 
@@ -282,7 +282,7 @@ def qry_get_utilities_items():
     
     container = {
         'id': '',
-        'name': 'utilities',
+        'name': kodi.translate(40897),
         'obj_type': constants.OBJ_NONE,
         'items': []
     }
@@ -292,164 +292,156 @@ def qry_get_utilities_items():
     # EXECUTE_UTILS_CHECK_DATABASE -> Substituted by db constraints and migration scripts.
 
     container['items'].append({
-        'name': 'Reset database',
+        'name': kodi.translate(40899),
         'url': globals.router.url_for_path('execute/command/reset_database'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Reset database',
-            'plot': 'Reset the AKL database. You will loose all data.',
+            'title': kodi.translate(40899),
+            'plot': kodi.translate(42003),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Rebuild views',
+        'name': kodi.translate(40856),
         'url': globals.router.url_for_path('execute/command/render_views'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Rebuild views',
-            'plot': 'Rebuild all the container views in the application',
+            'title': kodi.translate(40856),
+            'plot': kodi.translate(42004),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Rebuild virtual views',
+        'name': kodi.translate(40900),
         'url': globals.router.url_for_path('execute/command/render_virtual_views'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Rebuild virtual views',
-            'plot': 'Rebuild all the virtual categories and collections in the container',
+            'title': kodi.translate(40900),
+            'plot': kodi.translate(42018),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Scan for plugin-addons',
+        'name': kodi.translate(40901),
         'url': globals.router.url_for_path('execute/command/scan_for_addons'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Scan for plugin-addons',
-            'plot': 'Scan for addons that can be used by AKL (launchers, scrapers etc.)',
+            'title': kodi.translate(40901),
+            'plot': kodi.translate(42019),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Show plugin-addons',
+        'name': kodi.translate(40902),
         'url': globals.router.url_for_path('execute/command/show_addons'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Show plugin-addons',
-            'plot': 'Shows previously scanned addons that can be used by AKL (launchers, scrapers etc.)',
+            'title': kodi.translate(40902),
+            'plot': kodi.translate(42020),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Manage ROM tags',
+        'name': kodi.translate(40903),
         'url': globals.router.url_for_path('execute/command/manage_rom_tags'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Manage ROM tags',
-            'plot': 'Manage existing/available tags for ROMs',
+            'title': kodi.translate(40903),
+            'plot': kodi.translate(42021),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Import category/launcher XML configuration file',
+        'name': kodi.translate(40904),
         'url': globals.router.url_for_path('execute/command/import_launchers'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Import category/launcher XML configuration file',
-            'plot': 'Execute several [COLOR orange]Utilities[/COLOR].',
+            'title': kodi.translate(40904),
+            'plot': kodi.translate(42022),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Export category/rom collection XML configuration file',
+        'name': kodi.translate(40905),
         'url': globals.router.url_for_path('execute/command/export_to_legacy_xml'), 
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Export category/rom collection XML configuration file',
-            'plot': (
-                'Exports all AKL categories and collections into an XML configuration file. '
-                'You can later reimport this XML file.'),
+            'title': kodi.translate(40905),
+            'plot': kodi.translate(42023),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Check collections',
+        'name': kodi.translate(40906),
         'url': globals.router.url_for_path('execute/command/check_collections'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Check collections',
-            'plot':  ('Check all collections for missing launchers or scanners, missing artwork, '
-                    'wrong platform names, asset path existence, etc.'),
+            'title': kodi.translate(40906),
+            'plot': kodi.translate(42024),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Check ROMs artwork image integrity',
+        'name': kodi.translate(40907),
         'url': globals.router.url_for_path('execute/command/check_rom_artwork_integrity'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Check ROMs artwork image integrity',
-            'plot': ('Scans existing [COLOR=orange]ROMs artwork images[/COLOR] in ROM Collections '
-                    'and verifies that the images have correct extension '
-                    'and size is greater than 0. You can delete corrupted images to be rescraped later.'),
+            'title': kodi.translate(40907),
+            'plot': kodi.translate(42025),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Delete ROMs redundant artwork',
+        'name': kodi.translate(40908),
         'url': globals.router.url_for_path('execute/command/delete_redundant_rom_artwork'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Delete ROMs redundant artwork',
-            'plot': ('Scans all ROM collections and finds '
-                    '[COLOR orange]redundant ROMs artwork[/COLOR]. You may delete these unneeded images.'),
+            'title':  kodi.translate(40908),
+            'plot': kodi.translate(42026),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     container['items'].append({
-        'name': 'Show detected No-Intro/Redump DATs',
+        'name': kodi.translate(40909),
         'url': globals.router.url_for_path('execute/command/EXECUTE_UTILS_SHOW_DETECTED_DATS'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Show detected No-Intro/Redump DATs',
-            'plot': ('Display the auto-detected No-Intro/Redump DATs that will be used for the '
-                    'ROM audit. You have to configure the DAT directories in '
-                    '[COLOR orange]AKL addon settings[/COLOR], [COLOR=orange]ROM Audit[/COLOR] tab.'),
+            'title': kodi.translate(40909),
+            'plot': kodi.translate(42027),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
@@ -477,13 +469,13 @@ def qry_get_globalreport_items():
 
     # --- Global ROM statistics ---
     container['items'].append({
-        'name': 'Global ROM statistics',
+        'name': kodi.translate(40910),
         'url': globals.router.url_for_path('execute/command/global_rom_stats'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Global ROM statistics',
-            'plot': 'Shows a report of all ROM collections with number of ROMs.',
+            'title': kodi.translate(40910),
+            'plot': kodi.translate(42028),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
@@ -492,14 +484,13 @@ def qry_get_globalreport_items():
     
     # --- Global ROM Audit statistics  ---
     container['items'].append({
-        'name': 'Global ROM Audit statistics (All)',
+        'name': kodi.translate(40911),
         'url': globals.router.url_for_path('execute/command/EXECUTE_GLOBAL_AUDIT_STATS_ALL'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Global ROM Audit statistics (All)',
-            'plot': ('Shows a report of all audited ROM collections, with Have, Miss and Unknown '
-                    'statistics.'),
+            'title': kodi.translate(40911),
+            'plot': kodi.translate(42029),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
@@ -507,14 +498,13 @@ def qry_get_globalreport_items():
     })
     
     container['items'].append({
-        'name': 'Global ROM Audit statistics (No-Intro only)',
+        'name': kodi.translate(40912),
         'url': globals.router.url_for_path('execute/command/EXECUTE_GLOBAL_AUDIT_STATS_NOINTRO'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Global ROM Audit statistics (No-Intro only)',
-            'plot': ('Shows a report of all audited ROM Launchers, with Have, Miss and Unknown '
-                    'statistics. Only No-Intro platforms (cartridge-based) are reported.'),
+            'title': kodi.translate(40912),
+            'plot': kodi.translate(42030),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
@@ -522,14 +512,13 @@ def qry_get_globalreport_items():
     })
     
     container['items'].append({
-        'name': 'Global ROM Audit statistics (Redump only)',
+        'name': kodi.translate(40913),
         'url': globals.router.url_for_path('execute/command/EXECUTE_GLOBAL_AUDIT_STATS_REDUMP'),
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title': 'Global ROM Audit statistics (Redump only)',
-            'plot': ('Shows a report of all audited ROM Launchers, with Have, Miss and Unknown '
-                    'statistics. Only Redump platforms (optical-based) are reported.'),
+            'title': kodi.translate(40913),
+            'plot': kodi.translate(42031),
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
@@ -558,23 +547,23 @@ def qry_container_context_menu_items(container_data) -> typing.List[typing.Tuple
     
     commands = []
     if is_category: 
-        commands.append(('Rebuild {} view'.format(container_name),
+        commands.append((kodi.translate(40893).format(container_name),
                         _context_menu_url_for('execute/command/render_category_view',{'category_id':container_id})))
         
     if is_romcollection:
-        commands.append(('Search ROM in collection', _context_menu_url_for(f'/collection/{container_id}/search')))
-        commands.append(('Rebuild {} view'.format(container_name),
+        commands.append((kodi.translate(40894), _context_menu_url_for(f'/collection/{container_id}/search')))
+        commands.append((kodi.translate(40893).format(container_name),
                          _context_menu_url_for('execute/command/render_romcollection_view', {'romcollection_id':container_id})))    
     if is_virtual_category and not is_root:
-        commands.append(('Rebuild {} view'.format(container_name),
+        commands.append((kodi.translate(40893).format(container_name),
                         _context_menu_url_for('execute/command/render_vcategory_view',{'vcategory_id':container_id})))
     if is_virtual_collection:
-        commands.append(('Rebuild {} view'.format(container_name),
+        commands.append((kodi.translate(40893).format(container_name),
                         _context_menu_url_for('execute/command/render_vcategory_view',{'vcategory_id':container_parentid})))    
     
     commands.append((kodi.translate(40856), _context_menu_url_for('execute/command/render_views')))
-    commands.append(('Open Kodi file manager', 'ActivateWindow(filemanager)'))
-    commands.append(('AKL addon settings', 'Addon.OpenSettings({0})'.format(globals.addon_id)))
+    commands.append((kodi.translate(40895), 'ActivateWindow(filemanager)'))
+    commands.append((kodi.translate(40896), 'Addon.OpenSettings({0})'.format(globals.addon_id)))
 
     return commands
 
@@ -605,29 +594,29 @@ def qry_listitem_context_menu_items(list_item_data, container_data)-> typing.Lis
     
     commands = []
     if is_rom: 
-        commands.append(('View ROM', _context_menu_url_for(f'/rom/view/{item_id}')))
-        commands.append(('Edit ROM', _context_menu_url_for(f'/rom/edit/{item_id}')))
-        commands.append(('Link ROM in other collection', _context_menu_url_for('/execute/command/link_rom',{'rom_id':item_id})))
-        commands.append(('Add ROM to AKL Favourites', _context_menu_url_for('/execute/command/add_rom_to_favourites',{'rom_id':item_id})))
+        commands.append((kodi.translate(40882), _context_menu_url_for(f'/rom/view/{item_id}')))
+        commands.append((kodi.translate(40883), _context_menu_url_for(f'/rom/edit/{item_id}')))
+        commands.append((kodi.translate(40884), _context_menu_url_for('/execute/command/link_rom',{'rom_id':item_id})))
+        commands.append((kodi.translate(40885), _context_menu_url_for('/execute/command/add_rom_to_favourites',{'rom_id':item_id})))
         
     if is_category: 
-        commands.append(('View Category', _context_menu_url_for(f'/categories/view/{item_id}')))
-        commands.append(('Edit Category', _context_menu_url_for(f'/categories/edit/{item_id}')))
-        commands.append(('Add new Category',_context_menu_url_for(f'/categories/add/{item_id}/in/{container_id}')))
-        commands.append(('Add new ROM Collection', _context_menu_url_for(f'/romcollection/add/{item_id}/in/{container_id}')))
-        commands.append((   'Add new ROM (Standalone)', _context_menu_url_for(f'/categories/addrom/{item_id}/in/{container_id}')))
+        commands.append((kodi.translate(40886), _context_menu_url_for(f'/categories/view/{item_id}')))
+        commands.append((kodi.translate(40887), _context_menu_url_for(f'/categories/edit/{item_id}')))
+        commands.append((kodi.translate(40888),_context_menu_url_for(f'/categories/add/{item_id}/in/{container_id}')))
+        commands.append((kodi.translate(40889), _context_menu_url_for(f'/romcollection/add/{item_id}/in/{container_id}')))
+        commands.append((kodi.translate(40890), _context_menu_url_for(f'/categories/addrom/{item_id}/in/{container_id}')))
         
     if is_romcollection: 
-        commands.append(('View ROM Collection', _context_menu_url_for(f'/romcollection/view/{item_id}')))
-        commands.append(('Edit ROM Collection', _context_menu_url_for(f'/romcollection/edit/{item_id}')))
+        commands.append((kodi.translate(40891), _context_menu_url_for(f'/romcollection/view/{item_id}')))
+        commands.append((kodi.translate(40892), _context_menu_url_for(f'/romcollection/edit/{item_id}')))
     
     if not is_category and container_is_category:
-        commands.append(('Add new Category',_context_menu_url_for(f'/categories/add/{container_id}')))
-        commands.append(('Add new ROM Collection', _context_menu_url_for(f'/romcollection/add/{container_id}')))
-        commands.append(('Add new ROM (Standalone)', _context_menu_url_for(f'/categories/addrom/{container_id}')))
+        commands.append((kodi.translate(40888),_context_menu_url_for(f'/categories/add/{container_id}')))
+        commands.append((kodi.translate(40889), _context_menu_url_for(f'/romcollection/add/{container_id}')))
+        commands.append((kodi.translate(40890), _context_menu_url_for(f'/categories/addrom/{container_id}')))
         
     if is_virtual_category:
-        commands.append((f'Rebuild {item_name} view', _context_menu_url_for('execute/command/render_vcategory_view',{'vcategory_id':item_id})))
+        commands.append((kodi.translate(40893).format(item_name), _context_menu_url_for('execute/command/render_vcategory_view',{'vcategory_id':item_id})))
                 
     return commands
 

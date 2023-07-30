@@ -80,7 +80,7 @@ def cmd_manage_rom_launchers(args):
         
     launchers = rom.get_launchers()
     default_launcher = next((l for l in launchers if l.is_default()), launchers[0]) if len(launchers) > 0 else None
-    default_launcher_name = default_launcher.get_name() if default_launcher is not None else 'None'
+    default_launcher_name = default_launcher.get_name() if default_launcher is not None else kodi.translate(20010)
     
     options = collections.OrderedDict()
     options['ADD_ROM_LAUNCHER'] = kodi.translate(42026)

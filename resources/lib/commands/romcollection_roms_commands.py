@@ -164,10 +164,12 @@ def cmd_set_rom_asset_dirs(args):
         romcollection = repository.find_romcollection(romcollection_id)
         
         root_path = romcollection.get_assets_root_path()
-        list_items[AssetInfo()] = "Change root assets path: '{}'".format(root_path.getPath() if root_path else 'Undefined')
+        root_path_str = root_path.getPath() if root_path else kodi.translate(41158)
+        list_items[AssetInfo()] = kodi.translate(42083).format(root_path_str)
         for asset_info in assets:
             path = romcollection.get_asset_path(asset_info)
-            if path: list_items[asset_info] = "Change {} path: '{}'".format(asset_info.plural, path.getPath())
+            if path:
+                list_items[asset_info] = kodi.translate(42084).format(asset_info.plural, path.getPath())
 
         dialog = kodi.OrdDictionaryDialog()
         selected_asset: AssetInfo = dialog.select(kodi.translate(41129), list_items)
@@ -178,7 +180,7 @@ def cmd_set_rom_asset_dirs(args):
 
         # rootpath?
         if selected_asset.id == '':
-            dir_path = kodi.browse(type=0, text='Select root assets path', preselected_path=root_path.getPath() if root_path else None)
+            dir_path = kodi.browse(type=0, text=kodi.translate(41159), preselected_path=root_path.getPath() if root_path else None)
             if not dir_path or (root_path is not None and dir_path == root_path.getPath()):  
                 AppMediator.sync_cmd('SET_ROMS_ASSET_DIRS', args)
                 return
@@ -188,7 +190,7 @@ def cmd_set_rom_asset_dirs(args):
             romcollection.set_assets_root_path(root_path, constants.ROM_ASSET_ID_LIST, create_default_subdirectories=apply_to_all)            
         else:
             selected_asset_path = romcollection.get_asset_path(selected_asset)
-            dir_path = kodi.browse(type=0, text='Select {} path'.format(selected_asset.plural), preselected_path=selected_asset_path.getPath())
+            dir_path = kodi.browse(type=0, text=kodi.translate(41160).format(selected_asset.plural), preselected_path=selected_asset_path.getPath())
             if not dir_path or dir_path == selected_asset_path.getPath():  
                 AppMediator.sync_cmd('SET_ROMS_ASSET_DIRS', args)
                 return

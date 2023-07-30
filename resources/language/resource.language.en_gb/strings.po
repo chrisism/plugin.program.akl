@@ -262,6 +262,8 @@ msgctxt "#40702"
 msgid "Google scraper plugin"
 msgstr "settings.xml"
 
+################################################################################################################
+
 ############################
 # Metadata labels
 ############################
@@ -325,6 +327,125 @@ msgstr ""
 msgctxt "#40815"
 msgid "Name"
 msgstr ""
+
+msgctxt "#40816"
+msgid "Default box size"
+msgstr ""
+
+############################
+# Constant Enum values
+############################
+
+msgctxt "#43001"
+msgid "Icon"
+msgstr "Assets"
+
+msgctxt "#43002"
+msgid "Fanart"
+msgstr "Assets"
+
+msgctxt "#43003"
+msgid "Banner"
+msgstr "Assets"
+
+msgctxt "#43004"
+msgid "Poster"
+msgstr "Assets"
+
+msgctxt "#43005"
+msgid "Clearlogo"
+msgstr "Assets"
+
+msgctxt "#43006"
+msgid "Controller"
+msgstr "Assets"
+
+msgctxt "#43007"
+msgid "Trailer"
+msgstr "Assets"
+
+msgctxt "#43008"
+msgid "Title"
+msgstr "Assets"
+
+msgctxt "#43009"
+msgid "Snap"
+msgstr "Assets"
+
+msgctxt "#43010"
+msgid "Boxfront"
+msgstr "Assets"
+
+msgctxt "#43011"
+msgid "Boxback"
+msgstr "Assets"
+
+msgctxt "#43012"
+msgid "Cartridge"
+msgstr "Assets"
+
+msgctxt "#43013"
+msgid "Flyer"
+msgstr "Assets"
+
+msgctxt "#43014"
+msgid "Map"
+msgstr "Assets"
+
+msgctxt "#43015"
+msgid "Manual"
+msgstr "Assets"
+
+msgctxt "#43016"
+msgid "3D Box"
+msgstr "Assets"
+
+
+############################
+# Object names
+############################
+
+msgctxt "#42501"
+msgid "Category"
+msgstr "domain"
+
+msgctxt "#42502"
+msgid "Virtual Category"
+msgstr "domain"
+
+msgctxt "#42503"
+msgid "ROM Collection"
+msgstr "domain"
+
+msgctxt "#42504"
+msgid "Virtual Collection"
+msgstr "domain"
+
+############################
+# Advanced Enum values
+############################
+
+msgctxt "#30911"
+msgid "ERROR"
+msgstr "LOG ENUM"
+
+msgctxt "#30912"
+msgid "WARNING"
+msgstr "LOG ENUM"
+
+msgctxt "#30913"
+msgid "INFO"
+msgstr "LOG ENUM"
+
+msgctxt "#30914"
+msgid "VERBOSE"
+msgstr "LOG ENUM"
+
+msgctxt "#30915"
+msgid "DEBUG"
+msgstr "LOG ENUM"
+
+################################################################################################################
 
 ############################
 # Actions
@@ -456,6 +577,134 @@ msgstr ""
 
 msgctxt "#40881"
 msgid "Scrape"
+msgstr ""
+
+msgctxt "#40882"
+msgid "View ROM"
+msgstr ""
+
+msgctxt "#40883"
+msgid "Edit ROM"
+msgstr ""
+
+msgctxt "#40884"
+msgid "Link ROM in other collection"
+msgstr ""
+
+msgctxt "#40885"
+msgid "Add ROM to AKL Favourites"
+msgstr ""
+
+msgctxt "#40886"
+msgid "View Category"
+msgstr ""
+
+msgctxt "#40887"
+msgid "Edit Category"
+msgstr ""
+
+msgctxt "#40888"
+msgid "Add new Category"
+msgstr ""
+
+msgctxt "#40889"
+msgid "Add new ROM Collection"
+msgstr ""
+
+msgctxt "#40890"
+msgid "Add new ROM (Standalone)"
+msgstr ""
+
+msgctxt "#40891"
+msgid "View ROM Collection"
+msgstr ""
+
+msgctxt "#40892"
+msgid "Edit ROM Collection"
+msgstr ""
+
+msgctxt "#40893"
+msgid "Rebuild {0} view"
+msgstr ""
+
+msgctxt "#40894"
+msgid "Search ROM in collection"
+msgstr ""
+
+msgctxt "#40895"
+msgid "Open Kodi file manager"
+msgstr ""
+
+msgctxt "#40896"
+msgid "AKL addon settings"
+msgstr ""
+
+msgctxt "#40897"
+msgid "Utilities"
+msgstr ""
+
+msgctxt "#40898"
+msgid "Global Reports"
+msgstr ""
+
+msgctxt "#40899"
+msgid "Reset database"
+msgstr ""
+
+msgctxt "#40900"
+msgid "Rebuild virtual views"
+msgstr ""
+
+msgctxt "#40901"
+msgid "Scan for plugin-addons"
+msgstr ""
+
+msgctxt "#40902"
+msgid "Show plugin-addons"
+msgstr ""
+
+msgctxt "#40903"
+msgid "Manage ROM tags"
+msgstr ""
+
+msgctxt "#40904"
+msgid "Import category/launcher XML configuration file"
+msgstr ""
+
+msgctxt "#40905"
+msgid "Export category/rom collection XML configuration file"
+msgstr ""
+
+msgctxt "#40906"
+msgid "Check collections"
+msgstr ""
+
+msgctxt "#40907"
+msgid "Check ROMs artwork image integrity"
+msgstr ""
+
+msgctxt "#40908"
+msgid "Delete ROMs redundant artwork"
+msgstr ""
+
+msgctxt "#40909"
+msgid "Show detected No-Intro/Redump DATs"
+msgstr ""
+
+msgctxt "#40910"
+msgid "Global ROM statistics"
+msgstr ""
+
+msgctxt "#40911"
+msgid "Global ROM Audit statistics (All)"
+msgstr ""
+
+msgctxt "#40912"
+msgid "Global ROM Audit statistics (No-Intro only)"
+msgstr ""
+
+msgctxt "#40913"
+msgid "Global ROM Audit statistics (Redump only)"
 msgstr ""
 
 ############################
@@ -1289,6 +1538,26 @@ msgctxt "#41155"
 msgid "Select ROMs JSON file"
 msgstr ""
 
+msgctxt "#41156"
+msgid "Unknown"
+msgstr ""
+
+msgctxt "#41157"
+msgid "Select description file (TXT|DAT)"
+msgstr ""
+
+msgctxt "#41158"
+msgid "Undefined"
+msgstr ""
+
+msgctxt "#41159"
+msgid "Select root assets path"
+msgstr ""
+
+msgctxt "#41160"
+msgid "Select {} path"
+msgstr ""
+
 ############################
 # List/Action options
 ############################
@@ -1541,94 +1810,198 @@ msgctxt "#42062"
 msgid "By Rating"
 msgstr ""
 
+msgctxt "#42063"
+msgid "<Favourites>"
+msgstr ""
+
+msgctxt "#42064"
+msgid "[Recently played ROMs]"
+msgstr ""
+
+msgctxt "#42065"
+msgid "[Most played ROMs]"
+msgstr ""
+
+msgctxt "#42066"
+msgid "Browse by..."
+msgstr ""
+
+msgctxt "#42067"
+msgid "Browse by Title"
+msgstr ""
+
+msgctxt "#42068"
+msgid "Browse by Year"
+msgstr ""
+
+msgctxt "#42069"
+msgid "Browse by Genre"
+msgstr ""
+
+msgctxt "#42070"
+msgid "Browse by Developer"
+msgstr ""
+
+msgctxt "#42071"
+msgid "Browse by Number of Players"
+msgstr ""
+
+msgctxt "#42072"
+msgid "Browse by ESRB Rating"
+msgstr ""
+
+msgctxt "#42073"
+msgid "Browse by PEGI Rating"
+msgstr ""
+
+msgctxt "#42074"
+msgid "Browse by Rating"
+msgstr ""
+
+msgctxt "#42080"
+msgid "Add new scanner"
+msgstr ""
+
+msgctxt "#42081"
+msgid "Edit scanner"
+msgstr ""
+
+msgctxt "#42082"
+msgid "Remove scanner"
+msgstr ""
+
+msgctxt "#42083"
+msgid "Change root assets path: '{}'"
+msgstr ""
+
+msgctxt "#42084"
+msgid "Change {} path: '{}'"
+msgstr ""
+
 ############################
-# Constant Enum values
+# Context menu item descriptions
 ############################
 
-msgctxt "#43001"
-msgid "Icon"
-msgstr "Assets"
+msgctxt "#42001"
+msgid "Execute several [COLOR orange]Utilities[/COLOR]."
+msgstr "viewqueries"
 
-msgctxt "#43002"
-msgid "Fanart"
-msgstr "Assets"
+msgctxt "#42002"
+msgid "Generate and view [COLOR orange]Global Reports[/COLOR]."
+msgstr "viewqueries"
 
-msgctxt "#43003"
-msgid "Banner"
-msgstr "Assets"
+msgctxt "#42003"
+msgid "Reset the AKL database. You will loose all data."
+msgstr "viewqueries"
 
-msgctxt "#43004"
-msgid "Poster"
-msgstr "Assets"
+msgctxt "#42004"
+msgid "Rebuild all the container views in the application."
+msgstr "viewqueries"
 
-msgctxt "#43005"
-msgid "Clearlogo"
-msgstr "Assets"
+msgctxt "#42005"
+msgid "Browse AKL Favourite ROMs"
+msgstr "domain"
 
-msgctxt "#43006"
-msgid "Controller"
-msgstr "Assets"
+msgctxt "#42006"
+msgid "Browse the ROMs you played recently"
+msgstr "domain"
 
-msgctxt "#43007"
-msgid "Trailer"
-msgstr "Assets"
+msgctxt "#42007"
+msgid "Browse the ROMs you play most"
+msgstr "domain"
 
-msgctxt "#43008"
-msgid "Title"
-msgstr "Assets"
+msgctxt "#42008"
+msgid "Browse ROMs filtered on '{0}'"
+msgstr "domain"
 
-msgctxt "#43009"
-msgid "Snap"
-msgstr "Assets"
+msgctxt "#42009"
+msgid "Browse the ROMs by specifics"
+msgstr "domain"
 
-msgctxt "#43010"
-msgid "Boxfront"
-msgstr "Assets"
+msgctxt "#42010"
+msgid "Browse the ROMs by title"
+msgstr "domain"
 
-msgctxt "#43011"
-msgid "Boxback"
-msgstr "Assets"
+msgctxt "#42011"
+msgid "Browse the ROMs by year"
+msgstr "domain"
 
-msgctxt "#43012"
-msgid "Cartridge"
-msgstr "Assets"
+msgctxt "#42012"
+msgid "Browse the ROMs by genre"
+msgstr "domain"
 
-msgctxt "#43013"
-msgid "Flyer"
-msgstr "Assets"
+msgctxt "#42013"
+msgid "Browse the ROMs by developer"
+msgstr "domain"
 
-msgctxt "#43014"
-msgid "Map"
-msgstr "Assets"
+msgctxt "#42014"
+msgid "Browse the ROMs by number of players"
+msgstr "domain"
 
-msgctxt "#43015"
-msgid "Manual"
-msgstr "Assets"
+msgctxt "#42015"
+msgid "Browse the ROMs by ESRB rating"
+msgstr "domain"
 
-msgctxt "#43016"
-msgid "3D Box"
-msgstr "Assets"
+msgctxt "#42016"
+msgid "Browse the ROMs by PEGI rating"
+msgstr "domain"
 
-############################
-# Advanced Enum values
-############################
+msgctxt "#42017"
+msgid "Browse the ROMs by rating"
+msgstr "domain"
 
-msgctxt "#30911"
-msgid "ERROR"
-msgstr "LOG ENUM"
+msgctxt "#42018"
+msgid "Rebuild all the virtual categories and collections in the container"
+msgstr "viewqueries"
 
-msgctxt "#30912"
-msgid "WARNING"
-msgstr "LOG ENUM"
+msgctxt "#42019"
+msgid "Scan for addons that can be used by AKL (launchers, scrapers etc.)"
+msgstr "viewqueries"
 
-msgctxt "#30913"
-msgid "INFO"
-msgstr "LOG ENUM"
+msgctxt "#42020"
+msgid "Shows previously scanned addons that can be used by AKL (launchers, scrapers etc.)"
+msgstr "viewqueries"
 
-msgctxt "#30914"
-msgid "VERBOSE"
-msgstr "LOG ENUM"
+msgctxt "#42021"
+msgid "Manage existing/available tags for ROMs"
+msgstr "viewqueries"
 
-msgctxt "#30915"
-msgid "DEBUG"
-msgstr "LOG ENUM"
+msgctxt "#42022"
+msgid "Execute several [COLOR orange]Utilities[/COLOR]."
+msgstr "viewqueries"
+
+msgctxt "#42023"
+msgid "Exports all AKL categories and collections into an XML configuration file.\nYou can later reimport this XML file."
+msgstr "viewqueries"
+
+msgctxt "#42024"
+msgid "Check all collections for missing launchers or scanners, missing artwork, wrong platform names, asset path existence, etc."
+msgstr "viewqueries"
+
+msgctxt "#42025"
+msgid "Scans existing [COLOR=orange]ROMs artwork images[/COLOR] in ROM Collections and verifies that the images have correct extension and size is greater than 0. You can delete corrupted images to be rescraped later."
+msgstr "viewqueries"
+
+msgctxt "#42026"
+msgid "Scans all ROM collections and finds [COLOR orange]redundant ROMs artwork[/COLOR]. You may delete these unneeded images."
+msgstr "viewqueries"
+
+msgctxt "#42027"
+msgid "Display the auto-detected No-Intro/Redump DATs that will be used for the ROM audit. You have to configure the DAT directories in [COLOR orange]AKL addon settings[/COLOR], [COLOR=orange]ROM Audit[/COLOR] tab."
+msgstr "viewqueries"
+
+msgctxt "#42028"
+msgid "Shows a report of all ROM collections with number of ROMs."
+msgstr "viewqueries"
+
+msgctxt "#42029"
+msgid "Shows a report of all audited ROM collections, with Have, Miss and Unknown statistics."
+msgstr "viewqueries"
+
+msgctxt "#42030"
+msgid "Shows a report of all audited ROM Launchers, with Have, Miss and Unknown statistics. Only No-Intro platforms (cartridge-based) are reported."
+msgstr "viewqueries"
+
+msgctxt "#42031"
+msgid "Shows a report of all audited ROM Launchers, with Have, Miss and Unknown statistics. Only Redump platforms (optical-based) are reported."
+msgstr "viewqueries"

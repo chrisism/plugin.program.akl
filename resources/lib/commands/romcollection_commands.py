@@ -296,7 +296,7 @@ def cmd_romcollection_metadata_title(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
         
-        if editors.edit_field_by_str(romcollection, 'Title', romcollection.get_name, romcollection.set_name):
+        if editors.edit_field_by_str(romcollection, kodi.translate(40812), romcollection.get_name, romcollection.set_name):
             repository.update_romcollection(romcollection)
             uow.commit()
             AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection.get_id()})
@@ -311,7 +311,7 @@ def cmd_romcollection_metadata_platform(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
 
-        if editors.edit_field_by_list(romcollection, 'Platform', platforms.AKL_platform_list,
+        if editors.edit_field_by_list(romcollection, kodi.translate(40807), platforms.AKL_platform_list,
                                     romcollection.get_platform, romcollection.set_platform):
             repository.update_romcollection(romcollection)
             update_roms_too = kodi.dialog_yesno(kodi.translate(40955))
@@ -337,7 +337,7 @@ def cmd_romcollection_metadata_releaseyear(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
         
-        if editors.edit_field_by_str(romcollection, 'Release Year', romcollection.get_releaseyear, romcollection.set_releaseyear):
+        if editors.edit_field_by_str(romcollection, kodi.translate(40803), romcollection.get_releaseyear, romcollection.set_releaseyear):
             repository.update_romcollection(romcollection)
             uow.commit()
             AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection.get_id()})
@@ -352,7 +352,7 @@ def cmd_romcollection_metadata_genre(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
         
-        if editors.edit_field_by_str(romcollection, 'Genre', romcollection.get_genre, romcollection.set_genre):
+        if editors.edit_field_by_str(romcollection, kodi.translate(40801), romcollection.get_genre, romcollection.set_genre):
             repository.update_romcollection(romcollection)
             uow.commit()            
             AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection.get_id()})
@@ -367,7 +367,7 @@ def cmd_romcollection_metadata_developer(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
         
-        if editors.edit_field_by_str(romcollection, 'Developer', romcollection.get_developer, romcollection.set_developer):
+        if editors.edit_field_by_str(romcollection, kodi.translate(40802), romcollection.get_developer, romcollection.set_developer):
             repository.update_romcollection(romcollection)
             uow.commit()    
             AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection.get_id()})
@@ -397,7 +397,7 @@ def cmd_romcollection_metadata_plot(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
         
-        if editors.edit_field_by_str(romcollection, 'Plot', romcollection.get_plot, romcollection.set_plot):
+        if editors.edit_field_by_str(romcollection, kodi.translate(40811), romcollection.get_plot, romcollection.set_plot):
             repository.update_romcollection(romcollection)
             uow.commit()
             AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection.get_id()})
@@ -412,7 +412,7 @@ def cmd_romcollection_metadata_boxsize(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
 
-        if editors.edit_field_by_list(romcollection, 'Default box size', constants.BOX_SIZES,
+        if editors.edit_field_by_list(romcollection, kodi.translate(40816), constants.BOX_SIZES,
                                     romcollection.get_box_sizing, romcollection.set_box_sizing):
             repository.update_romcollection(romcollection)
             uow.commit()
@@ -443,7 +443,7 @@ def cmd_romcollection_import_nfo_file(args):
 def cmd_romcollection_browse_import_nfo_file(args):    
     romcollection_id = args['romcollection_id'] if 'romcollection_id' in args else None
     
-    NFO_file = kodi.browse(text='Select NFO description file', mask='.nfo')
+    NFO_file = kodi.browse(text=kodi.translate(41143), mask='.nfo')
     logger.debug('cmd_romcollection_browse_import_nfo_file() Dialog().browse returned "{0}"'.format(NFO_file))
     if not NFO_file: return
     NFO_FileName = io.FileName(NFO_file)

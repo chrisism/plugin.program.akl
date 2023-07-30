@@ -47,9 +47,9 @@ def cmd_manage_romcollection_scanners(args):
         romcollection = repository.find_romcollection(romcollection_id)
         
     options = collections.OrderedDict()
-    options['ADD_SCANNER']      = 'Add new scanner'
-    options['EDIT_SCANNER']     = 'Edit scanner'
-    options['REMOVE_SCANNER']   = 'Remove scanner'
+    options['ADD_SCANNER'] = kodi.translate(42080)
+    options['EDIT_SCANNER'] = kodi.translate(42081)
+    options['REMOVE_SCANNER'] = kodi.translate(42082)
         
     s = kodi.translate(41106).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)

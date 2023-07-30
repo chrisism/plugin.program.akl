@@ -257,7 +257,7 @@ def cmd_category_metadata_title(args):
         repository = CategoryRepository(uow)
         category = repository.find_category(category_id)
         
-        if editors.edit_field_by_str(category, 'Title', category.get_name, category.set_name):
+        if editors.edit_field_by_str(category, kodi.translate(40812), category.get_name, category.set_name):
             repository.update_category(category)
             uow.commit()
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
@@ -272,7 +272,7 @@ def cmd_category_metadata_releaseyear(args):
         repository = CategoryRepository(uow)
         category = repository.find_category(category_id)
         
-        if editors.edit_field_by_str(category, 'Release Year', category.get_releaseyear, category.set_releaseyear):
+        if editors.edit_field_by_str(category, kodi.translate(40803), category.get_releaseyear, category.set_releaseyear):
             repository.update_category(category)
             uow.commit()
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
@@ -287,7 +287,7 @@ def cmd_category_metadata_genre(args):
         repository = CategoryRepository(uow)
         category = repository.find_category(category_id)
         
-        if editors.edit_field_by_str(category, 'Genre', category.get_genre, category.set_genre):
+        if editors.edit_field_by_str(category, kodi.translate(40801), category.get_genre, category.set_genre):
             repository.update_category(category)
             uow.commit()            
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
@@ -302,7 +302,7 @@ def cmd_category_metadata_developer(args):
         repository = CategoryRepository(uow)
         category = repository.find_category(category_id)
         
-        if editors.edit_field_by_str(category, 'Developer', category.get_developer, category.set_developer):
+        if editors.edit_field_by_str(category, kodi.translate(40802), category.get_developer, category.set_developer):
             repository.update_category(category)
             uow.commit()    
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
@@ -332,7 +332,7 @@ def cmd_category_metadata_plot(args):
         repository = CategoryRepository(uow)
         category = repository.find_category(category_id)
         
-        if editors.edit_field_by_str(category, 'Plot', category.get_plot, category.set_plot):
+        if editors.edit_field_by_str(category, kodi.translate(40811), category.get_plot, category.set_plot):
             repository.update_category(category)
             uow.commit()
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})

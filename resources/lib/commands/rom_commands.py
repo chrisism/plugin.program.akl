@@ -233,7 +233,7 @@ def cmd_rom_metadata_title(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
         
-        if editors.edit_field_by_str(rom, 'Title', rom.get_name, rom.set_name):
+        if editors.edit_field_by_str(rom, kodi.translate(40812), rom.get_name, rom.set_name):
             repository.update_rom(rom)
             uow.commit()
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
@@ -249,7 +249,7 @@ def cmd_rom_metadata_platform(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
 
-        if editors.edit_field_by_list(rom, 'Platform', platforms.AKL_platform_list,
+        if editors.edit_field_by_list(rom, kodi.translate(40807), platforms.AKL_platform_list,
                                     rom.get_platform, rom.set_platform):
             repository.update_rom(rom)
             uow.commit()
@@ -265,7 +265,7 @@ def cmd_rom_metadata_esrb(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
 
-        if editors.edit_field_by_list(rom, 'ESRB rating', constants.ESRB_LIST,
+        if editors.edit_field_by_list(rom, kodi.translate(40804), constants.ESRB_LIST,
                                     rom.get_esrb_rating, rom.set_esrb_rating):
             repository.update_rom(rom)
             uow.commit()
@@ -282,7 +282,7 @@ def cmd_rom_metadata_pegi(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
 
-        if editors.edit_field_by_list(rom, 'PEGI rating', constants.PEGI_LIST,
+        if editors.edit_field_by_list(rom, kodi.translate(40805), constants.PEGI_LIST,
                                     rom.get_pegi_rating, rom.set_pegi_rating):
             repository.update_rom(rom)
             uow.commit()
@@ -299,7 +299,7 @@ def cmd_rom_metadata_releaseyear(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
         
-        if editors.edit_field_by_str(rom, 'Release Year', rom.get_releaseyear, rom.set_releaseyear):
+        if editors.edit_field_by_str(rom, kodi.translate(40803), rom.get_releaseyear, rom.set_releaseyear):
             repository.update_rom(rom)
             uow.commit()
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
@@ -315,7 +315,7 @@ def cmd_rom_metadata_genre(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
         
-        if editors.edit_field_by_str(rom, 'Genre', rom.get_genre, rom.set_genre):
+        if editors.edit_field_by_str(rom, kodi.translate(40801), rom.get_genre, rom.set_genre):
             repository.update_rom(rom)
             uow.commit()            
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
@@ -331,7 +331,7 @@ def cmd_rom_metadata_developer(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
         
-        if editors.edit_field_by_str(rom, 'Developer', rom.get_developer, rom.set_developer):
+        if editors.edit_field_by_str(rom, kodi.translate(40802), rom.get_developer, rom.set_developer):
             repository.update_rom(rom)
             uow.commit()    
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})
@@ -571,7 +571,7 @@ def cmd_rom_metadata_boxsize(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
 
-        if editors.edit_field_by_list(rom, 'Default box size', constants.BOX_SIZES,
+        if editors.edit_field_by_list(rom, kodi.translate(40816), constants.BOX_SIZES,
                                     rom.get_box_sizing, rom.set_box_sizing):
             repository.update_rom(rom)
             uow.commit()
@@ -582,7 +582,7 @@ def cmd_rom_metadata_boxsize(args):
 def cmd_rom_load_plot(args):    
     rom_id = args['rom_id'] if 'rom_id' in args else None
     
-    plot_file = kodi.browse(text='Select description file (TXT|DAT)', mask='.txt|.dat')
+    plot_file = kodi.browse(text=kodi.translate(41157), mask='.txt|.dat')
     logger.debug('cmd_rom_load_plot() Dialog().browse returned "{0}"'.format(plot_file))
     if not plot_file: return
     plot_FileName = io.FileName(plot_file)
@@ -630,7 +630,7 @@ def cmd_rom_import_nfo_file(args):
 def cmd_rom_browse_import_nfo_file(args):    
     rom_id = args['rom_id'] if 'rom_id' in args else None
     
-    NFO_file = kodi.browse(text='Select NFO description file', mask='.nfo')
+    NFO_file = kodi.browse(text=kodi.translate(41143), mask='.nfo')
     logger.debug('cmd_rom_browse_import_nfo_file() Dialog().browse returned "{0}"'.format(NFO_file))
     if not NFO_file: return
     NFO_FileName = io.FileName(NFO_file)

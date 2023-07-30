@@ -188,9 +188,12 @@ def edit_object_assets(obj_instance:MetaDataItemABC, preselected_asset = None) -
         list_item = xbmcgui.ListItem(label = label1_str, label2 = label2_stt)
         if asset_fname_str:
             item_path = io.FileName(asset_fname_str)
-            if item_path.isVideoFile():     item_img = 'DefaultAddonVideo.png'
-            elif item_path.isManualFile():  item_img = 'DefaultAddonInfoProvider.png'
-            else:                           item_img = asset_fname_str
+            if item_path.isVideoFile():
+                item_img = 'DefaultAddonVideo.png'
+            elif item_path.isManualFile():
+                item_img = 'DefaultAddonInfoProvider.png'
+            else:
+                item_img = asset_fname_str
         else:
             item_img = 'DefaultAddonNone.png'
         list_item.setArt({'icon' : item_img})
@@ -267,9 +270,9 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> str:
     
     # --- Show image editing options ---
     options = collections.OrderedDict()
-    options['LINK_LOCAL']   = kodi.translate(42004).format(asset_info.name)
+    options['LINK_LOCAL'] = kodi.translate(42004).format(asset_info.name)
     options['IMPORT_LOCAL'] = kodi.translate(42005).format(asset_info.name)
-    options['UNSET']        = kodi.translate(42006)
+    options['UNSET'] = kodi.translate(42006)
     if obj_instance.get_assets_kind() == constants.KIND_ASSET_ROM:
         options['SCRAPE_ASSET'] = kodi.translate(42007).format(asset_info.name)
         
@@ -452,14 +455,19 @@ def edit_object_default_assets(obj_instance: MetaDataItemABC, preselected_asset_
         # >> icon is the fname string of the current mapped asset.
         mapped_asset_info = obj_instance.get_asset_mapping(default_asset_info)
         mapped_asset_str = obj_instance.get_asset_str(mapped_asset_info)
-        label1_str = f'Choose asset for {default_asset_info.name} (currently {mapped_asset_info.name})'
+        label1_str = kodi.translate(42055).format(
+            kodi.translate(default_asset_info.name_id), 
+            kodi.translate(mapped_asset_info.name_id))
         label2_str = mapped_asset_str
         list_item = xbmcgui.ListItem(label = label1_str, label2 = label2_str)
         if mapped_asset_str:
             item_path = io.FileName(mapped_asset_str)
-            if item_path.isVideoFile():     item_img = 'DefaultAddonVideo.png'
-            elif item_path.isManualFile():  item_img = 'DefaultAddonInfoProvider.png'
-            else:                           item_img = mapped_asset_str
+            if item_path.isVideoFile():
+                item_img = 'DefaultAddonVideo.png'
+            elif item_path.isManualFile():
+                item_img = 'DefaultAddonInfoProvider.png'
+            else:
+                item_img = mapped_asset_str
         else:
             item_img = 'DefaultAddonNone.png'
         list_item.setArt({'icon' : item_img})
@@ -500,13 +508,16 @@ def edit_default_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> 
         # >> setArt('icon') is the asset picture.
         mapped_asset_str = obj_instance.get_asset_str(mappable_asset_info)
         label1_str = mappable_asset_info.name
-        label2_stt = mapped_asset_str if mapped_asset_str else 'Not set'
-        list_item = xbmcgui.ListItem(label = label1_str, label2 = label2_stt)
+        label2_str = mapped_asset_str if mapped_asset_str else kodi.translate(42001)
+        list_item = xbmcgui.ListItem(label = label1_str, label2 = label2_str)
         if mapped_asset_str:
             item_path = io.FileName(mapped_asset_str)
-            if item_path.isVideoFile():     item_img = 'DefaultAddonVideo.png'
-            elif item_path.isManualFile():  item_img = 'DefaultAddonInfoProvider.png'
-            else:                           item_img = mapped_asset_str
+            if item_path.isVideoFile():
+                item_img = 'DefaultAddonVideo.png'
+            elif item_path.isManualFile():
+                item_img = 'DefaultAddonInfoProvider.png'
+            else:
+                item_img = mapped_asset_str
         else:
             item_img = 'DefaultAddonNone.png'
         list_item.setArt({'icon' : item_img})
