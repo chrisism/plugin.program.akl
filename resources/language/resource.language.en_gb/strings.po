@@ -1202,7 +1202,7 @@ msgid "ROMCollection '{0}' has {1} ROMs."
 msgstr "" 
 
 msgctxt "#41070"
-msgid "File "{0}" has {1} bytes and it is very big. Are you sure this is the correct file?"
+msgid "File '{0}' has {1} bytes and it is very big. Are you sure this is the correct file?"
 msgstr "" 
 
 msgctxt "#41071"
@@ -1510,7 +1510,7 @@ msgid "Select XML category/launcher configuration file"
 msgstr ""
 
 msgctxt "#41146"
-msgid "Category "{}" status is now {}"
+msgid "Category '{}' status is now {}"
 msgstr ""
 
 msgctxt "#41147"
@@ -1526,7 +1526,7 @@ msgid "Assets directories not set: {0}.\nAsset scanner will be disabled for this
 msgstr ""
 
 msgctxt "#41150"
-msgid "ROMCollection "{}" status is now {}"
+msgid "ROMCollection '{}' status is now {}"
 msgstr ""
 
 msgctxt "#41151"
