@@ -16,7 +16,7 @@ from resources.lib import globals
 from resources.lib import queries as qry
 from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, Asset, AssetPath, AssetMapping, RomAssetMapping, VirtualCollection
 from resources.lib.domain import VirtualCategoryFactory, VirtualCollectionFactory, ROMLauncherAddonFactory, g_assetFactory
-from resources.lib.domain import ROMCollectionScanner, ROMLauncherAddon, AelAddon
+from resources.lib.domain import LibrarySource, ROMLauncherAddon, AelAddon
 
 
 # #################################################################################################
@@ -1651,3 +1651,28 @@ class AelAddonRepository(object):
                     addon.get_addon_type().name,
                     addon.get_extra_settings_str(),
                     addon.get_id())
+
+class LibrarySourceRepository(object):
+
+    def __init__(self, uow: UnitOfWork):
+        self._uow = uow
+        self.logger = logging.getLogger(__name__)
+
+    def find(self, id:str) -> LibrarySource:
+        self._uow.execute(qry.SELECT_ADDON, id)
+        result_set = self._uow.single_result()
+        return LibrarySource(result_set)
+
+    def find_by_addon_id(self, addon_id:str, type: constants.AddonType) -> AelAddon:
+        self._uow.execute(qry.SELECT_ADDON_BY_ADDON_ID, addon_id, type.name)
+        result_set = self._uow.single_result()
+        if result_set is None:
+            return None
+        return AelAddon(result_set)
+
+    def find_all(self) -> typing.Iterator[AelAddon]:
+        self._uow.execute(qry.SELECT_ADDONS)
+        result_set = self._uow.result_set()
+        for addon_data in result_set:
+            yield AelAddon(addon_data)
+

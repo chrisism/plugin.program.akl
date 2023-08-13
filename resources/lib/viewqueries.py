@@ -58,9 +58,32 @@ def qry_get_root_items():
         AppMediator.async_cmd('RENDER_VIEWS')
     
     listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()
+
+    listitem_name = kodi.translate(40914)
+    container['items'].append({
+        'name': listitem_name,
+        'url': globals.router.url_for_path('libraries'),
+        'is_folder': True,
+        'type': 'video',
+        'info': {
+            'title': listitem_name,
+            'plot': kodi.translate(42001),
+            'overlay': 4
+        },
+        'art': { 
+            'fanart' : listitem_fanart, 
+            'icon' : globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
+            'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath() 
+        },
+        'properties': { 
+            constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_CATEGORY, 
+            'obj_type': constants.OBJ_NONE 
+        }
+    })
+            
     
     if not settings.getSettingAsBool('display_hide_utilities'): 
-        listitem_name   = kodi.translate(40897)
+        listitem_name = kodi.translate(40897)
         container['items'].append({
             'name': listitem_name,
             'url': globals.router.url_for_path('utilities'),
@@ -270,6 +293,29 @@ def qry_get_view_scanned_data(rom_id: str):
 
     return container
 
+
+#
+# Library items
+#
+def qry_get_libraries():
+    # --- Common artwork for all Utilities VLaunchers ---
+    listitem_icon   = globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath()
+    listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()
+    listitem_poster = globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
+    
+    container = {
+        'id': '',
+        'name': kodi.translate(40914),
+        'obj_type': constants.OBJ_NONE,
+        'items': []
+    }
+
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        roms_repository = ROMsRepository(uow)
+        rom = roms_repository.find_rom(rom_id)
+
+        item = view_rendering_commands.render_rom_listitem(rom)
 
 #
 # Utilities items

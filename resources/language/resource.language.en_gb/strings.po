@@ -718,6 +718,10 @@ msgctxt "#40913"
 msgid "Global ROM Audit statistics (Redump only)"
 msgstr ""
 
+msgctxt "#40914"
+msgid "Libraries"
+msgstr ""
+
 ############################
 # Headers and texts / notifications / dialogs
 ############################
@@ -2015,4 +2019,8 @@ msgstr "viewqueries"
 
 msgctxt "#42031"
 msgid "Shows a report of all audited ROM Launchers, with Have, Miss and Unknown statistics. Only Redump platforms (optical-based) are reported."
+msgstr "viewqueries"
+
+msgctxt "#42032"
+msgid "Manage your game [COLOR orange]libraries[/COLOR] and sources."
 msgstr "viewqueries"

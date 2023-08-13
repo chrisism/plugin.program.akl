@@ -164,6 +164,17 @@ def vw_route_render_virtual_items_view(category_id: str):
     xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
        
 # -------------------------------------------------------------------------------------------------
+# Library sources
+# -------------------------------------------------------------------------------------------------
+@router.route('/libraries')
+def vw_route_render_libraries():
+    container = viewqueries.qry_get_libraries()
+    container_context_items = viewqueries.qry_container_context_menu_items(container)
+
+    _render_list_items(container, container_context_items)
+    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+       
+# -------------------------------------------------------------------------------------------------
 # Utilities and Global reports
 # -------------------------------------------------------------------------------------------------
 @router.route('/utilities')

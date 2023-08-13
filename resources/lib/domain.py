@@ -471,7 +471,8 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
         if not is_stored:
             kodi.notify_error(kodi.translate(40958))
      
-class ROMCollectionScanner(ROMAddon):
+#class ROMCollectionScanner(ROMAddon):
+class LibrarySource(ROMAddon):
     
     def get_last_scan_timestamp(self):
         return None
@@ -495,6 +496,7 @@ class ROMCollectionScanner(ROMAddon):
             '--romcollection_id': romcollection.get_id(),
             '--akl_addon_id':  self.get_id()
         }
+
 
 class ScraperAddon(ROMAddon):
     
