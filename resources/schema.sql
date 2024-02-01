@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS akl_addon(
 CREATE TABLE IF NOT EXISTS libraries(
     id TEXT PRIMARY KEY,
     library_name TEXT,
+    assets_path TEXT,
+    last_scan_timestamp TIMESTAMP,
     akl_addon_id TEXT,
     settings TEXT,
     FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
@@ -214,15 +216,6 @@ CREATE TABLE IF NOT EXISTS romcollection_assets(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-CREATE TABLE IF NOT EXISTS romcollection_assetpaths(
-    romcollection_id TEXT,
-    assetpaths_id TEXT,
-    FOREIGN KEY (romcollection_id) REFERENCES romcollections (id) 
-        ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (assetpaths_id) REFERENCES assetpaths (id) 
-        ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
 CREATE TABLE IF NOT EXISTS rom_assets(
     rom_id TEXT,
     asset_id TEXT,
@@ -236,6 +229,15 @@ CREATE TABLE IF NOT EXISTS rom_assetpaths(
     rom_id TEXT,
     assetpaths_id TEXT,
     FOREIGN KEY (rom_id) REFERENCES roms (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (assetpaths_id) REFERENCES assetpaths (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS library_assetpaths(
+    library_id TEXT,
+    assetpaths_id TEXT,
+    FOREIGN KEY (library_id) REFERENCES library (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY (assetpaths_id) REFERENCES assetpaths (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
@@ -345,15 +347,14 @@ FROM assets AS a
  INNER JOIN rom_assets AS ra ON a.id = ra.asset_id 
  INNER JOIN roms AS r ON ra.rom_id = r.id;
 
-CREATE VIEW IF NOT EXISTS vw_romcollection_asset_paths AS SELECT
+CREATE VIEW IF NOT EXISTS vw_library_asset_paths AS SELECT
     a.id as id,
-    r.id as romcollection_id,
-    r.parent_id,
+    l.id as library_id,
     a.path,
     a.asset_type
 FROM assetpaths AS a
- INNER JOIN romcollection_assetpaths AS ra ON a.id = ra.assetpaths_id 
- INNER JOIN romcollections AS r ON ra.romcollection_id = r.id;
+ INNER JOIN library_assetpaths AS la ON a.id = la.assetpaths_id 
+ INNER JOIN library AS l ON la.library_id = l.id;
 
 CREATE VIEW IF NOT EXISTS vw_rom_asset_paths AS SELECT
     a.id as id,

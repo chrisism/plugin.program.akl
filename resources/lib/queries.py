@@ -319,11 +319,19 @@ SELECT_ADDONS             = "SELECT * FROM akl_addon"
 SELECT_LAUNCHER_ADDONS    = "SELECT * FROM akl_addon WHERE addon_type = 'LAUNCHER' ORDER BY name"
 SELECT_SCANNER_ADDONS     = "SELECT * FROM akl_addon WHERE addon_type = 'SCANNER' ORDER BY name"
 SELECT_SCRAPER_ADDONS     = "SELECT * FROM akl_addon WHERE addon_type = 'SCRAPER' ORDER BY name"
-INSERT_ADDON              = "INSERT INTO akl_addon(id, name, addon_id, version, addon_type, extra_settings) VALUES(?,?,?,?,?,?)" 
-UPDATE_ADDON              = "UPDATE akl_addon SET name = ?, addon_id = ?, version = ?, addon_type = ?, extra_settings = ? WHERE id = ?" 
+INSERT_ADDON              = "INSERT INTO akl_addon(id, name, addon_id, version, addon_type, extra_settings) VALUES(?,?,?,?,?,?)"
+UPDATE_ADDON              = "UPDATE akl_addon SET name = ?, addon_id = ?, version = ?, addon_type = ?, extra_settings = ? WHERE id = ?"
 
 # Library
 SELECT_LIBRARY = "SELECT * FROM libraries WHERE id = ?"
 SELECT_LIBRARIES = "SELECT * FROM libraries"
 SELECT_LIBRARIES_BY_ADDON_ID = "SELECT * FROM libraries WHERE addon_id = ? AND addon_type = ?"
 
+INSERT_LIBRARY = """
+                INSERT INTO libraries (id,library_name,assets_path,last_scan_timestamp,settings,akl_addon_id) 
+                VALUES (?,?,?,?,?,?)
+                """
+UPDATE_LIBRARY = "UPDATE libraries SET library_name=?, assets_path=?, last_scan_timestamp=?, settings=? WHERE id =?"
+DELETE_LIBRARY = "DELETE FROM libraries WHERE id = ?"
+
+INSERT_LIBRARY_ASSET_PATH = "INSERT INTO libraries_assetpaths (library_id, assetpaths_id) VALUES (?, ?)"

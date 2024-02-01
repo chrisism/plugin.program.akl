@@ -64,6 +64,38 @@ def cmd_scrape_romcollection(args):
         
     AppMediator.sync_cmd('SCRAPE_ROMS_WITH_SETTINGS', args)
 
+
+@AppMediator.register('SCRAPE_LIBRARY_ROMS')
+def cmd_scrape_library(args):
+    library_id:str = args['library_id'] if 'library_id' in args else None
+    
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        collection_repository = LibrariesRepository(uow)
+        collection = collection_repository.find_romcollection(romcollection_id)   
+    
+        scraper_settings:ScraperSettings = ScraperSettings.from_addon_settings()
+        
+        dialog_title    = kodi.translate(41124).format(collection.get_name())
+        selected_addon  = _select_scraper(uow, dialog_title, scraper_settings)
+        if selected_addon is None:
+            # >> Exits context menu
+            logger.debug('SCRAPE_ROMS: cmd_scrape_romcollection() Selected None. Closing context menu')
+            AppMediator.sync_cmd('ROMCOLLECTION_MANAGE_ROMS', args)
+            return 
+
+        scraper_settings.asset_IDs_to_scrape = selected_addon.get_supported_assets()
+        scraper_settings.metadata_IDs_to_scrape = selected_addon.get_supported_metadata()
+
+        logger.debug(f'cmd_scrape_romcollection() Selected scraper#{selected_addon.get_name()}')
+        args['scraper_settings'] = scraper_settings
+        args['scraper_id'] = selected_addon.addon.get_id()
+        args['scraper_supported_metadata'] = selected_addon.get_supported_metadata()
+        args['scraper_supported_assets'] = selected_addon.get_supported_assets()
+        
+    AppMediator.sync_cmd('SCRAPE_ROMS_WITH_SETTINGS', args)
+
+
 # Scrape ROM - Select scraper to use    
 @AppMediator.register('SCRAPE_ROM')
 def cmd_scrape_rom(args):

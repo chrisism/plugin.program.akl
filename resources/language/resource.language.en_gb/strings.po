@@ -933,9 +933,10 @@ msgctxt "#40999"
 msgid "Scan completed. Found {0} addons"
 msgstr ""
 
-msgctxt "#41000"
-msgid "No ROM scanners configured."
-msgstr ""
+# TODO: Obsolete
+# msgctxt "#41000"
+# msgid "No ROM scanners configured."
+# msgstr ""
 
 msgctxt "#41001"
 msgid "No launcher configured."
@@ -1373,9 +1374,10 @@ msgctxt "#41109"
 msgid "Choose scanner to remove"
 msgstr "" 
 
-msgctxt "#41110"
-msgid "Choose ROM scanner"
-msgstr "" 
+# TODO: obsolete
+# msgctxt "#41110"
+# msgid "Choose ROM scanner"
+# msgstr "" 
 
 msgctxt "#41111"
 msgid "Scrape collection '{0}' ROMs with '{1}'"
@@ -1445,9 +1447,9 @@ msgctxt "#41127"
 msgid "Edit Launcher '{0}' metadata"
 msgstr ""
 
-msgctxt "#41128"
-msgid "Move to category"
-msgstr ""
+# msgctxt "#41128"
+# msgid "Move to category"
+# msgstr ""
 
 msgctxt "#41128"
 msgid "Manage ROM Collection '{}' ROMs"
@@ -1583,6 +1585,10 @@ msgstr ""
 
 msgctxt "#41161"
 msgid "Rendering library views"
+msgstr ""
+
+msgctxt "#41162"
+msgid "Manage Library '{}' ROMs"
 msgstr ""
 
 ############################

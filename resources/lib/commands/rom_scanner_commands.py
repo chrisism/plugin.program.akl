@@ -25,8 +25,8 @@ from akl.utils import kodi
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
-from resources.lib.repositories import UnitOfWork, ROMCollectionRepository, ROMsRepository, AelAddonRepository
-from resources.lib.domain import ROM, ROMCollectionScanner, AelAddon
+from resources.lib.repositories import UnitOfWork, ROMCollectionRepository, LibrariesRepository, AelAddonRepository
+from resources.lib.domain import ROM, AelAddon
 
 logger = logging.getLogger(__name__)
 
@@ -175,40 +175,22 @@ def cmd_remove_romcollection_scanner(args):
         uow.commit()
     
     AppMediator.async_cmd('EDIT_ROMCOLLECTION_SCANNERS', args) 
-  
+
+
 # -------------------------------------------------------------------------------------------------
-# ROMCollection Scanner executing
+# Library Scanner executing
 # -------------------------------------------------------------------------------------------------
 @AppMediator.register('SCAN_ROMS')
 def cmd_execute_rom_scanner(args):
-    romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
+    library_id: str = args['library_id'] if 'library_id' in args else None
 
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        romcollection_repository = ROMCollectionRepository(uow)
-        romcollection = romcollection_repository.find_romcollection(romcollection_id)
+        libraries_repository = LibrariesRepository(uow)
+        library = libraries_repository.find(library_id)
 
-    scanners = romcollection.get_scanners()
-    if scanners is None or len(scanners) == 0:
-        kodi.notify_warn(kodi.translate(41000))
-        return
-
-    selected_scanner = scanners[0]
-    if len(scanners) > 1:
-        scanner_options = collections.OrderedDict()
-        for scanner in scanners:
-            scanner_options[scanner] = scanner.get_name()
-        dialog = kodi.OrdDictionaryDialog()
-        selected_scanner = dialog.select(kodi.translate(41110), scanner_options)
- 
-    if selected_scanner is None:
-        # >> Exits context menu
-        logger.debug('SCAN_ROMS: cmd_execute_rom_scanner() Selected None. Closing context menu')
-        AppMediator.async_cmd('ROMCOLLECTION_MANAGE_ROMS', args)
-        return    
-
-    logger.info('SCAN_ROMS: selected scanner "{}"'.format(selected_scanner.get_name()))
+    logger.info(f'SCAN_ROMS: scanner for library "{library.get_name()}"')
     kodi.notify(kodi.translate(40980))
     kodi.run_script(
-        selected_scanner.addon.get_addon_id(),
-        selected_scanner.get_scan_command(romcollection))
+        library.addon.get_addon_id(),
+        library.get_scan_command(library))

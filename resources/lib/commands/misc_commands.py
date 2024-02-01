@@ -31,7 +31,7 @@ from akl import constants
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
-from resources.lib.repositories import UnitOfWork, AelAddonRepository, CategoryRepository, ROMCollectionRepository, XmlConfigurationRepository
+from resources.lib.repositories import UnitOfWork, AelAddonRepository, CategoryRepository, ROMCollectionRepository, XmlConfigurationRepository, LibrariesRepository
 from resources.lib.domain import Category, ROMCollection, AelAddon
 
 logger = logging.getLogger(__name__)
@@ -270,20 +270,22 @@ def cmd_execute_migrations(args):
     uow.migrate_database([migration_file], version_to_store, selected_index==1)
     kodi.notify(kodi.translate(41016))
 
+
 @AppMediator.register('CHECK_DUPLICATE_ASSET_DIRS')
 def cmd_check_duplicate_asset_dirs(args):
-    romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
+    library_id: str = args['library_id'] if 'library_id' in args else None
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = ROMCollectionRepository(uow)
-        romcollection = repository.find_romcollection(romcollection_id)
+        repository = LibrariesRepository(uow)
+        library = repository.find(library_id)
 
     # >> Check for duplicate paths and warn user.
-    duplicated_name_list = romcollection.get_duplicated_asset_dirs()
+    duplicated_name_list = library.get_duplicated_asset_dirs()
     if duplicated_name_list:
         duplicated_asset_srt = ', '.join(duplicated_name_list)
         kodi.dialog_OK(kodi.translate(41147).format(duplicated_asset_srt))
+
 
 def _apply_addon_launcher_for_legacy_launcher(collection: ROMCollection, available_addons: typing.Dict[str, AelAddon]):
     launcher_type = collection.get_custom_attribute('type')

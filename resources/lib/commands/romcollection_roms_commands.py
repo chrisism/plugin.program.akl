@@ -73,7 +73,7 @@ def cmd_manage_roms(args):
         options['DELETE_ROMS_NFO'] = kodi.translate(42053)
         options['CLEAR_ROMS'] = kodi.translate(42054)
 
-    s = kodi.translate(41128).format(romcollection.get_name())
+    s = kodi.translate(4141161128).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu

@@ -1705,18 +1705,19 @@ class AelAddonRepository(object):
                     addon.get_extra_settings_str(),
                     addon.get_id())
 
+
 class LibrariesRepository(object):
 
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
         self.logger = logging.getLogger(__name__)
 
-    def find(self, id:str) -> Library:
+    def find(self, id: str) -> Library:
         self._uow.execute(qry.SELECT_LIBRARY, id)
         result_set = self._uow.single_result()
         return Library(result_set)
 
-    def find_by_addon_id(self, addon_id:str, type: constants.AddonType) -> AelAddon:
+    def find_by_addon_id(self, addon_id: str, type: constants.AddonType) -> AelAddon:
         self._uow.execute(qry.SELECT_ADDON_BY_ADDON_ID, addon_id, type.name)
         result_set = self._uow.single_result()
         if result_set is None:
@@ -1729,3 +1730,47 @@ class LibrariesRepository(object):
         for result_set in result_sets:
             yield Library(result_set)
 
+    def insert_library(self, library: Library):
+        self.logger.info(f"LibrariesRepository.insert_library(): Inserting new library '{library.get_library_name()}'")
+        
+        library.set_id(text.misc_generate_random_SID())
+        assets_path = library.get_assets_root_path()
+        addon = library.get_addon()
+        
+        self._uow.execute(qry.INSERT_LIBRARY,
+                          library.get_id(),
+                          library.get_library_name(),
+                          assets_path.getPath() if assets_path is not None else None,
+                          library.get_last_scan_timestamp(),
+                          library.get_settings_str(),
+                          addon.get_id())
+                  
+        for asset_path in library.get_asset_paths():
+            self._insert_asset_path(asset_path, library)
+
+    def update_library(self, library: Library):
+        self.logger.info(f"LibrariesRepository.update_library(): Updating library '{library.get_library_name()}'")
+        assets_path = library.get_assets_root_path()
+        
+        self._uow.execute(qry.UPDATE_LIBRARY,
+                          library.get_library_name(),
+                          assets_path.getPath() if assets_path is not None else None,
+                          library.get_last_scan_timestamp(),
+                          library.get_settings_str(),
+                          library.get_id())
+                  
+        for asset_path in library.get_asset_paths():
+            if asset_path.get_id() == '':
+                self._insert_asset_path(asset_path, library)
+            else:
+                self._update_asset_path(asset_path, library)
+            
+    def _insert_asset_path(self, asset_path: AssetPath, library: Library):
+        asset_db_id = text.misc_generate_random_SID()
+        self._uow.execute(qry.INSERT_ASSET_PATH, asset_db_id, asset_path.get_path(), asset_path.get_asset_info_id())
+        self._uow.execute(qry.INSERT_LIBRARY_ASSET_PATH, library.get_id(), asset_db_id)
+        
+    def _update_asset_path(self, asset_path: AssetPath, library: Library):
+        self._uow.execute(qry.UPDATE_ASSET_PATH, asset_path.get_path(), asset_path.get_asset_info_id(), asset_path.get_id())
+        if asset_path.get_custom_attribute('library_id') is None:
+            self._uow.execute(qry.INSERT_LIBRARY_ASSET_PATH, library.get_id(), asset_path.get_id())

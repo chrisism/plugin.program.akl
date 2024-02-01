@@ -344,7 +344,7 @@ class ROMAddon(EntityABC):
     
     def get_secondary_name(self):
         settings = self.get_settings()
-        return settings['secname'] if 'secname' in settings else None   
+        return settings['secname'] if 'secname' in settings else None
             
     def get_settings_str(self) -> str:
         return self.entity_data['settings'] if 'settings' in self.entity_data else None
@@ -355,10 +355,10 @@ class ROMAddon(EntityABC):
             return {}
         return json.loads(settings)
     
-    def set_settings_str(self, addon_settings:str):
+    def set_settings_str(self, addon_settings: str):
         self.entity_data['settings'] = addon_settings
     
-    def set_settings(self, addon_settings:dict):
+    def set_settings(self, addon_settings: dict):
         self.entity_data['settings'] = json.dumps(addon_settings)
     
     def get_addon(self) -> AelAddon:
@@ -475,33 +475,103 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
 
 class Library(ROMAddon):
     
+    def __init__(self,
+                 entity_data: dict = None,
+                 addon: AelAddon = None,
+                 asset_paths: typing.List[AssetPath] = []):
+        self.asset_paths = asset_paths
+        super(Library, self).__init__(addon, entity_data)
+    
     def get_library_name(self):
         return self.entity_data["library_name"]
     
     def get_type(self):
-        return constants.OBJ_LIBRARY # 42506
+        return constants.OBJ_LIBRARY  # 42506
+        
+    def get_assets_root_path(self) -> io.FileName:
+        return self._get_directory_filename_from_field('assets_path')
     
-    def get_last_scan_timestamp(self):
+    def get_asset_path(self, asset_info: AssetInfo, fallback_to_root=True) -> io.FileName:
+        if not asset_info:
+            return None
+        if asset_info.id in self.asset_paths:
+            return self.asset_paths[asset_info.id].get_path_FN()
+        
+        if fallback_to_root and self.get_assets_root_path() is not None:
+            return self.get_assets_root_path().pjoin(asset_info.plural.lower(), isdir=True)
         return None
+        
+    def get_asset_paths(self) -> typing.List[AssetPath]:
+        return list(self.asset_paths.values())
     
-    def get_scan_command(self, rom_collection: ROMCollection) -> dict:
+    def set_asset_path(self, asset_info: AssetInfo, path: str):
+        logger.debug(f'Setting "{asset_info.id}" to {path}')
+        asset_path = self.asset_paths[asset_info.id] if asset_info.id in self.asset_paths else AssetPath()
+        asset_path.set_path(path)
+        asset_path.set_asset_info(asset_info)
+        
+        self.asset_paths[asset_info.id] = asset_path
+        
+    def set_assets_root_path(self, path: io.FileName, asset_ids=[], create_default_subdirectories=False):
+        path_str = path.getPath() if path else ''
+        self.entity_data['assets_path'] = path_str
+        
+        if create_default_subdirectories:
+            asset_ids = constants.ROM_ASSET_ID_LIST if not asset_ids else asset_ids
+            for asset_info_id in asset_ids:
+                asset_info = g_assetFactory.get_asset_info(asset_info_id)
+                new_path = path.pjoin(asset_info.plural.lower(), isdir=True)
+                self.set_asset_path(asset_info, new_path.getPath())
+                if not new_path.exists():
+                    new_path.makedirs()
+
+    #
+    # Get a list of assets with duplicated paths. Refuse to do anything if duplicated paths found.
+    #
+    def get_duplicated_asset_dirs(self):
+        duplicated_bool_list = [False] * len(constants.ROM_ASSET_ID_LIST)
+        duplicated_name_list = []
+
+        # >> Check for duplicated asset paths
+        for i, asset_i in enumerate(constants.ROM_ASSET_ID_LIST[:-1]):
+            A_i = g_assetFactory.get_asset_info(asset_i)
+            for j, asset_j in enumerate(constants.ROM_ASSET_ID_LIST[i + 1:]):
+                A_j = g_assetFactory.get_asset_info(asset_j)
+                # >> Exclude unconfigured assets (empty strings).
+                if A_i.path_key not in self.entity_data or A_j.path_key not in self.entity_data  \
+                    or not self.entity_data[A_i.path_key] or not self.entity_data[A_j.path_key]: continue
+                
+                # logger.debug('asset_get_duplicated_asset_list() Checking {0:<9} vs {1:<9}'.format(A_i.name, A_j.name))
+                if self.entity_data[A_i.path_key] == self.entity_data[A_j.path_key]:
+                    duplicated_bool_list[i] = True
+                    duplicated_name_list.append('{0} and {1}'.format(A_i.name, A_j.name))
+                    logger.info('asset_get_duplicated_asset_list() DUPLICATED {0} and {1}'.format(A_i.name, A_j.name))
+
+        return duplicated_name_list
+                
+    def get_last_scan_timestamp(self):
+        return self.entity_data["last_scan_timestamp"]
+    
+    def get_scan_command(self, library: Library) -> dict:
         return {
             '--cmd': 'scan',
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--romcollection_id': rom_collection.get_id(),
+            '--romcollection_id': library.get_id(),  # backwards compatiblity, TODO: remove
+            '--library_id': library.get_id(),
             '--akl_addon_id': self.get_id()
         }
         
-    def get_configure_command(self, romcollection: ROMCollection) -> dict:        
+    def get_configure_command(self, library: Library) -> dict:
         return {
             '--cmd': 'configure',
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--romcollection_id': romcollection.get_id(),
-            '--akl_addon_id':  self.get_id()
+            '--romcollection_id': library.get_id(),  # backwards compatiblity, TODO: remove
+            '--library_id': library.get_id(),
+            '--akl_addon_id': self.get_id()
         }
 
 
@@ -854,7 +924,7 @@ class MetaDataItemABC(EntityABC):
         asset.clear()
         
     def get_assets_root_path(self) -> io.FileName:
-        return self._get_directory_filename_from_field('assets_path')  
+        return self._get_directory_filename_from_field('assets_path')
     
     def set_assets_root_path(self, path: io.FileName, asset_ids = [], create_default_subdirectories = False):
         path_str = path.getPath() if path else ''        
@@ -1134,7 +1204,7 @@ class VirtualCategory(Category):
 class ROMCollection(MetaDataItemABC):
     __metaclass__ = abc.ABCMeta
     
-    def __init__(self, 
+    def __init__(self,
                  entity_data: dict = None, 
                  assets_data: typing.List[Asset] = None,
                  asset_paths: typing.List[AssetPath] = None,
@@ -1221,30 +1291,6 @@ class ROMCollection(MetaDataItemABC):
             self.rom_asset_mappings.append(mapped_asset)
 
         mapped_asset.set_mapping(asset_info, mapped_to_info)
-
-    #
-    # Get a list of assets with duplicated paths. Refuse to do anything if duplicated paths found.
-    #
-    def get_duplicated_asset_dirs(self):
-        duplicated_bool_list = [False] * len(constants.ROM_ASSET_ID_LIST)
-        duplicated_name_list = []
-
-        # >> Check for duplicated asset paths
-        for i, asset_i in enumerate(constants.ROM_ASSET_ID_LIST[:-1]):
-            A_i = g_assetFactory.get_asset_info(asset_i)
-            for j, asset_j in enumerate(constants.ROM_ASSET_ID_LIST[i+1:]):
-                A_j = g_assetFactory.get_asset_info(asset_j)
-                # >> Exclude unconfigured assets (empty strings).
-                if A_i.path_key not in self.entity_data or A_j.path_key not in self.entity_data  \
-                    or not self.entity_data[A_i.path_key] or not self.entity_data[A_j.path_key]: continue
-                
-                # logger.debug('asset_get_duplicated_asset_list() Checking {0:<9} vs {1:<9}'.format(A_i.name, A_j.name))
-                if self.entity_data[A_i.path_key] == self.entity_data[A_j.path_key]:
-                    duplicated_bool_list[i] = True
-                    duplicated_name_list.append('{0} and {1}'.format(A_i.name, A_j.name))
-                    logger.info('asset_get_duplicated_asset_list() DUPLICATED {0} and {1}'.format(A_i.name, A_j.name))
-
-        return duplicated_name_list
 
     def num_roms(self) -> int:
         return self.entity_data['num_roms'] if 'num_roms' in self.entity_data else 0
