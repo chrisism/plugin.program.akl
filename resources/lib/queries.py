@@ -210,6 +210,18 @@ SELECT_ROM_ASSET_MAPPINGS_BY_CATEGORY = """
                                     AND rc.category_id = ?
                                     """
 
+SELECT_ROMS_BY_LIBRARY = "SELECT r.* FROM vw_roms AS r WHERE r.scanned_by_id = ?"
+SELECT_ROM_ASSETS_BY_LIBRARY = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_ASSETPATHS_BY_LIBRARY = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_TAGS_BY_LIBRARY = "SELECT rt.* FROM vw_rom_tags AS rt INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_ASSET_MAPPINGS_BY_LIBRARY = """
+                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
+                                    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
+                                    INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
+                                        AND r.scanned_by_id = ?
+                                    """
+
+
 SELECT_ROMS_BY_ROOT_CATEGORY = "SELECT r.* FROM vw_roms AS r INNER JOIN roms_in_category AS rc ON rc.rom_id = r.id AND rc.category_id IS NULL"
 SELECT_ROM_ASSETS_BY_ROOT_CATEGORY = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms_in_category AS rc ON rc.rom_id = ra.rom_id AND rc.category_id IS NULL"
 SELECT_ROM_ASSETPATHS_BY_ROOT_CATEGORY = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms_in_category AS rc ON rc.rom_id = rap.rom_id AND rc.category_id IS NULL"
@@ -282,6 +294,7 @@ DELETE_ROMS_BY_COLLECTION = "DELETE FROM roms WHERE id IN (SELECT rc.rom_id FROM
 SELECT_ROM_SCANNED_DATA = "SELECT s.* FROM scanned_roms_data AS s WHERE s.rom_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_SET = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_romcollection AS rs ON rs.rom_id = s.rom_id AND rs.romcollection_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_CATEGORY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_category AS rc ON rc.rom_id = s.rom_id AND rc.category_id = ?"
+SELECT_ROM_SCANNED_DATA_BY_LIBRARY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN rom AS r ON r.rom_id = s.rom_id AND r.scanned_by_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_ROOT_CATEGORY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_category AS rc ON rc.rom_id = s.rom_id AND rc.category_id IS NULL"
 DELETE_SCANNED_DATA = "DELETE FROM scanned_roms_data WHERE rom_id = ?"
 
@@ -308,3 +321,9 @@ SELECT_SCANNER_ADDONS     = "SELECT * FROM akl_addon WHERE addon_type = 'SCANNER
 SELECT_SCRAPER_ADDONS     = "SELECT * FROM akl_addon WHERE addon_type = 'SCRAPER' ORDER BY name"
 INSERT_ADDON              = "INSERT INTO akl_addon(id, name, addon_id, version, addon_type, extra_settings) VALUES(?,?,?,?,?,?)" 
 UPDATE_ADDON              = "UPDATE akl_addon SET name = ?, addon_id = ?, version = ?, addon_type = ?, extra_settings = ? WHERE id = ?" 
+
+# Library
+SELECT_LIBRARY = "SELECT * FROM libraries WHERE id = ?"
+SELECT_LIBRARIES = "SELECT * FROM libraries"
+SELECT_LIBRARIES_BY_ADDON_ID = "SELECT * FROM libraries WHERE addon_id = ? AND addon_type = ?"
+

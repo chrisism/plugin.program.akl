@@ -74,16 +74,16 @@ class AKL_Paths(object):
         self.DEFAULT_FAV_ASSET_DIR     = self.ADDON_DATA_DIR.pjoin('asset-favourites')
         
         # --- Rendered views (normal and virtuals/generated) ---
-        self.GENERATED_VIEWS_DIR       = self.ADDON_DATA_DIR.pjoin('db_generated_views')
-        self.VIEWS_DIR                 = self.ADDON_DATA_DIR.pjoin('db_views')
+        self.GENERATED_VIEWS_DIR = self.ADDON_DATA_DIR.pjoin('db_generated_views')
+        self.VIEWS_DIR = self.ADDON_DATA_DIR.pjoin('db_views')
         
         # Reports
-        self.REPORTS_DIR                            = self.ADDON_DATA_DIR.pjoin('reports')
-        self.BIOS_REPORT_FILE_PATH                  = self.REPORTS_DIR.pjoin('report_BIOS.txt')
-        self.COLLECTIONS_REPORT_FILE_PATH           = self.REPORTS_DIR.pjoin('report_collections.txt')
-        self.ROM_SYNC_REPORT_FILE_PATH              = self.REPORTS_DIR.pjoin('report_ROM_sync_status.txt')
-        self.ROM_ART_INTEGRITY_REPORT_FILE_PATH     = self.REPORTS_DIR.pjoin('report_ROM_artwork_integrity.txt')
-        self.ROM_REDUNDANT_FILES_REPORT_FILE_PATH   = self.REPORTS_DIR.pjoin('report_ROM_redundant_files.txt')
+        self.REPORTS_DIR = self.ADDON_DATA_DIR.pjoin('reports')
+        self.BIOS_REPORT_FILE_PATH = self.REPORTS_DIR.pjoin('report_BIOS.txt')
+        self.COLLECTIONS_REPORT_FILE_PATH = self.REPORTS_DIR.pjoin('report_collections.txt')
+        self.ROM_SYNC_REPORT_FILE_PATH = self.REPORTS_DIR.pjoin('report_ROM_sync_status.txt')
+        self.ROM_ART_INTEGRITY_REPORT_FILE_PATH = self.REPORTS_DIR.pjoin('report_ROM_artwork_integrity.txt')
+        self.ROM_REDUNDANT_FILES_REPORT_FILE_PATH = self.REPORTS_DIR.pjoin('report_ROM_redundant_files.txt')
 
     def build(self):
         # --- Addon data paths creation ---

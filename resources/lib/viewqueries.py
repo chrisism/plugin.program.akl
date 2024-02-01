@@ -34,7 +34,7 @@ from akl.utils import kodi
 from resources.lib import globals
 from resources.lib.commands.mediator import AppMediator
 from resources.lib.commands import view_rendering_commands
-from resources.lib.repositories import ViewRepository, UnitOfWork, ROMsRepository, g_assetFactory
+from resources.lib.repositories import ViewRepository, UnitOfWork, ROMsRepository, LibrariesRepository, g_assetFactory
 
 
 logger = logging.getLogger(__name__)
@@ -128,10 +128,11 @@ def qry_get_root_items():
 #
 # View pre-rendered items.
 #
-def qry_get_view_items(view_id: str, is_virtual_view=False):
+def qry_get_view_items(view_id: str, obj_type: int):
     views_repository = ViewRepository(globals.g_PATHS)
-    container = views_repository.find_items(view_id, is_virtual_view)
+    container = views_repository.find_items(view_id, obj_type)
     return container
+
 
 #
 # DB based items
@@ -152,6 +153,7 @@ def qry_get_view_item(rom_id: str):
         }
 
     return container
+
 
 def qry_get_view_metadata(rom_id: str):
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
@@ -298,25 +300,48 @@ def qry_get_view_scanned_data(rom_id: str):
 # Library items
 #
 def qry_get_libraries():
-    # --- Common artwork for all Utilities VLaunchers ---
-    listitem_icon   = globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath()
-    listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()
-    listitem_poster = globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
-    
-    container = {
-        'id': '',
-        'name': kodi.translate(40914),
-        'obj_type': constants.OBJ_NONE,
-        'items': []
-    }
-
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    container = None
     with uow:
-        roms_repository = ROMsRepository(uow)
-        rom = roms_repository.find_rom(rom_id)
+        libs_repository = LibrariesRepository(uow)
+        libraries = libs_repository.find_all()
+        
+        if container is None:
+            container = {
+                'id': '',
+                'name': kodi.translate(constants.OBJ_LIBRARY),
+                'obj_type': constants.OBJ_LIBRARY,
+                'items': []
+            }
+            return container
+        
+        listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()
 
-        item = view_rendering_commands.render_rom_listitem(rom)
-
+        for library in libraries:    
+            listitem_name = library.get_library_name()
+            container['items'].append({
+                'name': listitem_name,
+                'url': globals.router.url_for_path(f'library/{library.get_id()}'),
+                'is_folder': True,
+                'type': 'video',
+                'info': {
+                    'title': listitem_name,
+                    'plot': f'Library of type {library.addon.get_addon_type()}',
+                    'overlay': 4
+                },
+                'art': { 
+                    'fanart' : listitem_fanart, 
+                    'icon' : globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
+                    'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath() 
+                },
+                'properties': { 
+                    constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_CATEGORY, 
+                    'obj_type': constants.OBJ_NONE 
+                }
+            })
+        
+        return container    
+    
 #
 # Utilities items
 #

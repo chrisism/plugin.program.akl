@@ -52,9 +52,9 @@ CREATE TABLE IF NOT EXISTS akl_addon(
 );
 
 
-CREATE TABLE IF NOT EXISTS library_source(
+CREATE TABLE IF NOT EXISTS libraries(
     id TEXT PRIMARY KEY,
-    name TEXT,
+    library_name TEXT,
     akl_addon_id TEXT,
     settings TEXT,
     FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
@@ -97,17 +97,6 @@ CREATE TABLE IF NOT EXISTS romcollection_launchers(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-CREATE TABLE IF NOT EXISTS romcollection_scanners(
-    id TEXT PRIMARY KEY, 
-    romcollection_id TEXT,
-    akl_addon_id TEXT,
-    settings TEXT,
-    FOREIGN KEY (romcollection_id) REFERENCES romcollections (id) 
-        ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
-        ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
 CREATE TABLE IF NOT EXISTS roms(
     id TEXT PRIMARY KEY, 
     name TEXT NOT NULL,
@@ -128,7 +117,7 @@ CREATE TABLE IF NOT EXISTS roms(
     scanned_by_id TEXT NULL,
     FOREIGN KEY (metadata_id) REFERENCES metadata (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (scanned_by_id) REFERENCES romcollection_scanner (id) 
+    FOREIGN KEY (scanned_by_id) REFERENCES libraries (id) 
         ON DELETE SET NULL ON UPDATE NO ACTION
 );
 
@@ -158,6 +147,22 @@ CREATE TABLE IF NOT EXISTS roms_in_category(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
+CREATE TABLE IF NOT EXISTS collection_library_ruleset(
+    ruleset_id TEXT PRIMARY KEY,
+    library_id TEXT,
+    collection_id TEXT,
+    set_operator INTEGER DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS import_rule(
+    rule_id TEXT PRIMARY KEY,
+    ruleset_id TEXT,
+    property TEXT,
+    value TEXT,
+    operator INTEGER DEFAULT 1 NOT NULL
+);
+
+
 CREATE TABLE IF NOT EXISTS rom_launchers(
     id TEXT PRIMARY KEY, 
     rom_id TEXT,
@@ -169,6 +174,7 @@ CREATE TABLE IF NOT EXISTS rom_launchers(
     FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
+
 -------------------------------------------------
 -- ASSETS JOIN TABLES
 -------------------------------------------------
@@ -380,17 +386,18 @@ CREATE VIEW IF NOT EXISTS vw_romcollection_launchers AS SELECT
 FROM romcollection_launchers AS l
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
     
-CREATE VIEW IF NOT EXISTS vw_romcollection_scanners AS SELECT
+CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT
     s.id AS id,
     s.romcollection_id,
     a.id AS associated_addon_id,
+    s.library_name,
     a.name,
     a.addon_id,
     a.version,
     a.addon_type,
     a.extra_settings,
     s.settings
-FROM romcollection_scanners AS s
+FROM libraries AS s
     INNER JOIN akl_addon AS a ON s.akl_addon_id = a.id;
 
 CREATE VIEW IF NOT EXISTS vw_rom_launchers AS SELECT
