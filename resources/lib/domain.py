@@ -26,6 +26,7 @@ import re
 import time
 import datetime
 import json
+from enum import Enum
 
 # --- AKL packages ---
 from resources.lib import globals
@@ -471,8 +472,14 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
         if not is_stored:
             kodi.notify_error(kodi.translate(40958))
      
-#class ROMCollectionScanner(ROMAddon):
-class LibrarySource(ROMAddon):
+
+class Library(ROMAddon):
+    
+    def get_library_name(self):
+        return self.entity_data["library_name"]
+    
+    def get_type(self):
+        return constants.OBJ_LIBRARY # 42506
     
     def get_last_scan_timestamp(self):
         return None
@@ -575,6 +582,64 @@ class ScraperAddon(ROMAddon):
             '--settings': io.parse_to_json_arg(self.get_settings())
         }
  
+
+class RuleSetOperator(Enum):
+    AND = 1
+    OR = 2
+
+class RuleOperator(Enum):
+    Equals = 1
+    NotEquals = 2
+    Contains = 3
+    DoesNotContain = 4
+    MoreThan = 5
+    LessThan = 6
+    
+class Rule(object):
+    
+    def __init__(self, data: dict):
+        self.property = data['property']
+        self.value = data['value']
+        self.operator = RuleOperator(data['operator'])
+    
+    def applies_to(self, rom: ROM):
+        actual = rom.get_custom_attribute(self.property)
+        if self.operator == RuleOperator.Equals:
+            return actual == self.value
+        if self.operator == RuleOperator.NotEquals:
+            return actual != self.value
+        if self.operator == RuleOperator.Contains:
+            return self.value in actual
+        if self.operator == RuleOperator.DoesNotContain:
+            return self.value not in actual
+        if self.operator == RuleOperator.MoreThan:
+            return self.value > actual
+        if self.operator == RuleOperator.LessThan:
+            return self.value < actual
+        return False
+
+class RuleSet(object):
+    
+    def __init__(self, data: dict):
+        self.set_operator = data['set_operator']
+        self.rules = []
+    
+    def applies_to(self, rom: ROM):
+        # no rules, then all applied
+        if len(self.rules) == 0:
+            return True
+        
+        for rule in self.rules:
+            if rule.applies_to(rom):
+                if self.set_operator == RuleSetOperator.OR:
+                    return True
+            else:
+                if self.set_operator == RuleSetOperator.AND:
+                    return False
+                
+        return self.set_operator == RuleSetOperator.AND
+
+
 # -------------------------------------------------------------------------------------------------
 # Abstract base class for business objects which support the generic
 # metadata fields and assets.
@@ -1076,7 +1141,7 @@ class ROMCollection(MetaDataItemABC):
                  asset_mappings: typing.List[AssetMapping] = [],
                  rom_asset_mappings: typing.List[RomAssetMapping] = [],
                  launchers_data: typing.List[ROMLauncherAddon] = [], 
-                 scanners_data: typing.List[ROMCollectionScanner] = []):
+                 library_data: typing.List[Library] = []):
         # Concrete classes are responsible of creating a default entity_data dictionary
         # with sensible defaults.
         if entity_data is None:
@@ -1084,7 +1149,7 @@ class ROMCollection(MetaDataItemABC):
             entity_data['id'] = text.misc_generate_random_SID()
             
         self.launchers_data = launchers_data
-        self.scanners_data = scanners_data
+        self.scanners_data = library_data
 
         self.rom_asset_mappings = rom_asset_mappings
         mappable_assets = self.get_ROM_mappable_asset_list()
@@ -1103,7 +1168,8 @@ class ROMCollection(MetaDataItemABC):
     def get_assets_kind(self):
         return constants.KIND_ASSET_LAUNCHER
     
-    def get_type(self): return constants.OBJ_ROMCOLLECTION
+    def get_type(self):
+        return constants.OBJ_ROMCOLLECTION
     
     # parent category / romcollection this item belongs to.
     def get_parent_id(self) -> str:

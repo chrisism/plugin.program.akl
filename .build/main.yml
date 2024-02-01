@@ -67,7 +67,9 @@ stages:
         condition: eq(${{variables.isMaster}}, true)
 
       - task: UsePythonVersion@0
-        displayName: 'Use Python 3.x'
+        displayName: 'Use Python 3.9'
+        inputs:
+          versionSpec: '3.9'
 
       - task: PipAuthenticate@0
         displayName: Authenticate with artifact feed

@@ -16,7 +16,7 @@ from resources.lib import globals
 from resources.lib import queries as qry
 from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, Asset, AssetPath, AssetMapping, RomAssetMapping, VirtualCollection
 from resources.lib.domain import VirtualCategoryFactory, VirtualCollectionFactory, ROMLauncherAddonFactory, g_assetFactory
-from resources.lib.domain import LibrarySource, ROMLauncherAddon, AelAddon
+from resources.lib.domain import Library, ROMLauncherAddon, AelAddon
 
 
 # #################################################################################################
@@ -56,11 +56,9 @@ class ViewRepository(object):
         
         return item_data
 
-    def find_items(self, view_id, is_virtual=False) -> typing.Any:
-        repository_file = self.paths.VIEWS_DIR.pjoin('view_{}.json'.format(view_id))
-        if is_virtual:
-            repository_file = self.paths.GENERATED_VIEWS_DIR.pjoin('view_{}.json'.format(view_id))
-            
+    def find_items(self, view_id, obj_type: int) -> typing.Any:
+        
+        repository_file = self._assemble_view_file_name(view_id, obj_type)
         self.logger.debug('find_items(): Loading path data from file {}'.format(repository_file.getPath()))
         try:
             item_data = repository_file.readJson()
@@ -72,18 +70,14 @@ class ViewRepository(object):
             return None
         
         return item_data
-
+    
     def store_root_view(self, view_data):
         repository_file = self.paths.ROOT_PATH
         self.logger.debug('store_root_view(): Storing data in file {}'.format(repository_file.getPath()))
         repository_file.writeJson(view_data)
 
-    def store_view(self, view_id:str, object_type:str, view_data):        
-        if object_type == constants.OBJ_CATEGORY_VIRTUAL or object_type == constants.OBJ_COLLECTION_VIRTUAL:
-            repository_file = self.paths.GENERATED_VIEWS_DIR.pjoin(f'view_{view_id}.json')
-        else:
-            repository_file = self.paths.VIEWS_DIR.pjoin(f'view_{view_id}.json')
-        
+    def store_view(self, view_id:str, object_type:int, view_data):        
+        repository_file = self._assemble_view_file_name(view_id, object_type)
         if view_data is None: 
             if repository_file.exists():
                 self.logger.debug('store_view(): No data for file {}. Removing file'.format(repository_file.getPath()))
@@ -94,24 +88,40 @@ class ViewRepository(object):
         repository_file.writeJson(view_data)
 
     def cleanup_views(self, view_ids_to_keep:typing.List[str]):
-        view_files = self.paths.VIEWS_DIR.scanFilesInPath('view_*.json')
+        view_files = self.paths.VIEWS_DIR.scanFilesInPath('*.json')
         for view_file in view_files:
-            view_id = view_file.getBaseNoExt().replace('view_', '')
+            view_id = view_file.getBaseNoExt().replace('collection_', '').replace('category_', '').replace('library_', '')
             if not view_id in view_ids_to_keep:
                 self.logger.info(f'Removing file for view "{view_id}"')
                 view_file.unlink()
 
     def cleanup_virtual_category_views(self, view_id):
-        view_files = self.paths.GENERATED_VIEWS_DIR.scanFilesInPath(f'view_{view_id}_*.json')
+        view_files = self.paths.GENERATED_VIEWS_DIR.scanFilesInPath(f'category_{view_id}_*.json')
         self.logger.info(f'Removing {len(view_files)} files for virtual category "{view_id}"')
         for view_file in view_files:
             view_file.unlink()
  
     def cleanup_all_virtual_category_views(self):
-        view_files = self.paths.GENERATED_VIEWS_DIR.scanFilesInPath('view_vcategory*.json')
+        view_files = self.paths.GENERATED_VIEWS_DIR.scanFilesInPath('category_*.json')
         self.logger.info(f'Removing {len(view_files)} files for all virtual categories')
         for view_file in view_files:
             view_file.unlink()
+            
+    def _assemble_view_file_name(self, view_id, obj_type):
+        
+        if obj_type == constants.OBJ_CATEGORY:
+            return self.paths.VIEWS_DIR.pjoin(f'category_{view_id}.json')
+        elif obj_type == constants.OBJ_ROMCOLLECTION:
+            return self.paths.VIEWS_DIR.pjoin(f'collection_{view_id}.json')
+        elif obj_type == constants.OBJ_LIBRARY:
+            return self.paths.VIEWS_DIR.pjoin(f'library_{view_id}.json')
+        elif obj_type == constants.OBJ_CATEGORY_VIRTUAL:
+            return self.paths.GENERATED_VIEWS_DIR.pjoin(f'category_{view_id}.json')
+        elif obj_type == constants.OBJ_COLLECTION_VIRTUAL:
+            return self.paths.GENERATED_VIEWS_DIR.pjoin(f'collection_{view_id}.json')
+        
+        return self.paths.VIEWS_DIR.pjoin(f'view_{view_id}.json')
+    
         
 #
 # XmlConfigurationRepository works with original XML configuration files, which contained the 
@@ -1308,6 +1318,49 @@ class ROMsRepository(object):
             }
             yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
 
+    def find_roms_by_library(self, library: Library) -> typing.Iterator[ROM]:
+        library_id = library.get_id()
+
+        self._uow.execute(qry.SELECT_ROMS_BY_LIBRARY, library_id)
+        result_set = self._uow.result_set()
+        
+        self._uow.execute(qry.SELECT_ROM_ASSETS_BY_LIBRARY, library_id)
+        assets_result_set = self._uow.result_set()
+        
+        self._uow.execute(qry.SELECT_ROM_ASSETPATHS_BY_LIBRARY, library_id)
+        asset_paths_result_set = self._uow.result_set()
+                        
+        self._uow.execute(qry.SELECT_ROM_ASSET_MAPPINGS_BY_LIBRARY, library_id)
+        asset_mappings_result_set = self._uow.result_set()
+
+        self._uow.execute(qry.SELECT_ROM_SCANNED_DATA_BY_LIBRARY, library_id)
+        scanned_data_result_set = self._uow.result_set()
+
+        self._uow.execute(qry.SELECT_ROM_TAGS_BY_LIBRARY, library_id)
+        tags_data_set = self._uow.result_set()
+                        
+        for rom_data in result_set:
+            assets = []
+            asset_paths = []
+            asset_mappings = []
+            tags = {}
+            for asset_data in filter(lambda a: a['rom_id'] == rom_data['id'], assets_result_set):
+                assets.append(Asset(asset_data))    
+            for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
+                asset_paths.append(AssetPath(asset_paths_data))
+            for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
+                asset_mappings.append(RomAssetMapping(mapping_data))    
+            for tag in filter(lambda t: t['rom_id'] == rom_data['id'], tags_data_set):
+                tags[tag['tag']] = tag['id']
+                
+            scanned_data = {
+                entry['data_key']: entry['data_value'] 
+                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set) 
+            }
+            yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
+
+    
+    
     def find_rom(self, rom_id:str) -> ROM:
         self._uow.execute(qry.SELECT_ROM, rom_id)
         rom_data = self._uow.single_result()
@@ -1652,27 +1705,27 @@ class AelAddonRepository(object):
                     addon.get_extra_settings_str(),
                     addon.get_id())
 
-class LibrarySourceRepository(object):
+class LibrariesRepository(object):
 
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
         self.logger = logging.getLogger(__name__)
 
-    def find(self, id:str) -> LibrarySource:
-        self._uow.execute(qry.SELECT_ADDON, id)
+    def find(self, id:str) -> Library:
+        self._uow.execute(qry.SELECT_LIBRARY, id)
         result_set = self._uow.single_result()
-        return LibrarySource(result_set)
+        return Library(result_set)
 
     def find_by_addon_id(self, addon_id:str, type: constants.AddonType) -> AelAddon:
         self._uow.execute(qry.SELECT_ADDON_BY_ADDON_ID, addon_id, type.name)
         result_set = self._uow.single_result()
         if result_set is None:
             return None
-        return AelAddon(result_set)
+        return Library(result_set)
 
-    def find_all(self) -> typing.Iterator[AelAddon]:
-        self._uow.execute(qry.SELECT_ADDONS)
-        result_set = self._uow.result_set()
-        for addon_data in result_set:
-            yield AelAddon(addon_data)
+    def find_all(self) -> typing.Iterator[Library]:
+        self._uow.execute(qry.SELECT_LIBRARIES)
+        result_sets = self._uow.result_set()
+        for result_set in result_sets:
+            yield Library(result_set)
 

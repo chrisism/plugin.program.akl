@@ -35,7 +35,6 @@ from __future__ import annotations
 import sys
 import abc
 import logging
-import typing
 
 # --- Kodi stuff ---
 import xbmc
@@ -95,11 +94,13 @@ def vw_route_render_root():
 
 @router.route('/category/<view_id>')
 @router.route('/collection/<view_id>')
-def vw_route_render_collection(view_id: str):
-    logger.debug("Executing route: vw_route_render_collection")
-    container               = viewqueries.qry_get_view_items(view_id)
+@router.route('/library/<view_id>')
+def vw_route_render_view(view_id: str):
+    logger.debug("Executing route: vw_route_render_view")
+    obj_type = vw_get_object_type_by_url(router.path)
+    container = viewqueries.qry_get_view_items(view_id, obj_type)
     container_context_items = viewqueries.qry_container_context_menu_items(container)
-    container_type          = container['obj_type'] if 'obj_type' in container else constants.OBJ_NONE
+    container_type = container['obj_type'] if 'obj_type' in container else constants.OBJ_NONE
 
     filter_type = router.args['filter'][0] if 'filter' in router.args else None
     filter_term = router.args['term'][0] if 'term' in router.args else None
@@ -127,9 +128,10 @@ def vw_route_search_collection(view_id: str):
 @router.route('/category/virtual/<view_id>')
 @router.route('/collection/virtual/<view_id>')
 def vw_route_render_virtual_view(view_id: str):
-    container               = viewqueries.qry_get_view_items(view_id, is_virtual_view=True)
+    obj_type = vw_get_object_type_by_url(router.path)
+    container = viewqueries.qry_get_view_items(view_id, obj_type)
     container_context_items = viewqueries.qry_container_context_menu_items(container)
-    container_type          = container['obj_type'] if 'obj_type' in container else constants.OBJ_NONE
+    container_type = container['obj_type'] if 'obj_type' in container else constants.OBJ_NONE
 
     filter_type = router.args['filter'][0] if 'filter' in router.args else None
     filter_term = router.args['term'][0] if 'term' in router.args else None
@@ -463,6 +465,21 @@ def vw_create_filter(filter_on_type:str, filter_on_value:str) -> ListFilter:
     
     logger.debug(f'Filter called without proper filter type. "{filter_on_type}"')
     return None
+
+def vw_get_object_type_by_url(url: str):
+    if 'category' in url or 'categories' in url:
+        if 'virtual' in url:
+            return constants.OBJ_CATEGORY_VIRTUAL
+        return constants.OBJ_CATEGORY
+    if 'collection' in url:
+        if 'virtual' in url:
+            return constants.OBJ_COLLECTION_VIRTUAL
+        return constants.OBJ_LAUNCHER_COLLECTION
+    if 'rom' in url:
+        return constants.OBJ_ROM
+    if 'library' in url:
+        return constants.OBJ_LIBRARY
+    return constants.OBJ_NONE
 
 class ListFilter(object):
     __metaclass__ = abc.ABCMeta

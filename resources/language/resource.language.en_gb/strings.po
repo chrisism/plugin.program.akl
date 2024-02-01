@@ -432,6 +432,14 @@ msgctxt "#42505"
 msgid "ROM"
 msgstr "domain"
 
+msgctxt "#42506"
+msgid "Library"
+msgstr "domain"
+
+msgctxt "#42507"
+msgid "No Type"
+msgstr "domain"
+
 ############################
 # Advanced Enum values
 ############################
@@ -1571,6 +1579,10 @@ msgstr ""
 
 msgctxt "#41160"
 msgid "Select {} path"
+msgstr ""
+
+msgctxt "#41161"
+msgid "Rendering library views"
 msgstr ""
 
 ############################
