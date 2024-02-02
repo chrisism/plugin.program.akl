@@ -3,7 +3,7 @@
 -- --------------------------------------
 CREATE TABLE IF NOT EXISTS libraries(
     id TEXT PRIMARY KEY,
-    library_name TEXT,
+    name TEXT,
     assets_path TEXT,
     last_scan_timestamp TIMESTAMP,
     akl_addon_id TEXT,
@@ -35,10 +35,22 @@ CREATE TABLE IF NOT EXISTS library_assetpaths(
     FOREIGN KEY (assetpaths_id) REFERENCES assetpaths (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
+
+CREATE TABLE IF NOT EXISTS library_launchers(
+    id TEXT PRIMARY KEY, 
+    library_id TEXT,
+    akl_addon_id TEXT,
+    settings TEXT,
+    is_default INTEGER DEFAULT 0 NOT NULL,
+    FOREIGN KEY (library_id) REFERENCES libraries (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
 -- --------------------------------------
 -- MIGRATE EXISTING DATA INTO NEW TABLES
 -- --------------------------------------
-INSERT INTO libraries (id, library_name, akl_addon_id, settings)
+INSERT INTO libraries (id, name, akl_addon_id, settings)
     SELECT rcs.id, rc.name || ' ' || aa.name || ' (' || rcs.id || ')' , rcs.akl_addon_id, rcs.settings
     FROM romcollection_scanners as rcs
         LEFT JOIN romcollections as rc ON rc.id = rcs.romcollection_id
@@ -81,7 +93,7 @@ CREATE TABLE IF NOT EXISTS roms(
     FOREIGN KEY (metadata_id) REFERENCES metadata (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY (scanned_by_id) REFERENCES libraries (id) 
-        ON DELETE SET NULL ON UPDATE NO ACTION
+        ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 INSERT INTO roms SELECT * FROM _roms_old;
@@ -103,19 +115,28 @@ PRAGMA foreign_keys=on;
 DROP VIEW vw_romcollection_scanners;
 DROP VIEW vw_romcollection_asset_paths;
 
-CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT
-    s.id AS id,
-    s.romcollection_id,
+CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT 
+    l.id AS id, 
+    l.name AS name,
+    l.assets_path AS assets_path,
+    l.last_scan_timestamp AS last_scan_timestamp,
+    l.settings AS settings,
+    (SELECT COUNT(*) FROM roms AS rms WHERE rms.scanned_by_id = l.id) as num_roms
+FROM libraries AS l;
+
+CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
+    l.id AS id,
+    l.library_id,
     a.id AS associated_addon_id,
-    s.library_name,
     a.name,
     a.addon_id,
     a.version,
     a.addon_type,
     a.extra_settings,
-    s.settings
-FROM libraries AS s
-    INNER JOIN akl_addon AS a ON s.akl_addon_id = a.id;
+    l.settings,
+    l.is_default
+FROM library_launchers AS l
+    INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
 
 CREATE VIEW IF NOT EXISTS vw_library_asset_paths AS SELECT
     a.id as id,

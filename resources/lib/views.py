@@ -163,7 +163,8 @@ def vw_route_render_virtual_items_view(category_id: str):
     
     _render_list_items(container, container_context_items, filter)
         
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
+
        
 # -------------------------------------------------------------------------------------------------
 # Library sources
@@ -174,7 +175,8 @@ def vw_route_render_libraries():
     container_context_items = viewqueries.qry_container_context_menu_items(container)
 
     _render_list_items(container, container_context_items)
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
+
        
 # -------------------------------------------------------------------------------------------------
 # Utilities and Global reports
@@ -186,6 +188,7 @@ def vw_route_render_utilities():
 
     _render_list_items(container, container_context_items)
     xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+
     
 @router.route('/globalreports')
 def vw_route_render_globalreports():
@@ -195,13 +198,15 @@ def vw_route_render_globalreports():
     _render_list_items(container, container_context_items)
     xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)    
 
+
 # -------------------------------------------------------------------------------------------------
 # Command execution
 # -------------------------------------------------------------------------------------------------
 @router.route('/execute/command/<cmd>')
-def vw_execute_cmd(cmd: str):    
-    cmd_args = { arg: router.args[arg][0] for arg in router.args }
+def vw_execute_cmd(cmd: str):
+    cmd_args = {arg: router.args[arg][0] for arg in router.args}
     AppMediator.async_cmd(cmd.capitalize(), cmd_args)
+
 
 @router.route('/categories/add')
 @router.route('/categories/add/<category_id>')
@@ -210,9 +215,11 @@ def vw_execute_cmd(cmd: str):
 def vw_add_category(category_id: str = None, parent_category_id: str = None):
     AppMediator.async_cmd('ADD_CATEGORY', {'category_id': category_id, 'parent_category_id': parent_category_id})
 
+
 @router.route('/categories/edit/<category_id>')
 def vw_edit_category(category_id: str):
     AppMediator.async_cmd('EDIT_CATEGORY', {'category_id': category_id })
+
 
 @router.route('/categories/addrom/<category_id>')
 @router.route('/categories/addrom/<category_id>/in')
@@ -232,9 +239,16 @@ def vw_view_romcollection(romcollection_id: str):
     #todo
     pass
 
+
 @router.route('/romcollection/edit/<romcollection_id>')
 def vw_edit_romcollection(romcollection_id: str):
-    AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id })
+    AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id})
+
+
+@router.route('/library/edit/<library_id>')
+def vw_edit_library(library_id: str):
+    AppMediator.async_cmd('EDIT_LIBRARY', {'library_id': library_id})
+
 
 @router.route('/rom/edit/<rom_id>')
 def vw_edit_rom(rom_id: str):
@@ -404,6 +418,7 @@ def vw_misc_set_all_sorting_methods():
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_STUDIO)
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_UNSORTED)
     xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_GENRE)
+
 
 #
 # Set the AEL content type.

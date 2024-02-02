@@ -102,6 +102,10 @@ class EntityABC(object):
     def get_id(self) -> str:
         return self.entity_data['id'] if 'id' in self.entity_data else None
 
+    @abc.abstractmethod
+    def get_type(self) -> str:
+        pass
+
     def get_data_dic(self):
         return self.entity_data
 
@@ -363,7 +367,8 @@ class ROMAddon(EntityABC):
     
     def get_addon(self) -> AelAddon:
         return self.addon
-            
+
+
 class ROMLauncherAddon(ROMAddon):
     __metaclass__ = abc.ABCMeta
     
@@ -383,40 +388,26 @@ class ROMLauncherAddon(ROMAddon):
             '--rom_id': rom.get_id()
         }
 
-    def get_configure_command(self, romcollection: ROMCollection) -> dict:                    
+    def get_configure_command(self, entity: EntityABC) -> dict:
         return {
             '--cmd': 'configure',
             '--type': constants.AddonType.LAUNCHER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--romcollection_id': romcollection.get_id(), 
+            '--entity_id': entity.get_id(),
+            '--entity_type': entity.get_type(),
             '--akl_addon_id': self.get_id()
         }
-        
-    def get_configure_command_for_rom(self, rom: ROM) -> dict:
-        return {
-            '--cmd': 'configure',
-            '--type': constants.AddonType.LAUNCHER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': globals.WEBSERVER_PORT,
-            '--rom_id': rom.get_id(), 
-            '--akl_addon_id': self.get_id()
-        }
-        
+    
     def launch(self, rom: ROM):
         kodi.run_script(
             self.addon.get_addon_id(), 
             self.get_launch_command(rom))
 
-    def configure(self, romcollection:ROMCollection):
+    def configure(self, entity: EntityABC):
         kodi.run_script(
-            self.addon.get_addon_id(), 
-            self.get_configure_command(romcollection))
-    
-    def configure_for_rom(self, rom:ROM):
-        kodi.run_script(
-            self.addon.get_addon_id(), 
-            self.get_configure_command_for_rom(rom))
+            self.addon.get_addon_id(),
+            self.get_configure_command(entity))
 
 
 class RetroplayerLauncherAddon(ROMLauncherAddon):
@@ -478,15 +469,37 @@ class Library(ROMAddon):
     def __init__(self,
                  entity_data: dict = None,
                  addon: AelAddon = None,
-                 asset_paths: typing.List[AssetPath] = []):
+                 asset_paths: typing.List[AssetPath] = [],
+                 launchers_data: typing.List[ROMLauncherAddon] = []):
+        
         self.asset_paths = asset_paths
+        self.launchers_data = launchers_data
+        
+        if entity_data is None:
+            entity_data = {
+                'id': text.misc_generate_random_SID(),
+                'name': '',
+                'assets_path': '',
+                'num_roms': 0,
+                'last_scan_timestamp': None,
+                'settings': None
+            }
         super(Library, self).__init__(addon, entity_data)
     
-    def get_library_name(self):
-        return self.entity_data["library_name"]
+    def get_name(self):
+        return self.entity_data["name"]
+    
+    def set_name(self, name):
+        self.entity_data["name"] = name
     
     def get_type(self):
         return constants.OBJ_LIBRARY  # 42506
+
+    def num_roms(self) -> int:
+        return self.entity_data['num_roms'] if 'num_roms' in self.entity_data else 0
+
+    def has_roms(self) -> bool:
+        return self.num_roms() > 0
         
     def get_assets_root_path(self) -> io.FileName:
         return self._get_directory_filename_from_field('assets_path')
@@ -548,29 +561,73 @@ class Library(ROMAddon):
                     logger.info('asset_get_duplicated_asset_list() DUPLICATED {0} and {1}'.format(A_i.name, A_j.name))
 
         return duplicated_name_list
+
+    def has_launchers(self) -> bool:
+        return len(self.launchers_data) > 0
+
+    def add_launcher(self, addon: AelAddon, settings: dict, is_non_blocking=True, is_default: bool = False):
+        launcher = ROMLauncherAddonFactory.create(addon, { 
+            'settings': json.dumps(settings),
+            'is_non_blocking': is_non_blocking,
+            'is_default': is_default
+        })
+        if is_default:
+            current_default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
+            if current_default_launcher:
+                current_default_launcher.set_default(False)
+            
+        self.launchers_data.append(launcher)
+        logger.debug(f'Adding addon "{addon.get_addon_id()}" to library "{self.get_name()}"')
+
+    def get_launchers(self) -> typing.List[ROMLauncherAddon]:
+        return self.launchers_data
+
+    def get_launcher(self, id: str) -> ROMLauncherAddon:
+        return next((ld for ld in self.launchers_data if ld.get_id() == id), None)
+
+    def get_default_launcher(self) -> ROMLauncherAddon:
+        if len(self.launchers_data) == 0:
+            return None
+        default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
+        if default_launcher is None:
+            return self.launchers_data[0]
+        
+        return default_launcher
+
+    def set_launcher_as_default(self, launcher_id):
+        if len(self.launchers_data) == 0:
+            return
+        
+        current_default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
+        if current_default_launcher:
+            current_default_launcher.set_default(False)
+        
+        launcher_to_be_default = next((ld for ld in self.launchers_data if ld.get_id() == launcher_id), None)
+        if launcher_to_be_default:
+            launcher_to_be_default.set_default(True)
                 
     def get_last_scan_timestamp(self):
         return self.entity_data["last_scan_timestamp"]
     
-    def get_scan_command(self, library: Library) -> dict:
+    def get_scan_command(self) -> dict:
         return {
             '--cmd': 'scan',
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--romcollection_id': library.get_id(),  # backwards compatiblity, TODO: remove
-            '--library_id': library.get_id(),
+            '--romcollection_id': self.get_id(),  # backwards compatiblity, TODO: remove
+            '--library_id': self.get_id(),
             '--akl_addon_id': self.get_id()
         }
         
-    def get_configure_command(self, library: Library) -> dict:
+    def get_configure_command(self) -> dict:
         return {
             '--cmd': 'configure',
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--romcollection_id': library.get_id(),  # backwards compatiblity, TODO: remove
-            '--library_id': library.get_id(),
+            '--romcollection_id': self.get_id(),  # backwards compatiblity, TODO: remove
+            '--library_id': self.get_id(),
             '--akl_addon_id': self.get_id()
         }
 
@@ -630,7 +687,7 @@ class ScraperAddon(ROMAddon):
     def set_scraper_settings(self, settings: ScraperSettings):
         self.entity_data['settings'] = json.dumps(settings.get_data_dic())
         
-    def get_scrape_command(self, rom: ROM)-> dict:        
+    def get_scrape_command(self, rom: ROM) -> dict:
         return {
             '--cmd': 'scrape',
             '--type': constants.AddonType.SCRAPER.name,
@@ -641,7 +698,7 @@ class ScraperAddon(ROMAddon):
             '--settings': io.parse_to_json_arg(self.get_settings())
         }
         
-    def get_scrape_command_for_collection(self, collection: ROMCollection) -> dict:     
+    def get_scrape_command_for_collection(self, collection: ROMCollection) -> dict:
         return {
             '--cmd': 'scrape',
             '--type': constants.AddonType.SCRAPER.name,
@@ -649,6 +706,17 @@ class ScraperAddon(ROMAddon):
             '--server_port': globals.WEBSERVER_PORT,
             '--akl_addon_id': self.addon.get_id(),
             '--romcollection_id': collection.get_id(),
+            '--settings': io.parse_to_json_arg(self.get_settings())
+        }
+        
+    def get_scrape_command_for_library(self, library: Library) -> dict:
+        return {
+            '--cmd': 'scrape',
+            '--type': constants.AddonType.SCRAPER.name,
+            '--server_host': globals.WEBSERVER_HOST,
+            '--server_port': globals.WEBSERVER_PORT,
+            '--akl_addon_id': self.addon.get_id(),
+            '--library_id': library.get_id(),
             '--settings': io.parse_to_json_arg(self.get_settings())
         }
  
@@ -759,10 +827,6 @@ class MetaDataItemABC(EntityABC):
 
     @abc.abstractmethod
     def get_assets_kind(self) -> int:
-        pass
-
-    @abc.abstractmethod
-    def get_type(self) -> str:
         pass
 
     # --- Metadata --------------------------------------------------------------------------------
@@ -1210,7 +1274,7 @@ class ROMCollection(MetaDataItemABC):
                  asset_paths: typing.List[AssetPath] = None,
                  asset_mappings: typing.List[AssetMapping] = [],
                  rom_asset_mappings: typing.List[RomAssetMapping] = [],
-                 launchers_data: typing.List[ROMLauncherAddon] = [], 
+                 launchers_data: typing.List[ROMLauncherAddon] = [],
                  library_data: typing.List[Library] = []):
         # Concrete classes are responsible of creating a default entity_data dictionary
         # with sensible defaults.
@@ -2410,7 +2474,7 @@ class VirtualCollectionFactory(object):
             return VirtualCollection(dict(default_entity_data, **{
                 'id' : vcollection_id,
                 'm_name' : kodi.translate(42063),
-                'plot': kodi.translate(42005),
+                'plot': kodi.translate(44005),
                 'finished': settings.getSettingAsBool('display_hide_favs')
             }), [
                 Asset({
@@ -2434,7 +2498,7 @@ class VirtualCollectionFactory(object):
             return VirtualCollection(dict(default_entity_data, **{
                 'id' : vcollection_id,
                 'm_name' : kodi.translate(42064),
-                'plot': kodi.translate(42006),
+                'plot': kodi.translate(44006),
                 'finished': settings.getSettingAsBool('display_hide_recent')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2446,7 +2510,7 @@ class VirtualCollectionFactory(object):
             return VirtualCollection(dict(default_entity_data, **{
                 'id' : vcollection_id,
                 'm_name' : kodi.translate(42065),
-                'plot': kodi.translate(42007),
+                'plot': kodi.translate(44007),
                 'finished': settings.getSettingAsBool('display_hide_mostplayed')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2464,7 +2528,7 @@ class VirtualCollectionFactory(object):
             'id' : f'{vcategory_id}_{collection_value}',
             'parent_id': vcategory_id,
             'm_name' : collection_value,
-            'plot': kodi.translate(42008).format(collection_value),
+            'plot': kodi.translate(44008).format(collection_value),
             'collection_value': collection_value,
             'finished': settings.getSettingAsBool('display_hide_vcategories')
         }), [
@@ -2481,7 +2545,7 @@ class VirtualCategoryFactory(object):
              return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42066),
-                'plot': kodi.translate(42009),
+                'plot': kodi.translate(44009),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2493,7 +2557,7 @@ class VirtualCategoryFactory(object):
              return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42067),
-                'plot': kodi.translate(42010),
+                'plot': kodi.translate(44010),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2505,7 +2569,7 @@ class VirtualCategoryFactory(object):
              return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42068),
-                'plot': kodi.translate(42011),
+                'plot': kodi.translate(44011),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2517,7 +2581,7 @@ class VirtualCategoryFactory(object):
              return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42069),
-                'plot': kodi.translate(42012),
+                'plot': kodi.translate(44012),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2529,7 +2593,7 @@ class VirtualCategoryFactory(object):
              return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42070),
-                'plot': kodi.translate(42013),
+                'plot': kodi.translate(44013),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2541,7 +2605,7 @@ class VirtualCategoryFactory(object):
              return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42071),
-                'plot': kodi.translate(42014),
+                'plot': kodi.translate(44014),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2553,7 +2617,7 @@ class VirtualCategoryFactory(object):
              return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name': kodi.translate(42072),
-                'plot': kodi.translate(42015),
+                'plot': kodi.translate(44015),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2565,7 +2629,7 @@ class VirtualCategoryFactory(object):
              return VirtualCategory({
                 'id' : vcategory_id,
                 'm_name': kodi.translate(42073),
-                'plot': kodi.translate(42016),
+                'plot': kodi.translate(44016),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }, [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
@@ -2577,7 +2641,7 @@ class VirtualCategoryFactory(object):
              return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name': kodi.translate(42074),
-                'plot': kodi.translate(42017),
+                'plot': kodi.translate(44017),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }), [
                 Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),

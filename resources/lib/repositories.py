@@ -753,6 +753,8 @@ class ROMCollectionRepository(object):
         return int(count_data['count'])
 
     def find_romcollection(self, romcollection_id: str) -> ROMCollection:
+        if romcollection_id is None:
+            return None
         self._uow.execute(qry.SELECT_ROMCOLLECTION, romcollection_id)
         romcollection_data = self._uow.single_result()
         
@@ -1169,6 +1171,7 @@ class ROMCollectionRepository(object):
 
         return None             
 
+
 class ROMsRepository(object):
        
     def __init__(self, uow: UnitOfWork):
@@ -1313,7 +1316,7 @@ class ROMsRepository(object):
                 tags[tag['tag']] = tag['id']
                 
             scanned_data = {
-                entry['data_key']: entry['data_value'] 
+                entry['data_key']: entry['data_value']
                 for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set) 
             }
             yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
@@ -1631,7 +1634,7 @@ class ROMsRepository(object):
             
         return None, None
               
-    def _get_query_by_filter(self, filter:str) -> typing.Tuple[str, str]:
+    def _get_query_by_filter(self, filter: str) -> typing.Tuple[str, str]:
         if filter == constants.META_GENRE_ID:
             return qry.SELECT_GENRES_BY_COLLECTION
         if filter == constants.META_YEAR_ID:
@@ -1641,19 +1644,20 @@ class ROMsRepository(object):
         if filter == constants.META_RATING_ID:
             return qry.SELECT_RATING_BY_COLLECTION
         return None
-        
+
+
 class AelAddonRepository(object):
 
     def __init__(self, uow: UnitOfWork):
         self._uow = uow
         self.logger = logging.getLogger(__name__)
 
-    def find(self, id:str) -> AelAddon:
+    def find(self, id: str) -> AelAddon:
         self._uow.execute(qry.SELECT_ADDON, id)
         result_set = self._uow.single_result()
         return AelAddon(result_set)
 
-    def find_by_addon_id(self, addon_id:str, type: constants.AddonType) -> AelAddon:
+    def find_by_addon_id(self, addon_id: str, type: constants.AddonType) -> AelAddon:
         self._uow.execute(qry.SELECT_ADDON_BY_ADDON_ID, addon_id, type.name)
         result_set = self._uow.single_result()
         if result_set is None:
@@ -1685,25 +1689,25 @@ class AelAddonRepository(object):
             yield AelAddon(addon_data)
             
     def insert_addon(self, addon: AelAddon):
-        self.logger.info("Saving addon '{}'".format(addon.get_addon_id()))        
+        self.logger.info("Saving addon '{}'".format(addon.get_addon_id()))
         self._uow.execute(qry.INSERT_ADDON,
-                    addon.get_id(),
-                    addon.get_name(),
-                    addon.get_addon_id(),
-                    addon.get_version(),
-                    addon.get_addon_type().name,
-                    addon.get_extra_settings_str())
+                          addon.get_id(),
+                          addon.get_name(),
+                          addon.get_addon_id(),
+                          addon.get_version(),
+                          addon.get_addon_type().name,
+                          addon.get_extra_settings_str())
         
     def update_addon(self, addon: AelAddon):
-        self.logger.info("Updating addon '{}'".format(addon.get_addon_id()))       
-        self.logger.info(f"EXTRA SETTINGS: {addon.get_extra_settings_str()}") 
+        self.logger.info("Updating addon '{}'".format(addon.get_addon_id()))
+        self.logger.info(f"EXTRA SETTINGS: {addon.get_extra_settings_str()}")
         self._uow.execute(qry.UPDATE_ADDON,
-                    addon.get_name(),
-                    addon.get_addon_id(),
-                    addon.get_version(),
-                    addon.get_addon_type().name,
-                    addon.get_extra_settings_str(),
-                    addon.get_id())
+                          addon.get_name(),
+                          addon.get_addon_id(),
+                          addon.get_version(),
+                          addon.get_addon_type().name,
+                          addon.get_extra_settings_str(),
+                          addon.get_id())
 
 
 class LibrariesRepository(object):
@@ -1713,16 +1717,30 @@ class LibrariesRepository(object):
         self.logger = logging.getLogger(__name__)
 
     def find(self, id: str) -> Library:
+        if id is None:
+            return None
+        
         self._uow.execute(qry.SELECT_LIBRARY, id)
         result_set = self._uow.single_result()
-        return Library(result_set)
-
-    def find_by_addon_id(self, addon_id: str, type: constants.AddonType) -> AelAddon:
-        self._uow.execute(qry.SELECT_ADDON_BY_ADDON_ID, addon_id, type.name)
-        result_set = self._uow.single_result()
-        if result_set is None:
-            return None
-        return Library(result_set)
+        
+        self._uow.execute(qry.SELECT_ADDON, id)
+        addon_data = self._uow.single_result()
+        
+        self._uow.execute(qry.SELECT_LIBRARY_ASSET_PATHS, id)
+        asset_paths_result_set = self._uow.result_set()
+        asset_paths = []
+        for asset_paths_data in asset_paths_result_set:
+            asset_paths.append(AssetPath(asset_paths_data))
+        
+        self._uow.execute(qry.SELECT_LIBRARY_LAUNCHERS, id)
+        launchers_data = self._uow.result_set()
+        launchers = []
+        for launcher_data in launchers_data:
+            addon = AelAddon(launcher_data.copy())
+            launcher = ROMLauncherAddonFactory.create(addon, launcher_data)
+            launchers.append(launcher)
+        
+        return Library(result_set, AelAddon(addon_data), asset_paths, launchers)
 
     def find_all(self) -> typing.Iterator[Library]:
         self._uow.execute(qry.SELECT_LIBRARIES)
@@ -1730,16 +1748,47 @@ class LibrariesRepository(object):
         for result_set in result_sets:
             yield Library(result_set)
 
-    def insert_library(self, library: Library):
-        self.logger.info(f"LibrariesRepository.insert_library(): Inserting new library '{library.get_library_name()}'")
+    def find_library_by_rom(self, rom_id) -> Library:
+        self._uow.execute(qry.SELECT_LIBRARY_BY_ROM, rom_id)
+        result_set = self._uow.single_result()
+        id = result_set['id']
         
-        library.set_id(text.misc_generate_random_SID())
+        self._uow.execute(qry.SELECT_ADDON, id)
+        addon_data = self._uow.single_result()
+        
+        self._uow.execute(qry.SELECT_LIBRARY_ASSET_PATHS, id)
+        asset_paths_result_set = self._uow.result_set()
+        asset_paths = []
+        for asset_paths_data in asset_paths_result_set:
+            asset_paths.append(AssetPath(asset_paths_data))
+        
+        self._uow.execute(qry.SELECT_LIBRARY_LAUNCHERS, id)
+        launchers_data = self._uow.result_set()
+        launchers = []
+        for launcher_data in launchers_data:
+            addon = AelAddon(launcher_data.copy())
+            launcher = ROMLauncherAddonFactory.create(addon, launcher_data)
+            launchers.append(launcher)
+        
+        return Library(result_set, AelAddon(addon_data), asset_paths, launchers)
+
+    def find_romcollection_ids_by_library(self, library_id):
+        self._uow.execute(qry.SELECT_ROMCOLLECTION_IDS_BY_LIBRARY, library_id)
+        result_sets = self._uow.result_set()
+        collection_ids = []
+        for result_set in result_sets:
+            collection_ids.append(result_set['collection_id'])
+        return collection_ids
+        
+    def insert_library(self, library: Library):
+        self.logger.info(f"LibrariesRepository.insert_library(): Inserting new library '{library.get_name()}'")
+        
         assets_path = library.get_assets_root_path()
         addon = library.get_addon()
         
         self._uow.execute(qry.INSERT_LIBRARY,
                           library.get_id(),
-                          library.get_library_name(),
+                          library.get_name(),
                           assets_path.getPath() if assets_path is not None else None,
                           library.get_last_scan_timestamp(),
                           library.get_settings_str(),
@@ -1747,13 +1796,14 @@ class LibrariesRepository(object):
                   
         for asset_path in library.get_asset_paths():
             self._insert_asset_path(asset_path, library)
+        self._update_launchers(library.get_id(), library.get_launchers())
 
     def update_library(self, library: Library):
-        self.logger.info(f"LibrariesRepository.update_library(): Updating library '{library.get_library_name()}'")
+        self.logger.info(f"LibrariesRepository.update_library(): Updating library '{library.get_name()}'")
         assets_path = library.get_assets_root_path()
         
         self._uow.execute(qry.UPDATE_LIBRARY,
-                          library.get_library_name(),
+                          library.get_name(),
                           assets_path.getPath() if assets_path is not None else None,
                           library.get_last_scan_timestamp(),
                           library.get_settings_str(),
@@ -1764,7 +1814,18 @@ class LibrariesRepository(object):
                 self._insert_asset_path(asset_path, library)
             else:
                 self._update_asset_path(asset_path, library)
-            
+        self._update_launchers(library.get_id(), library.get_launchers())
+
+    def delete_library(self, library_id: str):
+        self.logger.info(f"LibrariesRepository.delete_library(): Deleting library '{library_id}'")
+        self._uow.execute(qry.DELETE_LIBRARY, library_id)
+
+    def remove_all_roms_in_library(self, library_id: str):
+        self._uow.execute(qry.REMOVE_ROMS_FROM_LIBRARY, library_id)
+    
+    def remove_launcher(self, library_id: str, launcher_id: str):
+        self._uow.execute(qry.DELETE_LIBRARY_LAUNCHER, library_id, launcher_id)
+     
     def _insert_asset_path(self, asset_path: AssetPath, library: Library):
         asset_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET_PATH, asset_db_id, asset_path.get_path(), asset_path.get_asset_info_id())
@@ -1774,3 +1835,19 @@ class LibrariesRepository(object):
         self._uow.execute(qry.UPDATE_ASSET_PATH, asset_path.get_path(), asset_path.get_asset_info_id(), asset_path.get_id())
         if asset_path.get_custom_attribute('library_id') is None:
             self._uow.execute(qry.INSERT_LIBRARY_ASSET_PATH, library.get_id(), asset_path.get_id())
+
+    def _update_launchers(self, library_id: str, rom_launchers: typing.List[ROMLauncherAddon]):        
+        for rom_launcher in rom_launchers:
+            if rom_launcher.get_id() is None:
+                rom_launcher.set_id(text.misc_generate_random_SID())
+                self._uow.execute(qry.INSERT_LIBRARY_LAUNCHER,
+                                  rom_launcher.get_id(),
+                                  library_id,
+                                  rom_launcher.addon.get_id(),
+                                  rom_launcher.get_settings_str(),
+                                  rom_launcher.is_default())
+            else:
+                self._uow.execute(qry.UPDATE_LIBRARY_LAUNCHER,
+                                  rom_launcher.get_settings_str(),
+                                  rom_launcher.is_default(),
+                                  rom_launcher.get_id())

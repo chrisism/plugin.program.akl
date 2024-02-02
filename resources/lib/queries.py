@@ -96,7 +96,6 @@ SELECT_ROOT_ROMCOLLECTION_ASSETS = "SELECT * FROM vw_romcollection_assets WHERE 
 SELECT_ROMCOLLECTIONS_ASSETS_BY_PARENT = "SELECT * FROM vw_romcollection_assets WHERE parent_id = ?"
 SELECT_ROMCOLLECTION_ASSETS_BY_ROM = "SELECT ra.* FROM vw_romcollection_assets AS ra INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = ra.romcollection_id WHERE rr.rom_id = ?"
 SELECT_ROMCOLLECTION_ASSETS = "SELECT * FROM vw_romcollection_assets"
-SELECT_ROMCOLLECTION_ASSET_PATHS = "SELECT * FROM vw_romcollection_asset_paths WHERE romcollection_id = ?"
 SELECT_ROMCOLLECTION_ASSETS_PATHS_BY_ROM = "SELECT rap.* FROM vw_romcollection_asset_paths AS rap INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rap.romcollection_id WHERE rr.rom_id = ?"
 SELECT_ROMCOLLECTION_ASSET_MAPPINGS = """
                                     SELECT am.*, mm.metadata_id FROM assetmappings AS am 
@@ -313,25 +312,35 @@ DELETE_TAG                = "DELETE FROM tags WHERE id = ?"
 #
 # AelAddonRepository -> AKL Adoon objects from SQLite DB
 #     
-SELECT_ADDON              = "SELECT * FROM akl_addon WHERE id = ?"
+SELECT_ADDON = "SELECT * FROM akl_addon WHERE id = ?"
 SELECT_ADDON_BY_ADDON_ID  = "SELECT * FROM akl_addon WHERE addon_id = ? AND addon_type = ?"
 SELECT_ADDONS             = "SELECT * FROM akl_addon"
 SELECT_LAUNCHER_ADDONS    = "SELECT * FROM akl_addon WHERE addon_type = 'LAUNCHER' ORDER BY name"
 SELECT_SCANNER_ADDONS     = "SELECT * FROM akl_addon WHERE addon_type = 'SCANNER' ORDER BY name"
 SELECT_SCRAPER_ADDONS     = "SELECT * FROM akl_addon WHERE addon_type = 'SCRAPER' ORDER BY name"
-INSERT_ADDON              = "INSERT INTO akl_addon(id, name, addon_id, version, addon_type, extra_settings) VALUES(?,?,?,?,?,?)"
-UPDATE_ADDON              = "UPDATE akl_addon SET name = ?, addon_id = ?, version = ?, addon_type = ?, extra_settings = ? WHERE id = ?"
+INSERT_ADDON = "INSERT INTO akl_addon(id, name, addon_id, version, addon_type, extra_settings) VALUES(?,?,?,?,?,?)"
+UPDATE_ADDON = "UPDATE akl_addon SET name = ?, addon_id = ?, version = ?, addon_type = ?, extra_settings = ? WHERE id = ?"
 
 # Library
-SELECT_LIBRARY = "SELECT * FROM libraries WHERE id = ?"
+SELECT_LIBRARY = "SELECT * FROM vw_libraries WHERE id = ?"
 SELECT_LIBRARIES = "SELECT * FROM libraries"
-SELECT_LIBRARIES_BY_ADDON_ID = "SELECT * FROM libraries WHERE addon_id = ? AND addon_type = ?"
+SELECT_LIBRARY_BY_ROM = "SELECT * FROM libraries WHERE scanned_by_id = ?"
+SELECT_ROMCOLLECTION_IDS_BY_LIBRARY = "SELECT r.id as collection_id FROM romcollections LEFT JOIN collection_library_ruleset as clr ON clr.collection_id = r.id WHERE clr.library_id = ?"
+
+SELECT_LIBRARY_ASSET_PATHS = "SELECT * FROM vw_library_asset_paths WHERE library_id = ?"
 
 INSERT_LIBRARY = """
-                INSERT INTO libraries (id,library_name,assets_path,last_scan_timestamp,settings,akl_addon_id) 
+                INSERT INTO libraries (id,name,assets_path,last_scan_timestamp,settings,akl_addon_id) 
                 VALUES (?,?,?,?,?,?)
                 """
-UPDATE_LIBRARY = "UPDATE libraries SET library_name=?, assets_path=?, last_scan_timestamp=?, settings=? WHERE id =?"
+UPDATE_LIBRARY = "UPDATE libraries SET name=?, assets_path=?, last_scan_timestamp=?, settings=? WHERE id =?"
 DELETE_LIBRARY = "DELETE FROM libraries WHERE id = ?"
 
 INSERT_LIBRARY_ASSET_PATH = "INSERT INTO libraries_assetpaths (library_id, assetpaths_id) VALUES (?, ?)"
+REMOVE_ROMS_FROM_LIBRARY = "DELETE FROM roms WHERE scanned_by_id = ?"
+
+SELECT_LIBRARY_LAUNCHERS = "SELECT * FROM vw_library_launchers WHERE library_id = ?"
+INSERT_LIBRARY_LAUNCHER = "INSERT INTO library_launchers (id, library_id, akl_addon_id, settings, is_default) VALUES (?,?,?,?,?)"
+UPDATE_LIBRARY_LAUNCHER = "UPDATE library_launchers SET settings = ?, is_default = ? WHERE id = ?"
+DELETE_LIBRARY_LAUNCHERS = "DELETE FROM library_launchers WHERE library_id = ?"
+DELETE_LIBRARY_LAUNCHER = "DELETE FROM library_launchers WHERE library_id = ? AND id = ?"

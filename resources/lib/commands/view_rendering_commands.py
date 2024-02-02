@@ -334,7 +334,7 @@ def _render_root_view(categories_repository: CategoryRepository, romcollections_
             views_repository.store_view(root_romcollection.get_id(), root_romcollection.get_type(), collection_view_data)
 
     for library in libraries:
-        logger.debug(f'Processing library "{library.get_library_name()}"')
+        logger.debug(f'Processing library "{library.get_name()}"')
         library_view_data = _render_library_view(library, roms_repository)
         views_repository.store_view(library.get_id(), library.get_type(), library_view_data)        
 
@@ -448,7 +448,7 @@ def _render_library_view(library: Library, roms_repository: ROMsRepository) -> d
     roms = roms_repository.find_roms_by_library(library)
     view_data = {
         'id': library.get_id(),
-        'name': library.get_library_name(),
+        'name': library.get_name(),
         'properties': {
         },
         'obj_type': library.get_type(),
@@ -461,7 +461,7 @@ def _render_library_view(library: Library, roms_repository: ROMsRepository) -> d
         except Exception:
             logger.exception(f'Exception while rendering list item ROM "{rom.get_name()}"')
         
-    logger.debug(f'Found {len(view_items)} items for library "{library.get_library_name()}" view.')
+    logger.debug(f'Found {len(view_items)} items for library "{library.get_name()}" view.')
     view_data['items'] = view_items
     return view_data
 

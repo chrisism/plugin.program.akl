@@ -32,6 +32,7 @@ from resources.lib.domain import MetaDataItemABC, AssetInfo, g_assetFactory
 
 logger = logging.getLogger(__name__)
 
+
 # Edits an object field which is a Unicode string.
 #
 # Example call:

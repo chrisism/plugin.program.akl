@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS akl_addon(
 
 CREATE TABLE IF NOT EXISTS libraries(
     id TEXT PRIMARY KEY,
-    library_name TEXT,
+    name TEXT,
     assets_path TEXT,
     last_scan_timestamp TIMESTAMP,
     akl_addon_id TEXT,
@@ -87,18 +87,6 @@ CREATE TABLE IF NOT EXISTS romcollections(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-CREATE TABLE IF NOT EXISTS romcollection_launchers(
-    id TEXT PRIMARY KEY, 
-    romcollection_id TEXT,
-    akl_addon_id TEXT,
-    settings TEXT,
-    is_default INTEGER DEFAULT 0 NOT NULL,
-    FOREIGN KEY (romcollection_id) REFERENCES romcollections (id) 
-        ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
-        ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
 CREATE TABLE IF NOT EXISTS roms(
     id TEXT PRIMARY KEY, 
     name TEXT NOT NULL,
@@ -120,7 +108,7 @@ CREATE TABLE IF NOT EXISTS roms(
     FOREIGN KEY (metadata_id) REFERENCES metadata (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY (scanned_by_id) REFERENCES libraries (id) 
-        ON DELETE SET NULL ON UPDATE NO ACTION
+        ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS scanned_roms_data(
@@ -164,6 +152,29 @@ CREATE TABLE IF NOT EXISTS import_rule(
     operator INTEGER DEFAULT 1 NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS romcollection_launchers(
+    id TEXT PRIMARY KEY, 
+    romcollection_id TEXT,
+    akl_addon_id TEXT,
+    settings TEXT,
+    is_default INTEGER DEFAULT 0 NOT NULL,
+    FOREIGN KEY (romcollection_id) REFERENCES romcollections (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS library_launchers(
+    id TEXT PRIMARY KEY, 
+    library_id TEXT,
+    akl_addon_id TEXT,
+    settings TEXT,
+    is_default INTEGER DEFAULT 0 NOT NULL,
+    FOREIGN KEY (library_id) REFERENCES libraries (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
 
 CREATE TABLE IF NOT EXISTS rom_launchers(
     id TEXT PRIMARY KEY, 
@@ -262,7 +273,16 @@ CREATE VIEW IF NOT EXISTS vw_categories AS SELECT
     (SELECT COUNT(*) FROM romcollections AS sr WHERE sr.parent_id = c.id) AS num_collections
 FROM categories AS c 
     INNER JOIN metadata AS m ON c.metadata_id = m.id;
-       
+
+CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT 
+    l.id AS id, 
+    l.name AS name,
+    l.assets_path AS assets_path,
+    l.last_scan_timestamp AS last_scan_timestamp,
+    l.settings AS settings,
+    (SELECT COUNT(*) FROM roms AS rms WHERE rms.scanned_by_id = l.id) as num_roms
+FROM libraries AS l;
+
 CREATE VIEW IF NOT EXISTS vw_romcollections AS SELECT 
     r.id AS id, 
     r.parent_id AS parent_id,
@@ -387,19 +407,19 @@ CREATE VIEW IF NOT EXISTS vw_romcollection_launchers AS SELECT
 FROM romcollection_launchers AS l
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
     
-CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT
-    s.id AS id,
-    s.romcollection_id,
+CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
+    l.id AS id,
+    l.library_id,
     a.id AS associated_addon_id,
-    s.library_name,
     a.name,
     a.addon_id,
     a.version,
     a.addon_type,
     a.extra_settings,
-    s.settings
-FROM libraries AS s
-    INNER JOIN akl_addon AS a ON s.akl_addon_id = a.id;
+    l.settings,
+    l.is_default
+FROM library_launchers AS l
+    INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
 
 CREATE VIEW IF NOT EXISTS vw_rom_launchers AS SELECT
     l.id AS id,

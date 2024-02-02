@@ -57,7 +57,6 @@ def cmd_manage_roms(args):
 
     options = collections.OrderedDict()
     options['SET_ROMS_DEFAULT_ARTWORK'] = kodi.translate(42044)
-    options['SET_ROMS_ASSET_DIRS'] = kodi.translate(42045)
     
     if romcollection.has_scanners():
         options['SCAN_ROMS'] = kodi.translate(42046)

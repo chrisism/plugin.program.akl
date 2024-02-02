@@ -730,6 +730,14 @@ msgctxt "#40914"
 msgid "Libraries"
 msgstr ""
 
+msgctxt "#40915"
+msgid "Edit Library"
+msgstr ""
+
+msgctxt "#40916"
+msgid "Add Library"
+msgstr ""
+
 ############################
 # Headers and texts / notifications / dialogs
 ############################
@@ -933,10 +941,9 @@ msgctxt "#40999"
 msgid "Scan completed. Found {0} addons"
 msgstr ""
 
-# TODO: Obsolete
-# msgctxt "#41000"
-# msgid "No ROM scanners configured."
-# msgstr ""
+msgctxt "#41000"
+msgid "Scrape collection '{0}' ROMs with '{1}'"
+msgstr ""
 
 msgctxt "#41001"
 msgid "No launcher configured."
@@ -1374,13 +1381,12 @@ msgctxt "#41109"
 msgid "Choose scanner to remove"
 msgstr "" 
 
-# TODO: obsolete
-# msgctxt "#41110"
-# msgid "Choose ROM scanner"
-# msgstr "" 
+msgctxt "#41110"
+msgid "Scrape library '{0}' ROMs"
+msgstr "" 
 
 msgctxt "#41111"
-msgid "Scrape collection '{0}' ROMs with '{1}'"
+msgid "Scrape library '{0}' ROMs with '{1}'"
 msgstr "" 
 
 msgctxt "#41112"
@@ -1589,6 +1595,38 @@ msgstr ""
 
 msgctxt "#41162"
 msgid "Manage Library '{}' ROMs"
+msgstr ""
+
+msgctxt "#41163"
+msgid "Library has no ROMs. Nothing to do."
+msgstr ""
+
+msgctxt "#41164"
+msgid "Library '{0}' has {1} ROMs. Are you sure you want to clear them from this library?"
+msgstr ""
+
+msgctxt "#41165"
+msgid "Cleared ROMs from library"
+msgstr ""
+
+msgctxt "#41166"
+msgid "New Library Name"
+msgstr "" 
+
+msgctxt "#41167"
+msgid "Select action for Library {0}"
+msgstr ""
+
+msgctxt "#41168"
+msgid "No launchers configured for this library!"
+msgstr ""
+
+msgctxt "#41169"
+msgid "Library '{0}' has {1} ROMs. These will be deleted also."
+msgstr "" 
+
+msgctxt "#41170"
+msgid "Deleted library {0}"
 msgstr ""
 
 ############################
@@ -1911,134 +1949,138 @@ msgctxt "#42084"
 msgid "Change {} path: '{}'"
 msgstr ""
 
+msgctxt "#42085"
+msgid "Delete Library"
+msgstr ""
+
 ############################
 # Context menu item descriptions
 ############################
 
-msgctxt "#42001"
+msgctxt "#44001"
 msgid "Execute several [COLOR orange]Utilities[/COLOR]."
 msgstr "viewqueries"
 
-msgctxt "#42002"
+msgctxt "#44002"
 msgid "Generate and view [COLOR orange]Global Reports[/COLOR]."
 msgstr "viewqueries"
 
-msgctxt "#42003"
+msgctxt "#44003"
 msgid "Reset the AKL database. You will loose all data."
 msgstr "viewqueries"
 
-msgctxt "#42004"
+msgctxt "#44004"
 msgid "Rebuild all the container views in the application."
 msgstr "viewqueries"
 
-msgctxt "#42005"
+msgctxt "#44005"
 msgid "Browse AKL Favourite ROMs"
 msgstr "domain"
 
-msgctxt "#42006"
+msgctxt "#44006"
 msgid "Browse the ROMs you played recently"
 msgstr "domain"
 
-msgctxt "#42007"
+msgctxt "#44007"
 msgid "Browse the ROMs you play most"
 msgstr "domain"
 
-msgctxt "#42008"
+msgctxt "#44008"
 msgid "Browse ROMs filtered on '{0}'"
 msgstr "domain"
 
-msgctxt "#42009"
+msgctxt "#44009"
 msgid "Browse the ROMs by specifics"
 msgstr "domain"
 
-msgctxt "#42010"
+msgctxt "#44010"
 msgid "Browse the ROMs by title"
 msgstr "domain"
 
-msgctxt "#42011"
+msgctxt "#44011"
 msgid "Browse the ROMs by year"
 msgstr "domain"
 
-msgctxt "#42012"
+msgctxt "#44012"
 msgid "Browse the ROMs by genre"
 msgstr "domain"
 
-msgctxt "#42013"
+msgctxt "#44013"
 msgid "Browse the ROMs by developer"
 msgstr "domain"
 
-msgctxt "#42014"
+msgctxt "#44014"
 msgid "Browse the ROMs by number of players"
 msgstr "domain"
 
-msgctxt "#42015"
+msgctxt "#44015"
 msgid "Browse the ROMs by ESRB rating"
 msgstr "domain"
 
-msgctxt "#42016"
+msgctxt "#44016"
 msgid "Browse the ROMs by PEGI rating"
 msgstr "domain"
 
-msgctxt "#42017"
+msgctxt "#44017"
 msgid "Browse the ROMs by rating"
 msgstr "domain"
 
-msgctxt "#42018"
+msgctxt "#44018"
 msgid "Rebuild all the virtual categories and collections in the container"
 msgstr "viewqueries"
 
-msgctxt "#42019"
+msgctxt "#44019"
 msgid "Scan for addons that can be used by AKL (launchers, scrapers etc.)"
 msgstr "viewqueries"
 
-msgctxt "#42020"
+msgctxt "#44020"
 msgid "Shows previously scanned addons that can be used by AKL (launchers, scrapers etc.)"
 msgstr "viewqueries"
 
-msgctxt "#42021"
+msgctxt "#44021"
 msgid "Manage existing/available tags for ROMs"
 msgstr "viewqueries"
 
-msgctxt "#42022"
+msgctxt "#44022"
 msgid "Execute several [COLOR orange]Utilities[/COLOR]."
 msgstr "viewqueries"
 
-msgctxt "#42023"
+msgctxt "#44023"
 msgid "Exports all AKL categories and collections into an XML configuration file.\nYou can later reimport this XML file."
 msgstr "viewqueries"
 
-msgctxt "#42024"
+msgctxt "#44024"
 msgid "Check all collections for missing launchers or scanners, missing artwork, wrong platform names, asset path existence, etc."
 msgstr "viewqueries"
 
-msgctxt "#42025"
+msgctxt "#44025"
 msgid "Scans existing [COLOR=orange]ROMs artwork images[/COLOR] in ROM Collections and verifies that the images have correct extension and size is greater than 0. You can delete corrupted images to be rescraped later."
 msgstr "viewqueries"
 
-msgctxt "#42026"
+msgctxt "#44026"
 msgid "Scans all ROM collections and finds [COLOR orange]redundant ROMs artwork[/COLOR]. You may delete these unneeded images."
 msgstr "viewqueries"
 
-msgctxt "#42027"
+msgctxt "#44027"
 msgid "Display the auto-detected No-Intro/Redump DATs that will be used for the ROM audit. You have to configure the DAT directories in [COLOR orange]AKL addon settings[/COLOR], [COLOR=orange]ROM Audit[/COLOR] tab."
 msgstr "viewqueries"
 
-msgctxt "#42028"
+msgctxt "#44028"
 msgid "Shows a report of all ROM collections with number of ROMs."
 msgstr "viewqueries"
 
-msgctxt "#42029"
+msgctxt "#44029"
 msgid "Shows a report of all audited ROM collections, with Have, Miss and Unknown statistics."
 msgstr "viewqueries"
 
-msgctxt "#42030"
+msgctxt "#44030"
 msgid "Shows a report of all audited ROM Launchers, with Have, Miss and Unknown statistics. Only No-Intro platforms (cartridge-based) are reported."
 msgstr "viewqueries"
 
-msgctxt "#42031"
+msgctxt "#44031"
 msgid "Shows a report of all audited ROM Launchers, with Have, Miss and Unknown statistics. Only Redump platforms (optical-based) are reported."
 msgstr "viewqueries"
 
-msgctxt "#42032"
+msgctxt "#44032"
 msgid "Manage your game [COLOR orange]libraries[/COLOR] and sources."
 msgstr "viewqueries"
