@@ -46,10 +46,12 @@ def _is_a_number(input: any):
 def _is_empty(input: any) -> bool:
     return input is None or (not _is_a_number(input) and len(input) == 0)
 
+
 def _is_empty_or_default(input: any, default: any):
     if _is_empty(input):
         return True
     return input == default
+
 
 # -------------------------------------------------------------------------------------------------
 # Gets all required information about an asset: path, name, etc.
@@ -142,6 +144,7 @@ class EntityABC(object):
         if not value or value == '': return None
         return io.FileName(value, isdir)
 
+
 # Addons that can be used as AKL plugin (launchers, scrapers)
 class AelAddon(EntityABC):
     
@@ -187,6 +190,7 @@ class AelAddon(EntityABC):
     def set_extra_settings(self, settings: dict):
         self.entity_data['extra_settings'] = json.dumps(settings)
         
+
 class Asset(EntityABC):
 
     def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
@@ -230,6 +234,7 @@ class Asset(EntityABC):
         asset.set_asset_info(asset_info)
         return asset
         
+
 class AssetPath(EntityABC):
         
     def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
@@ -725,6 +730,7 @@ class RuleSetOperator(Enum):
     AND = 1
     OR = 2
 
+
 class RuleOperator(Enum):
     Equals = 1
     NotEquals = 2
@@ -733,6 +739,7 @@ class RuleOperator(Enum):
     MoreThan = 5
     LessThan = 6
     
+
 class Rule(object):
     
     def __init__(self, data: dict):
@@ -755,6 +762,7 @@ class Rule(object):
         if self.operator == RuleOperator.LessThan:
             return self.value < actual
         return False
+
 
 class RuleSet(object):
     
@@ -1097,6 +1105,7 @@ class MetaDataItemABC(EntityABC):
     def __str__(self):
         return '{}#{}: {}'.format(self.get_object_name(), self.get_id(), self.get_name())
 
+
 # -------------------------------------------------------------------------------------------------
 # Class representing an AKL Category.
 # Contains code to generate the context menus passed to Dialog.select()
@@ -1251,6 +1260,7 @@ class Category(MetaDataItemABC):
     def __str__(self):
         return super().__str__()
     
+
 class VirtualCategory(Category):
     
     def get_object_name(self):
@@ -1262,6 +1272,7 @@ class VirtualCategory(Category):
     def get_type(self):
         return constants.OBJ_CATEGORY_VIRTUAL # 42502
  
+
 # -------------------------------------------------------------------------------------------------
 # Class representing a collection of ROMs.
 # -------------------------------------------------------------------------------------------------
@@ -1381,7 +1392,7 @@ class ROMCollection(MetaDataItemABC):
     def get_launchers(self) -> typing.List[ROMLauncherAddon]:
         return self.launchers_data
 
-    def get_launcher(self, id:str) -> ROMLauncherAddon:
+    def get_launcher(self, id:svtr) -> ROMLauncherAddon:
         return next((l for l in self.launchers_data if l.get_id() == id), None)
 
     def get_default_launcher(self) -> ROMLauncherAddon:
@@ -1403,20 +1414,6 @@ class ROMCollection(MetaDataItemABC):
         launcher_to_be_default = next((l for l in self.launchers_data if l.get_id() == launcher_id), None)
         if launcher_to_be_default:
             launcher_to_be_default.set_default(True)
-
-    def has_scanners(self) -> bool:
-        return len(self.scanners_data) > 0
-    
-    def add_scanner(self, addon: AelAddon, settings: dict):
-        scanner = ROMCollectionScanner(addon, {})
-        scanner.set_settings(settings)
-        self.scanners_data.append(scanner)
-
-    def get_scanners(self) -> typing.List[ROMCollectionScanner]:
-        return self.scanners_data
-
-    def get_scanner(self, id:str) -> ROMCollectionScanner:
-        return next((s for s in self.scanners_data if s.get_id() == id), None)
 
     def get_NFO_name(self) -> io.FileName:
         nfo_dir = io.FileName(settings.getSetting('launchers_asset_dir'), isdir = True)
@@ -1524,6 +1521,7 @@ class ROMCollection(MetaDataItemABC):
     def __str__(self):
         return super().__str__()
      
+
 class VirtualCollection(ROMCollection):
     def __init__(self, 
                 entity_data: dict = None, 
@@ -1554,6 +1552,7 @@ class VirtualCollection(ROMCollection):
     def get_collection_value(self) -> str:
         return self.entity_data['collection_value'] if 'collection_value' in self.entity_data else None
   
+
 # -------------------------------------------------------------------------------------------------
 # Class representing a ROM file you can play through AKL.
 # -------------------------------------------------------------------------------------------------
@@ -2062,6 +2061,7 @@ class ROM(MetaDataItemABC):
     def __str__(self):
         """Overrides the default implementation"""
         return json.dumps(self.entity_data)
+
 
 # -------------------------------------------------------------------------------------------------
 # OBJECT FACTORIES

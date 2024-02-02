@@ -869,9 +869,10 @@ msgctxt "#40981"
 msgid "Creating new AKL database"
 msgstr ""
 
-msgctxt "#40982"
-msgid "No scanners configured for this romcollection!"
-msgstr ""
+# TODO: Obsolete
+# msgctxt "#40982"
+# msgid "No scanners configured for this romcollection!"
+# msgstr ""
 
 msgctxt "#40983"
 msgid "{0} {1} mapped to {2}"
@@ -1181,9 +1182,10 @@ msgctxt "#41059"
 msgid "Are you sure to delete launcher '{}'?"
 msgstr ""
 
-msgctxt "#41060"
-msgid "Are you sure to delete ROM scanner '{}'?"
-msgstr ""
+# TODO: obsolete
+# msgctxt "#41060"
+# msgid "Are you sure to delete ROM scanner '{}'?"
+# msgstr ""
 
 msgctxt "#41061"
 msgid "Overwrite existing assets?"
@@ -1365,9 +1367,10 @@ msgctxt "#41105"
 msgid "Choose launcher"
 msgstr "" 
 
-msgctxt "#41106"
-msgid "Manage ROM scanners for {}"
-msgstr "" 
+# TODO: obsolete
+# msgctxt "#41106"
+# msgid "Manage ROM scanners for {}"
+# msgstr "" 
 
 msgctxt "#41107"
 msgid "Choose scanner to associate"
@@ -1377,9 +1380,10 @@ msgctxt "#41108"
 msgid "Choose scanner to edit"
 msgstr "" 
 
-msgctxt "#41109"
-msgid "Choose scanner to remove"
-msgstr "" 
+# TODO: obsolete
+# msgctxt "#41109"
+# msgid "Choose scanner to remove"
+# msgstr "" 
 
 msgctxt "#41110"
 msgid "Scrape library '{0}' ROMs"
@@ -1929,17 +1933,19 @@ msgctxt "#42074"
 msgid "Browse by Rating"
 msgstr ""
 
-msgctxt "#42080"
-msgid "Add new scanner"
-msgstr ""
+# TODO: oboslete
+# msgctxt "#42080"
+# msgid "Add new scanner"
+# msgstr ""
 
 msgctxt "#42081"
 msgid "Edit scanner"
 msgstr ""
 
-msgctxt "#42082"
-msgid "Remove scanner"
-msgstr ""
+# TODO: oboslete
+# msgctxt "#42082"
+# msgid "Remove scanner"
+# msgstr ""
 
 msgctxt "#42083"
 msgid "Change root assets path: '{}'"

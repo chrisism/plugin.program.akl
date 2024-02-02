@@ -88,6 +88,7 @@ def cmd_edit_library(args):
 
     options = collections.OrderedDict()
     options['LIBRARY_EDIT_TITLE'] = kodi.translate(40863).format(library.get_name())
+    options['LIBRARY_EDIT_SCANNER'] = kodi.translate(42081)
     if library.has_launchers():
         options['EDIT_LIBRARY_LAUNCHERS'] = kodi.translate(42016)
     else:
@@ -137,6 +138,20 @@ def cmd_library_title(args):
         
     AppMediator.sync_cmd('EDIT_LIBRARY', args)
 
+
+@AppMediator.register('LIBRARY_EDIT_SCANNER')
+def cmd_edit_library_scanner(args):
+    library_id: str = args['library_id'] if 'library_id' in args else None
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        repository = LibrariesRepository(uow)
+        library = repository.find(library_id)
+     
+    kodi.notify(kodi.translate(40980))
+    kodi.run_script(
+        library.addon.get_addon_id(),
+        library.get_configure_command())
+       
 
 @AppMediator.register('DELETE_LIBRARY')
 def cmd_library_delete(args):
@@ -323,3 +338,22 @@ def cmd_clear_library_roms(args):
     for collection_id in collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})
     kodi.notify(kodi.translate(41165))
+
+
+# -------------------------------------------------------------------------------------------------
+# Library Scanner executing
+# -------------------------------------------------------------------------------------------------
+@AppMediator.register('SCAN_ROMS')
+def cmd_execute_rom_scanner(args):
+    library_id: str = args['library_id'] if 'library_id' in args else None
+
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        libraries_repository = LibrariesRepository(uow)
+        library = libraries_repository.find(library_id)
+
+    logger.info(f'SCAN_ROMS: scanner for library "{library.get_name()}"')
+    kodi.notify(kodi.translate(40980))
+    kodi.run_script(
+        library.addon.get_addon_id(),
+        library.get_scan_command(library))
