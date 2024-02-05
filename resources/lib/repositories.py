@@ -95,6 +95,12 @@ class ViewRepository(object):
                 self.logger.info(f'Removing file for view "{view_id}"')
                 view_file.unlink()
 
+    def cleanup_obsolete_views(self):
+        view_files = self.paths.VIEWS_DIR.scanFilesInPath('view*.json')
+        for view_file in view_files:
+            self.logger.info(f'Removing file: "{view_file}"')
+            view_file.unlink()
+
     def cleanup_virtual_category_views(self, view_id):
         view_files = self.paths.GENERATED_VIEWS_DIR.scanFilesInPath(f'category_{view_id}_*.json')
         self.logger.info(f'Removing {len(view_files)} files for virtual category "{view_id}"')

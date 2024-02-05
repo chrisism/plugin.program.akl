@@ -46,7 +46,10 @@ def cmd_render_views_data(args):
         libraries_repository = LibrariesRepository(uow)
         
         _render_root_view(categories_repository, romcollections_repository, roms_repository, libraries_repository, views_repository, render_sub_views=True)
-        
+    
+        # backwards compatibility
+        views_repository.cleanup_obsolete_views()
+    
     kodi.notify(kodi.translate(40969))
     kodi.refresh_container()
 
