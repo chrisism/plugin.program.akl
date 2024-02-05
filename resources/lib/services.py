@@ -65,7 +65,7 @@ class AppService(object):
         if db_version is None or LooseVersion(db_version) < LooseVersion(globals.addon_version):
             try:
                 self._do_version_upgrade(uow, LooseVersion(db_version))
-            except:
+            except Exception:
                 logger.exception("Failure while doing database migration")
                 kodi.notify_error(kodi.translate(40954))
         
@@ -157,7 +157,7 @@ class AppService(object):
         else:
             logger.info(f'Skipping automatic scan and view generation. Last scan was {now-then} days ago')        
         return too_long_ago
-        
+
 class AppMonitor(xbmc.Monitor):
     
     def __init__(self, *args, **kwargs):

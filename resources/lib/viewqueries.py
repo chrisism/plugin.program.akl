@@ -327,7 +327,7 @@ def qry_get_libraries():
                     'plot': f'Library of type {library.addon.get_addon_type()}',
                     'overlay': 4
                 },
-                'art': { 
+                'art': {
                     'fanart': listitem_fanart,
                     'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
                     'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()

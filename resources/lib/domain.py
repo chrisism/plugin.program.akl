@@ -106,7 +106,11 @@ class EntityABC(object):
 
     @abc.abstractmethod
     def get_type(self) -> str:
-        pass
+        return constants.OBJ_NONE
+
+    @abc.abstractmethod
+    def get_object_name(self) -> str:
+        return "Entity"
 
     def get_data_dic(self):
         return self.entity_data
@@ -484,6 +488,7 @@ class Library(ROMAddon):
             entity_data = {
                 'id': text.misc_generate_random_SID(),
                 'name': '',
+                'platform': '',
                 'assets_path': '',
                 'num_roms': 0,
                 'last_scan_timestamp': None,
@@ -499,6 +504,12 @@ class Library(ROMAddon):
     
     def get_type(self):
         return constants.OBJ_LIBRARY  # 42506
+
+    def get_platform(self):
+        return self.entity_data['platform'] if 'platform' in self.entity_data else None
+
+    def set_platform(self, platform):
+        self.entity_data['platform'] = platform
 
     def num_roms(self) -> int:
         return self.entity_data['num_roms'] if 'num_roms' in self.entity_data else 0
@@ -829,10 +840,6 @@ class MetaDataItemABC(EntityABC):
     # --------------------------------------------------------------------------------------------
     # Core functions
     # --------------------------------------------------------------------------------------------
-    @abc.abstractmethod
-    def get_object_name(self) -> str:
-        pass
-
     @abc.abstractmethod
     def get_assets_kind(self) -> int:
         pass
@@ -2044,14 +2051,19 @@ class ROM(MetaDataItemABC):
             # and kodi.dialog_yesno('Do you want to overwrite collection metadata properties with values from the launcher?'):
             # romcollection.import_data_dic(launcher_settings['romcollection'])
             # metadata_updated = True
-            
-    
+              
     def apply_romcollection_asset_paths(self, romcollection: ROMCollection):
         self.set_assets_root_path(romcollection.get_assets_root_path())
         self.asset_paths = {}
         for assetpath in romcollection.get_asset_paths():
             self.asset_paths[assetpath.get_asset_info_id()] = assetpath
-            
+    
+    def apply_library_asset_paths(self, library: Library):
+        self.set_assets_root_path(library.get_assets_root_path())
+        self.asset_paths = {}
+        for assetpath in library.get_asset_paths():
+            self.asset_paths[assetpath.get_asset_info_id()] = assetpath
+    
     def apply_romcollection_asset_mapping(self, romcollection: ROMCollection):
         mappable_assets = romcollection.get_ROM_mappable_asset_list()
         for mappable_asset in mappable_assets:

@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS akl_addon(
 CREATE TABLE IF NOT EXISTS libraries(
     id TEXT PRIMARY KEY,
     name TEXT,
+    platform TEXT,
     assets_path TEXT,
     last_scan_timestamp TIMESTAMP,
     akl_addon_id TEXT,
@@ -277,11 +278,19 @@ FROM categories AS c
 CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT 
     l.id AS id, 
     l.name AS name,
+    l.platform AS platform,
     l.assets_path AS assets_path,
     l.last_scan_timestamp AS last_scan_timestamp,
     l.settings AS settings,
+    a.id AS associated_addon_id,
+    a.name,
+    a.addon_id,
+    a.version,
+    a.addon_type,
+    a.extra_settings,
     (SELECT COUNT(*) FROM roms AS rms WHERE rms.scanned_by_id = l.id) as num_roms
-FROM libraries AS l;
+FROM libraries AS l
+    INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
 
 CREATE VIEW IF NOT EXISTS vw_romcollections AS SELECT 
     r.id AS id, 

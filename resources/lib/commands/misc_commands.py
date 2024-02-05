@@ -233,7 +233,7 @@ def cmd_execute_migrations(args):
     migrations_in_database = uow.get_migrations_history()
 
     options = collections.OrderedDict()
-    migrations_files_available  = uow.get_migration_files(LooseVersion("0.0.0"))
+    migrations_files_available = uow.get_migration_files(LooseVersion("0.0.0"))
     
     for migration_file in migrations_files_available:
         file_name = migration_file.getBase()
@@ -247,6 +247,7 @@ def cmd_execute_migrations(args):
     if selected_file is None:
         return
     
+    logger.debug(f"RUN_DB_MIGRATIONS: Selected {selected_file}")
     migration_file = io.FileName(selected_file)
     version_to_store = LooseVersion(globals.addon_version)
     file_version = uow.get_version_from_migration_file(migration_file)
@@ -256,18 +257,19 @@ def cmd_execute_migrations(args):
         version_to_store = db_version
     
     dialog = kodi.ListDialog()
-    selected_index = dialog.select(kodi.translate(41089).format(migration_file.getBaseNoExt()),[
+    selected_index = dialog.select(kodi.translate(41089).format(migration_file.getBaseNoExt()), [
         kodi.translate(41090),
         kodi.translate(41091)
     ])
-    if not selected_index:
+    
+    if selected_index is None or selected_index < 0:
         return
     
     if selected_index == 0:
         if not kodi.dialog_yesno(kodi.translate(41055).format(migration_file.getBaseNoExt())):
             return
         
-    uow.migrate_database([migration_file], version_to_store, selected_index==1)
+    uow.migrate_database([migration_file], version_to_store, selected_index == 1)
     kodi.notify(kodi.translate(41016))
 
 

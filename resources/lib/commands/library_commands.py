@@ -20,11 +20,11 @@ from __future__ import division
 import logging
 import collections
 
-from akl import constants
+from akl import constants, platforms
 from akl.utils import kodi, io
 
 from resources.lib.commands.mediator import AppMediator
-from resources.lib import globals
+from resources.lib import globals, editors
 from resources.lib.repositories import UnitOfWork, LibrariesRepository, ROMsRepository, AelAddonRepository
 from resources.lib.domain import Library, AelAddon, AssetInfo, g_assetFactory
 
@@ -88,6 +88,7 @@ def cmd_edit_library(args):
 
     options = collections.OrderedDict()
     options['LIBRARY_EDIT_TITLE'] = kodi.translate(40863).format(library.get_name())
+    options['LIBRARY_EDIT_PLATFORM'] = kodi.translate(40864).format(library.get_platform())
     options['LIBRARY_EDIT_SCANNER'] = kodi.translate(42081)
     if library.has_launchers():
         options['EDIT_LIBRARY_LAUNCHERS'] = kodi.translate(42016)
@@ -137,6 +138,32 @@ def cmd_library_title(args):
                 kodi.translate(40812)))
         
     AppMediator.sync_cmd('EDIT_LIBRARY', args)
+
+
+@AppMediator.register('LIBRARY_EDIT_PLATFORM')
+def cmd_library_metadata_platform(args):
+    library_id: str = args['library_id'] if 'library_id' in args else None
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        repository = LibrariesRepository(uow)
+        library = repository.find(library_id)
+    
+        if editors.edit_field_by_list(library, kodi.translate(40807), platforms.AKL_platform_list,
+                                      library.get_platform, library.set_platform):
+            repository.update_library(library)
+            update_roms_too = kodi.dialog_yesno(kodi.translate(40982))
+            
+            if update_roms_too:
+                roms_repository = ROMsRepository(uow)
+                roms_to_update = roms_repository.find_roms_by_library(library)
+                platform_to_apply = library.get_platform()
+                for rom in roms_to_update:
+                    rom.set_platform(platform_to_apply)
+                    roms_repository.update_rom(rom)
+
+            uow.commit()
+            AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
+    AppMediator.sync_cmd('ROMCOLLECTION_EDIT_METADATA', args)
 
 
 @AppMediator.register('LIBRARY_EDIT_SCANNER')

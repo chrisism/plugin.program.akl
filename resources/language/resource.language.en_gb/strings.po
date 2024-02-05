@@ -869,10 +869,9 @@ msgctxt "#40981"
 msgid "Creating new AKL database"
 msgstr ""
 
-# TODO: Obsolete
-# msgctxt "#40982"
-# msgid "No scanners configured for this romcollection!"
-# msgstr ""
+msgctxt "#40982"
+msgid "Should new platform be applied to existing ROMs in this library?"
+msgstr ""
 
 msgctxt "#40983"
 msgid "{0} {1} mapped to {2}"
@@ -971,7 +970,7 @@ msgid "Configured ROM scanner '{0}'"
 msgstr ""
 
 msgctxt "#41007"
-msgid "Stored scanned ROMS in ROMs Collection '{0}'"
+msgid "Stored scanned ROMS in Library '{0}'"
 msgstr ""
 
 msgctxt "#41008"

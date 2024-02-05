@@ -28,7 +28,7 @@ import xbmcgui
 from akl.utils import kodi, io, text
 from akl import constants, settings
 
-from resources.lib.domain import MetaDataItemABC, AssetInfo, g_assetFactory
+from resources.lib.domain import EntityABC, MetaDataItemABC, AssetInfo, g_assetFactory
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +72,7 @@ def edit_field_by_int(obj_instance: MetaDataItemABC, metadata_name, get_method, 
     kodi.notify(kodi.translate(40986).format(object_name, metadata_name, new_value))
     return True
 
+
 #
 # The values of str_list are supposed to be unique.
 #
@@ -79,7 +80,7 @@ def edit_field_by_int(obj_instance: MetaDataItemABC, metadata_name, get_method, 
 # edit_field_by_list('Launcher', 'Platform', AEL_platform_list,
 #                          launcher.get_platform, launcher.set_platform)
 #
-def edit_field_by_list(obj_instance: MetaDataItemABC, metadata_name:str, str_list: list, get_method, set_method) -> bool:
+def edit_field_by_list(obj_instance: EntityABC, metadata_name: str, str_list: list, get_method, set_method) -> bool:
     object_name = obj_instance.get_object_name()
     old_value = get_method()
     if old_value in str_list:

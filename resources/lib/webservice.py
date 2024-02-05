@@ -32,6 +32,7 @@ from resources.lib.commands import api_commands
 
 logger = logging.getLogger(__name__)
 
+
 #################################################################################################
 class WebService(threading.Thread):
     
@@ -63,7 +64,7 @@ class WebService(threading.Thread):
 
         return alive
 
-    def stop(self, check_alive = False):
+    def stop(self, check_alive=False):
         
         if check_alive and not self.is_alive():
             logger.info("Webservice not running, so stopping not needed.")
@@ -282,4 +283,4 @@ class RequestHandler(BaseHTTPRequestHandler):
         if 'store/rom/updated' in api_path:
             return api_commands.cmd_store_scraped_single_rom(data)
         
-        return False
+        return

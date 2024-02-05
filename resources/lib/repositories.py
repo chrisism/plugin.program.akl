@@ -129,7 +129,7 @@ class ViewRepository(object):
 #
 class XmlConfigurationRepository(object):
 
-    def __init__(self, file_path: io.FileName, debug = False):
+    def __init__(self, file_path: io.FileName, debug=False):
         self.file_path = file_path
         self.debug = debug
         self.logger = logging.getLogger(__name__)
@@ -363,11 +363,11 @@ class UnitOfWork(object):
             
         self.create_empty_database(schema_file_path)
 
-    def migrate_database(self, migration_files:typing.List[io.FileName], new_db_version, skip_scripts_execution=False):
+    def migrate_database(self, migration_files: typing.List[io.FileName], new_db_version, skip_scripts_execution=False):
         if not skip_scripts_execution:
             # make copy of existing database file to execute migration on.
             temp_filepath = self._db_path.changeExtension(f".{new_db_version}.db")
-            backup_filepath = self._db_path.changeExtension(f".db.bak")
+            backup_filepath = self._db_path.changeExtension(".db.bak")
             if temp_filepath.exists():
                 temp_filepath.unlink()
             else:
@@ -391,7 +391,7 @@ class UnitOfWork(object):
                 if not skip_scripts_execution:
                     self.execute_script(sql_statements)
                 self.commit()
-            except:
+            except Exception:
                 self.logger.exception(f"Failure with database migration '{migration_file.getBase()}'")
                 kodi.notify_error(kodi.translate(40954))
                 failed = True
@@ -401,11 +401,11 @@ class UnitOfWork(object):
                 self.close_session()
 
             if file_version > check_version:
-                self.execute_single_session(temp_filepath, qry.AKL_INSERT_MIGRATION,[ 
-                                migration_file.getBase(), str(new_db_version),
-                                datetime.datetime.now(), not failed])
+                self.execute_single_session(temp_filepath, qry.AKL_INSERT_MIGRATION, [
+                    migration_file.getBase(), str(new_db_version),
+                    datetime.datetime.now(), not failed])
 
-        self.logger.info(f'Updating database schema version of app {globals.addon_id} to {new_db_version}')        
+        self.logger.info(f'Updating database schema version of app {globals.addon_id} to {new_db_version}')
         self.execute_single_session(temp_filepath, qry.AKL_UPDATE_VERSION, [
             str(new_db_version), globals.addon_id])
 
@@ -855,7 +855,7 @@ class ROMCollectionRepository(object):
 
             yield ROMCollection(romcollection_data, assets, asset_mappings=asset_mappings, rom_asset_mappings=rom_asset_mappings)
 
-    def find_romcollections_by_parent(self, category_id:str) -> typing.Iterator[ROMCollection]:
+    def find_romcollections_by_parent(self, category_id: str) -> typing.Iterator[ROMCollection]:
         
         if category_id in constants.VCATEGORIES:
             for collection in self.find_virtualcollections_by_category(category_id):
@@ -888,7 +888,7 @@ class ROMCollectionRepository(object):
                 
             yield ROMCollection(romcollection_data, assets, asset_mappings=asset_mappings, rom_asset_mappings=rom_asset_mappings)
 
-    def find_virtualcollections_by_category(self, vcategory_id:str) -> typing.Iterator[VirtualCollection]:
+    def find_virtualcollections_by_category(self, vcategory_id:  str) -> typing.Iterator[VirtualCollection]:
         query = self._get_collections_query_by_vcategory_id(vcategory_id)
         if query is None: return []
         
@@ -900,7 +900,7 @@ class ROMCollectionRepository(object):
             if not option_value: option_value = 'Undefined'
             yield VirtualCollectionFactory.create_by_category(vcategory_id, option_value)
             
-    def find_romcollections_by_rom(self, rom_id:str) -> typing.Iterator[ROMCollection]:
+    def find_romcollections_by_rom(self, rom_id: str) -> typing.Iterator[ROMCollection]:
         self._uow.execute(qry.SELECT_ROMCOLLECTIONS_BY_ROM, rom_id)
         result_set = self._uow.result_set()
         
@@ -1524,12 +1524,12 @@ class ROMsRepository(object):
     def remove_launcher(self, rom_id: str, launcher_id:str):
         self._uow.execute(qry.DELETE_ROM_LAUNCHER, rom_id, launcher_id)
 
-    def insert_tag(self, tag:str) -> str:
+    def insert_tag(self, tag: str) -> str:
         db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_TAG, db_id, tag)
         return db_id
     
-    def delete_tag(self, tag_id:str):
+    def delete_tag(self, tag_id: str):
         self._uow.execute(qry.DELETE_TAG, tag_id)
 
     def _insert_asset(self, asset: Asset, rom_obj: ROM):
@@ -1565,7 +1565,7 @@ class ROMsRepository(object):
             return
         self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())          
 
-    def _update_launchers(self, rom_id:str, rom_launchers:typing.List[ROMLauncherAddon]):        
+    def _update_launchers(self, rom_id: str, rom_launchers: typing.List[ROMLauncherAddon]):        
         for rom_launcher in rom_launchers:
             if rom_launcher.get_id() is None:
                 rom_launcher.set_id(text.misc_generate_random_SID())
@@ -1745,8 +1745,10 @@ class LibrariesRepository(object):
     def find_all(self) -> typing.Iterator[Library]:
         self._uow.execute(qry.SELECT_LIBRARIES)
         result_sets = self._uow.result_set()
+        
         for result_set in result_sets:
-            yield Library(result_set)
+            addon = AelAddon(result_set.copy())
+            yield Library(result_set, addon)
 
     def find_library_by_rom(self, rom_id) -> Library:
         self._uow.execute(qry.SELECT_LIBRARY_BY_ROM, rom_id)
@@ -1789,6 +1791,7 @@ class LibrariesRepository(object):
         self._uow.execute(qry.INSERT_LIBRARY,
                           library.get_id(),
                           library.get_name(),
+                          library.get_platform(),
                           assets_path.getPath() if assets_path is not None else None,
                           library.get_last_scan_timestamp(),
                           library.get_settings_str(),
@@ -1804,6 +1807,7 @@ class LibrariesRepository(object):
         
         self._uow.execute(qry.UPDATE_LIBRARY,
                           library.get_name(),
+                          library.get_platform(),
                           assets_path.getPath() if assets_path is not None else None,
                           library.get_last_scan_timestamp(),
                           library.get_settings_str(),

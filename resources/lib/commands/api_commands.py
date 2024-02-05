@@ -27,7 +27,7 @@ from akl import constants
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
-from resources.lib.repositories import UnitOfWork, AelAddonRepository, ROMCollectionRepository, ROMsRepository
+from resources.lib.repositories import UnitOfWork, AelAddonRepository, ROMCollectionRepository, ROMsRepository, LibrariesRepository
 from resources.lib.domain import ROM
 
 logger = logging.getLogger(__name__)
@@ -89,76 +89,72 @@ def cmd_set_launcher_args(args) -> bool:
 # ROMCollection scanner API commands
 # -------------------------------------------------------------------------------------------------
 def cmd_set_scanner_settings(args) -> bool:
+    # TODO: backwards compatiblity
     romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
-    scanner_id: str = args['akl_addon_id'] if 'akl_addon_id' in args else None
-    addon_id: str = args['addon_id'] if 'addon_id' in args else None
+    library_id: str = args['library_id'] if 'library_id' in args else None
+    library_id = romcollection_id if not library_id else library_id
+    
     settings: dict = args['settings'] if 'settings' in args else None
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        addon_repository = AelAddonRepository(uow)
-        romcollection_repository = ROMCollectionRepository(uow)
+        lib_repository = LibrariesRepository(uow)
+        library = lib_repository.find(library_id)
         
-        addon = addon_repository.find_by_addon_id(addon_id, constants.AddonType.SCANNER)
-        romcollection = romcollection_repository.find_romcollection(romcollection_id)
-        
-        if scanner_id is None:
-            romcollection.add_scanner(addon, settings)       
-        else:
-            scanner = romcollection.get_scanner(scanner_id)
-            scanner.set_settings(settings)
+        library.set_settings(settings)
             
-        romcollection_repository.update_romcollection(romcollection)
+        lib_repository.update_library(library)
         uow.commit()
     
-    kodi.notify(kodi.translate(41006).format(addon.get_name()))
+    kodi.notify(kodi.translate(41006).format(library.addon.get_name()))
     
     if kodi.dialog_yesno(kodi.translate(41051)):
-        AppMediator.async_cmd('SCAN_ROMS', {'romcollection_id': romcollection_id})
+        AppMediator.async_cmd('SCAN_ROMS', {'library_id': library_id})
     else:
-        AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id})
+        AppMediator.async_cmd('EDIT_LIBRARY', {'library_id': library_id})
     return True
 
+
 def cmd_store_scanned_roms(args) -> bool:
-    romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
-    scanner_id:str       = args['akl_addon_id'] if 'akl_addon_id' in args else None
-    new_roms:list        = args['roms'] if 'roms' in args else None
+    # TODO: backwards compatiblity
+    romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
+    library_id: str = args['library_id'] if 'library_id' in args else None
+    library_id = romcollection_id if not library_id else library_id
+    
+    new_roms: list = args['roms'] if 'roms' in args else None
     
     if new_roms is None:
         return
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        romcollection_repository = ROMCollectionRepository(uow)
-        rom_repository           = ROMsRepository(uow)
-        
-        romcollection = romcollection_repository.find_romcollection(romcollection_id)
-        
+        rom_repository = ROMsRepository(uow)
+        lib_repository = LibrariesRepository(uow)
+        library = lib_repository.find(library_id)
+
         for rom_data in new_roms:
             api_rom_obj = ROMObj(rom_data)
             
             rom_obj = ROM()
             rom_obj.update_with(api_rom_obj, overwrite_existing_metadata=True, update_scanned_data=True)
-            rom_obj.set_platform(romcollection.get_platform())
-            rom_obj.scanned_with(scanner_id)
-            rom_obj.apply_romcollection_asset_paths(romcollection)
+            rom_obj.set_platform(library.get_platform())
+            rom_obj.scanned_with(library.get_id())
+            rom_obj.apply_library_asset_paths(library)
                                     
             rom_repository.insert_rom(rom_obj)
-            romcollection_repository.add_rom_to_romcollection(romcollection.get_id(), rom_obj.get_id())
         uow.commit()
     
-    kodi.notify(kodi.translate(41007).format(romcollection.get_name()))
-    
-    AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})
-    AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})  
+    kodi.notify(kodi.translate(41007).format(library.get_name()))
+
+    AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
     AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': constants.VCATEGORY_TITLE_ID})
-    AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id})
+    AppMediator.async_cmd('EDIT_LIBRARY', {'library_id': library_id})
     return True
 
 def cmd_remove_roms(args) -> bool:
     romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
-    scanner_id:str       = args['akl_addon_id'] if 'akl_addon_id' in args else None
-    rom_ids:list         = args['rom_ids'] if 'rom_ids' in args else None
+    scanner_id:str = args['akl_addon_id'] if 'akl_addon_id' in args else None
+    rom_ids:list = args['rom_ids'] if 'rom_ids' in args else None
     
     if rom_ids is None:
         return
@@ -166,8 +162,8 @@ def cmd_remove_roms(args) -> bool:
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         romcollection_repository = ROMCollectionRepository(uow)
-        rom_repository           = ROMsRepository(uow)
-        romcollection            = romcollection_repository.find_romcollection(romcollection_id)
+        rom_repository = ROMsRepository(uow)
+        romcollection = romcollection_repository.find_romcollection(romcollection_id)
         
         for rom_id in rom_ids:
             rom_repository.delete_rom(rom_id)
