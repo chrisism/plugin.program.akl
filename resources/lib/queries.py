@@ -206,8 +206,8 @@ SELECT_ROM_ASSET_MAPPINGS_BY_CATEGORY = """
 
 SELECT_ROMS_BY_LIBRARY = "SELECT r.* FROM vw_roms AS r WHERE r.scanned_by_id = ?"
 SELECT_ROM_ASSETS_BY_LIBRARY = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
-SELECT_ROM_ASSETPATHS_BY_LIBRARY = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
-SELECT_ROM_TAGS_BY_LIBRARY = "SELECT rt.* FROM vw_rom_tags AS rt INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_ASSETPATHS_BY_LIBRARY = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms AS r ON r.id = rap.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_TAGS_BY_LIBRARY = "SELECT rt.* FROM vw_rom_tags AS rt INNER JOIN roms AS r ON r.id = rt.rom_id AND r.scanned_by_id = ?"
 SELECT_ROM_ASSET_MAPPINGS_BY_LIBRARY = """
                                     SELECT am.*, mm.metadata_id FROM assetmappings AS am 
                                     INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
