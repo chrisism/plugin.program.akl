@@ -22,8 +22,8 @@
 # Views.py contains all methods accessible by URL commands (using routes/paths)
 # triggered from Kodi. The methods will only perform operations to render and visualize
 # the list items in the containers.
-# AKL follows a (sortof) CQRS architecture, meaning that all actions to gather the items 
-# or to perform commands are delegated to the queries.py file and different **_commands.py 
+# AKL follows a (sortof) CQRS architecture, meaning that all actions to gather the items
+# or to perform commands are delegated to the queries.py file and different **_commands.py
 # files. Query methods are called directly and the Command methods are called through
 # sending notifications to the AKL service (Monitor).
 #
@@ -51,6 +51,7 @@ from resources.lib.globals import router
 
 logger = logging.getLogger(__name__)
 
+
 # ---------------------------------------------------------------------------------------------
 # This is the plugin entry point.
 # ---------------------------------------------------------------------------------------------
@@ -59,10 +60,10 @@ def run_plugin(addon_argv):
     logger.debug('------------ Called Advanced Kodi Launcher run_plugin(addon_argv) ------------')
     logger.debug(f'addon.id         "{globals.addon_id}"')
     logger.debug(f'addon.version    "{globals.addon_version}"')
-    for i in range(len(sys.argv)): 
+    for i in range(len(sys.argv)):
         logger.debug(f'sys.argv[{i}] "{sys.argv[i]}"')
 
-    # --- Bootstrap object instances --- 
+    # --- Bootstrap object instances ---
     globals.g_bootstrap_instances()
 
     argv = None
@@ -80,6 +81,7 @@ def run_plugin(addon_argv):
         
     logger.debug('Advanced Kodi Launcher run_plugin() exit')
 
+
 # -------------------------------------------------------------------------------------------------
 # LisItem rendering
 # -------------------------------------------------------------------------------------------------
@@ -90,7 +92,8 @@ def vw_route_render_root():
     container_context_items = viewqueries.qry_container_context_menu_items(container)
 
     _render_list_items(container, container_context_items)
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
+
 
 @router.route('/category/<view_id>')
 @router.route('/collection/<view_id>')
@@ -116,14 +119,16 @@ def vw_route_render_view(view_id: str):
     else:
         _render_list_items(container, container_context_items, filter)
         
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
+
 
 @router.route('/collection/<view_id>/search')
 def vw_route_search_collection(view_id: str):
     logger.debug("Executing route: vw_route_search_collection")
-    #vw_route_render_collection(view_id)
+    # vw_route_render_collection(view_id)
     AppMediator.sync_cmd('SEARCH', {'romcollection_id': view_id})
     kodi.refresh_container()
+
 
 @router.route('/category/virtual/<view_id>')
 @router.route('/collection/virtual/<view_id>')
@@ -149,8 +154,9 @@ def vw_route_render_virtual_view(view_id: str):
     else:
         _render_list_items(container, container_context_items, filter)
         
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
-    
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
+
+
 @router.route('/collection/virtual/<category_id>/items')
 def vw_route_render_virtual_items_view(category_id: str):
     collection_value = router.args["value"][0]
@@ -227,12 +233,14 @@ def vw_edit_category(category_id: str):
 def vw_add_rom_to_category(category_id: str = None, parent_category_id: str = None):
     AppMediator.async_cmd('ADD_STANDALONE_ROM', {'category_id': category_id,  'parent_category_id': parent_category_id})
 
+
 @router.route('/romcollection/add')
 @router.route('/romcollection/add/<category_id>')
 @router.route('/romcollection/add/<category_id>/in')
 @router.route('/romcollection/add/<category_id>/in/<parent_category_id>')
 def vw_add_romcollection(category_id: str = None, parent_category_id: str = None):
     AppMediator.async_cmd('ADD_ROMCOLLECTION', {'category_id': category_id, 'parent_category_id': parent_category_id})
+
 
 @router.route('/romcollection/view/<romcollection_id>')
 def vw_view_romcollection(romcollection_id: str):
@@ -253,6 +261,7 @@ def vw_edit_library(library_id: str):
 @router.route('/rom/edit/<rom_id>')
 def vw_edit_rom(rom_id: str):
     AppMediator.async_cmd('EDIT_ROM', {'rom_id': rom_id })
+
 
 # -------------------------------------------------------------------------------------------------
 # ROM execution / view
@@ -287,13 +296,14 @@ def vw_view_rom_assets(rom_id):
 
 
 @router.route('/rom/<rom_id>/scanneddata')
-def vw_view_rom_metadata(rom_id):
+def vw_view_list_rom_scanneddata(rom_id):
     container = viewqueries.qry_get_view_scanned_data(rom_id)
     _render_list_items(container)
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
+
 
 @router.route('/rom/<rom_id>/view/scanneddata')
-def vw_view_rom_metadata(rom_id):
+def vw_view_rom_scanneddata(rom_id):
     field = router.args['field'][0] if 'field' in router.args else None
     if not field:
         kodi.notify_warn(kodi.translate(40997))
@@ -302,13 +312,14 @@ def vw_view_rom_metadata(rom_id):
     requested_item = next((i for i in container['items'] if i['name'] == field), None)
     xbmcgui.Dialog().textviewer(str(field), str(requested_item['name2']))
 
+
 # -------------------------------------------------------------------------------------------------
 # UI render methods
 # -------------------------------------------------------------------------------------------------
 #
 # Renders items for a view.
 #
-def _render_list_items(container_data:dict, container_context_items = [], filter_method:ListFilter = None):
+def _render_list_items(container_data: dict, container_context_items=[], filter_method: ListFilter = None):
     vw_misc_set_all_sorting_methods()
     vw_misc_set_AEL_Content(container_data['obj_type'] if 'obj_type' in container_data else constants.OBJ_NONE)
     vw_misc_clear_AEL_Launcher_Content()
@@ -333,6 +344,7 @@ def _render_list_items(container_data:dict, container_context_items = [], filter
             list_item.addContextMenuItems(item_context_items + container_context_items)
 
         xbmcplugin.addDirectoryItem(handle = router.handle, url = url_str, listitem = list_item, isFolder = folder_flag)
+
 
 def _render_list_item(list_item_data: dict) -> xbmcgui.ListItem:
     if list_item_data is None:
@@ -446,14 +458,16 @@ def vw_misc_set_AEL_Content(AEL_Content_Value):
     else:
         logger.error('vw_misc_set_AEL_Content() Invalid AEL_Content_Value "{0}"'.format(AEL_Content_Value))
 
+
 def vw_misc_clear_AEL_Launcher_Content():
     xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_LAUNCHER_NAME_LABEL, '')
     xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_LAUNCHER_ICON_LABEL, '')
     xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_LAUNCHER_CLEARLOGO_LABEL, '')
     xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_LAUNCHER_PLATFORM_LABEL, '')
     xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_LAUNCHER_BOXSIZE_LABEL, '')
+
     
-def vw_create_filter(filter_on_type:str, filter_on_value:str) -> ListFilter:
+def vw_create_filter(filter_on_type: str, filter_on_value: str) -> ListFilter:
     if filter_on_type is None:
         return None
     if filter_on_value == 'UNDEFINED':
@@ -481,6 +495,7 @@ def vw_create_filter(filter_on_type:str, filter_on_value:str) -> ListFilter:
     logger.debug(f'Filter called without proper filter type. "{filter_on_type}"')
     return None
 
+
 def vw_get_object_type_by_url(url: str):
     if 'category' in url or 'categories' in url:
         if 'virtual' in url:
@@ -496,6 +511,7 @@ def vw_get_object_type_by_url(url: str):
         return constants.OBJ_LIBRARY
     return constants.OBJ_NONE
 
+
 class ListFilter(object):
     __metaclass__ = abc.ABCMeta
     
@@ -506,38 +522,47 @@ class ListFilter(object):
     def is_valid(self, subject:dict) -> bool:
         return True
     
+
 class OnTitleFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'name' in subject and subject['name'].lower().find(self.filter_value) > -1
     
+
 class OnDeveloperFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'info' in subject and 'studio' in subject['info'] and subject['info']['studio'] == self.filter_value  
+
 
 class OnGenreFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'info' in subject and 'genre' in subject['info'] and subject['info']['genre'] == self.filter_value  
 
+
 class OnReleaseYearFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'info' in subject and 'year' in subject['info'] and subject['info']['year'] == self.filter_on_value    
+
 
 class OnRatingFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'info' in subject and 'rating' in subject['info'] and subject['info']['rating'] == self.filter_on_value    
     
+
 class OnESRBFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'properties' in subject and 'esrb' in subject['properties'] and subject['properties']['esrb'] == self.filter_on_value   
     
+
 class OnPEGIFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'properties' in subject and 'pegi' in subject['properties'] and subject['properties']['pegi'] == self.filter_on_value   
     
+
 class OnNumberOfPlayersFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'properties' in subject and 'nplayers' in subject['properties'] and subject['properties']['nplayers'] == self.filter_on_value  
     
+
 class OnPlatformFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
         return 'properties' in subject and 'platform' in subject['properties'] and subject['properties']['platform'] == self.filter_on_value

@@ -92,7 +92,7 @@ def cmd_rom_metadata(args):
     NFO_found_str = kodi.translate(42019) if NFO_FileName and NFO_FileName.exists() else kodi.translate(42020)
 
     options = collections.OrderedDict()
-    options['ROM_EDIT_METADATA_TITLE'] = kodi.translate(40863).format(rom.get_name)
+    options['ROM_EDIT_METADATA_TITLE'] = kodi.translate(40863).format(rom.get_name())
     options['ROM_EDIT_METADATA_PLATFORM'] = kodi.translate(40864).format(rom.get_platform())
     options['ROM_EDIT_METADATA_RELEASEYEAR'] = kodi.translate(40865).format(rom.get_releaseyear())
     options['ROM_EDIT_METADATA_GENRE'] = kodi.translate(40867).format(rom.get_genre())
@@ -103,7 +103,7 @@ def cmd_rom_metadata(args):
     options['ROM_EDIT_METADATA_PEGI'] = kodi.translate(40873).format(rom.get_pegi_rating())
     options['ROM_EDIT_METADATA_RATING'] = kodi.translate(40869).format(rating)
     options['ROM_EDIT_METADATA_PLOT'] = kodi.translate(40870).format(plot_str)
-    options['ROM_EDIT_METADATA_TAGS'] =  kodi.translate(40866)
+    options['ROM_EDIT_METADATA_TAGS'] = kodi.translate(40866)
     options['ROM_EDIT_METADATA_BOXSIZE'] = kodi.translate(40875).format(rom.get_box_sizing())
     options['ROM_LOAD_PLOT'] = kodi.translate(40879)
     options['ROM_IMPORT_NFO_FILE_DEFAULT'] = kodi.translate(40876).format(NFO_found_str)
@@ -121,13 +121,14 @@ def cmd_rom_metadata(args):
 
     # >> Execute edit metadata atomic subcommand.
     # >> Then, execute recursively this submenu again.
-    logger.debug('cmd_rom_metadata(EDIT_METADATA) Selected {0}'.format(selected_option))
+    logger.debug(f'cmd_rom_metadata(EDIT_METADATA) Selected {selected_option}')
     AppMediator.sync_cmd(selected_option, args)
-    
+
+  
 @AppMediator.register('ROM_EDIT_ASSETS')
 def cmd_rom_assets(args):
-    rom_id:str = args['rom_id'] if 'rom_id' in args else None
-    preselected_option = args['selected_asset'] if 'selected_asset' in args else None    
+    rom_id: str = args['rom_id'] if 'rom_id' in args else None
+    preselected_option = args['selected_asset'] if 'selected_asset' in args else None
        
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
@@ -167,7 +168,7 @@ def cmd_rom_assets(args):
     
 @AppMediator.register('ROM_EDIT_DEFAULT_ASSETS')
 def cmd_rom_edit_default_assets(args):
-    rom_id:str = args['rom_id'] if 'rom_id' in args else None
+    rom_id: str = args['rom_id'] if 'rom_id' in args else None
     preselected_option = args['selected_asset'] if 'selected_asset' in args else None
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)

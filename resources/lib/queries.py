@@ -288,7 +288,7 @@ DELETE_ROMS_BY_COLLECTION = "DELETE FROM roms WHERE id IN (SELECT rc.rom_id FROM
 SELECT_ROM_SCANNED_DATA = "SELECT s.* FROM scanned_roms_data AS s WHERE s.rom_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_SET = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_romcollection AS rs ON rs.rom_id = s.rom_id AND rs.romcollection_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_CATEGORY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_category AS rc ON rc.rom_id = s.rom_id AND rc.category_id = ?"
-SELECT_ROM_SCANNED_DATA_BY_LIBRARY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN rom AS r ON r.rom_id = s.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_SCANNED_DATA_BY_LIBRARY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms AS r ON r.id = s.rom_id AND r.scanned_by_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_ROOT_CATEGORY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_category AS rc ON rc.rom_id = s.rom_id AND rc.category_id IS NULL"
 DELETE_SCANNED_DATA = "DELETE FROM scanned_roms_data WHERE rom_id = ?"
 
