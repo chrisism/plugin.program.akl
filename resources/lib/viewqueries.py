@@ -165,18 +165,18 @@ def qry_get_view_metadata(rom_id: str):
         rom = roms_repository.find_rom(rom_id)
 
         items = []
+        items.append({
+            'id': 40801, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/{constants.VCATEGORY_GENRE_ID}/items?value={rom.get_genre()}'),
+            'name': kodi.translate(40801), 'name2': rom.get_genre(),
+            'info': {}, 'art': {}, 'properties': {'field': 'genre'}})
         items.append({ 
-                'id': 40801, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/{constants.VCATEGORY_GENRE_ID}/items?value={rom.get_genre()}'),
-                'name': kodi.translate(40801), 'name2': rom.get_genre(),
-                'info': {}, 'art': {}, 'properties': {'field': 'genre'}})
-        items.append({ 
-                'id': 40803, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/{constants.VCATEGORY_YEARS_ID}/items?value={rom.get_releaseyear()}'),
-                'name': kodi.translate(40803), 'name2': rom.get_releaseyear(),
-                'info': {}, 'art': {}, 'properties': {'field': 'releaseyear'}})
+            'id': 40803, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/{constants.VCATEGORY_YEARS_ID}/items?value={rom.get_releaseyear()}'),
+            'name': kodi.translate(40803), 'name2': rom.get_releaseyear(),
+            'info': {}, 'art': {}, 'properties': {'field': 'releaseyear'}})
         items.append({ 
                 'id': 40802, 'is_folder': False, 'type': 'game',
                 'url': globals.router.url_for_path(
@@ -320,6 +320,7 @@ def qry_get_libraries():
         for library in libraries:
             listitem_name = library.get_name()
             container['items'].append({
+                'id': library.get_id(),
                 'name': listitem_name,
                 'url': globals.router.url_for_path(f'library/{library.get_id()}'),
                 'is_folder': True,
@@ -373,7 +374,9 @@ def qry_get_utilities_items():
             'overlay': 4
         },
         'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE}
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40856),
@@ -412,7 +415,9 @@ def qry_get_utilities_items():
             'overlay': 4
         },
         'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40902),
@@ -578,7 +583,7 @@ def qry_get_globalreport_items():
             'plot': kodi.translate(44030),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
+        'art': {'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     
@@ -592,8 +597,10 @@ def qry_get_globalreport_items():
             'plot': kodi.translate(44031),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     return container
 
