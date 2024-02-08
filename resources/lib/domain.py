@@ -705,37 +705,16 @@ class ScraperAddon(ROMAddon):
         
     def set_scraper_settings(self, settings: ScraperSettings):
         self.entity_data['settings'] = json.dumps(settings.get_data_dic())
-        
-    def get_scrape_command(self, rom: ROM) -> dict:
+           
+    def get_scrape_command(self, entity: EntityABC) -> dict:
         return {
             '--cmd': 'scrape',
             '--type': constants.AddonType.SCRAPER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
+            '--entity_id': entity.get_id(),
+            '--entity_type': entity.get_type(),
             '--akl_addon_id': self.addon.get_id(),
-            '--rom_id': rom.get_id(),
-            '--settings': io.parse_to_json_arg(self.get_settings())
-        }
-        
-    def get_scrape_command_for_collection(self, collection: ROMCollection) -> dict:
-        return {
-            '--cmd': 'scrape',
-            '--type': constants.AddonType.SCRAPER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': globals.WEBSERVER_PORT,
-            '--akl_addon_id': self.addon.get_id(),
-            '--romcollection_id': collection.get_id(),
-            '--settings': io.parse_to_json_arg(self.get_settings())
-        }
-        
-    def get_scrape_command_for_library(self, library: Library) -> dict:
-        return {
-            '--cmd': 'scrape',
-            '--type': constants.AddonType.SCRAPER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': globals.WEBSERVER_PORT,
-            '--akl_addon_id': self.addon.get_id(),
-            '--library_id': library.get_id(),
             '--settings': io.parse_to_json_arg(self.get_settings())
         }
  

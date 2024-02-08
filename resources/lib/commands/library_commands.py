@@ -277,7 +277,7 @@ def cmd_set_rom_asset_dirs(args):
             path = library.get_asset_path(asset_info)
             if path:
                 gui_listitem = xbmcgui.ListItem(label=kodi.translate(42084).format(asset_info.plural), label2=path.getPath())
-                gui_listitem.setArt({'icon' : 'DefaultFolder.png'})
+                gui_listitem.setArt({'icon': 'DefaultFolder.png'})
                 list_items[asset_info] = gui_listitem
 
         dialog = kodi.OrdDictionaryDialog()

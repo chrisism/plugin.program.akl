@@ -1322,10 +1322,8 @@ class ROMsRepository(object):
                 for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set) 
             }
             yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
-
-    
-    
-    def find_rom(self, rom_id:str) -> ROM:
+  
+    def find_rom(self, rom_id: str) -> ROM:
         self._uow.execute(qry.SELECT_ROM, rom_id)
         rom_data = self._uow.single_result()
 
