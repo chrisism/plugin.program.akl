@@ -71,7 +71,6 @@ def qry_get_root_items():
             'overlay': 4
         },
         'art': {
-        'art': {
             'fanart': listitem_fanart,
             'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
             'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
@@ -119,14 +118,7 @@ def qry_get_root_items():
                 'fanart': listitem_fanart,
                 'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_icon.png').getPath(),
                 'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_poster.png').getPath()
-            'art': {
-                'fanart': listitem_fanart,
-                'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_icon.png').getPath(),
-                'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_poster.png').getPath()
             },
-            'properties': {
-                'obj_type': constants.OBJ_NONE
-            }
             'properties': {
                 'obj_type': constants.OBJ_NONE
             }
@@ -456,8 +448,10 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44021),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40904),
@@ -469,12 +463,14 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44022),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40905),
-        'url': globals.router.url_for_path('execute/command/export_to_legacy_xml'), 
+        'url': globals.router.url_for_path('execute/command/export_to_legacy_xml'),
         'is_folder': False,
         'type': 'video',
         'info': {
@@ -482,8 +478,10 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44023),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40906),
@@ -495,8 +493,10 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44024),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40907),
@@ -508,8 +508,10 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44025),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40908),
@@ -517,12 +519,14 @@ def qry_get_utilities_items():
         'is_folder': False,
         'type': 'video',
         'info': {
-            'title':  kodi.translate(40908),
+            'title': kodi.translate(40908),
             'plot': kodi.translate(44026),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40909),
@@ -534,8 +538,10 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44027),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     
     return container
@@ -545,8 +551,8 @@ def qry_get_utilities_items():
 # Global Reports items
 #
 def qry_get_globalreport_items():
-     # --- Common artwork for all Utilities VLaunchers ---
-    listitem_icon   = globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_icon.png').getPath()
+    # --- Common artwork for all Utilities VLaunchers ---
+    listitem_icon = globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_icon.png').getPath()
     listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()
     listitem_poster = globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_poster.png').getPath()
     
@@ -568,8 +574,10 @@ def qry_get_globalreport_items():
             'plot': kodi.translate(44028),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     
     # --- Global ROM Audit statistics  ---
@@ -583,8 +591,10 @@ def qry_get_globalreport_items():
             'plot': kodi.translate(44029),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     
     container['items'].append({
@@ -597,8 +607,10 @@ def qry_get_globalreport_items():
             'plot': kodi.translate(44030),
             'overlay': 4
         },
-        'art': {'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     
     container['items'].append({
