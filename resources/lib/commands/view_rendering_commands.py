@@ -45,7 +45,8 @@ def cmd_render_views_data(args):
         views_repository = ViewRepository(globals.g_PATHS)
         libraries_repository = LibrariesRepository(uow)
         
-        _render_root_view(categories_repository, romcollections_repository, roms_repository, libraries_repository, views_repository, render_sub_views=True)
+        _render_root_view(categories_repository, romcollections_repository, roms_repository,
+                          libraries_repository, views_repository, render_sub_views=True)
     
         # backwards compatibility
         views_repository.cleanup_obsolete_views()
@@ -84,18 +85,18 @@ def cmd_render_virtual_views(args):
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     do_notification = not settings.getSettingAsBool("display_hide_rendering_notifications")
     with uow:
-        categories_repository     = CategoryRepository(uow)
+        categories_repository = CategoryRepository(uow)
         romcollections_repository = ROMCollectionRepository(uow)
-        roms_repository           = ROMsRepository(uow)
-        views_repository          = ViewRepository(globals.g_PATHS)              
+        roms_repository = ROMsRepository(uow)
+        views_repository = ViewRepository(globals.g_PATHS)
         
         # cleanup first
         views_repository.cleanup_all_virtual_category_views()
                 
         root_vcategory = VirtualCategoryFactory.create(constants.VCATEGORY_ROOT_ID)
         logger.debug('Processing root virtual category')
-        _render_category_view(root_vcategory, categories_repository, romcollections_repository, 
-                                roms_repository, views_repository, True)  
+        _render_category_view(root_vcategory, categories_repository, romcollections_repository,
+                              roms_repository, views_repository, True)
 
         for vcollection_id in constants.VCOLLECTIONS:
             vcollection = VirtualCollectionFactory.create(vcollection_id)
@@ -116,14 +117,14 @@ def cmd_render_virtual_views(args):
 
 
 @AppMediator.register('RENDER_VCATEGORY_VIEWS')
-def cmd_render_vcategory(args):
+def cmd_render_vcategories(args):
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     do_notification = not settings.getSettingAsBool("display_hide_rendering_notifications")
     with uow:
-        categories_repository     = CategoryRepository(uow)
+        categories_repository = CategoryRepository(uow)
         romcollections_repository = ROMCollectionRepository(uow)
-        roms_repository           = ROMsRepository(uow)
-        views_repository          = ViewRepository(globals.g_PATHS)              
+        roms_repository = ROMsRepository(uow)
+        views_repository = ViewRepository(globals.g_PATHS)
         
         # cleanup first
         views_repository.cleanup_all_virtual_category_views()
@@ -207,9 +208,9 @@ def cmd_render_library_view_data(args):
         roms_repository = ROMsRepository(uow)
         views_repository = ViewRepository(globals.g_PATHS)
              
-        library = library_repository.find(library_id)    
+        library = library_repository.find(library_id)
         library_view_data = _render_library_view(library, roms_repository)
-        views_repository.store_view(library.get_id(), library.get_type(), library_view_data)  
+        views_repository.store_view(library.get_id(), library.get_type(), library_view_data)
     
     if do_notification:      
         kodi.notify(kodi.translate(40966))
@@ -339,7 +340,7 @@ def _render_root_view(categories_repository: CategoryRepository, romcollections_
     for library in libraries:
         logger.debug(f'Processing library "{library.get_name()}"')
         library_view_data = _render_library_view(library, roms_repository)
-        views_repository.store_view(library.get_id(), library.get_type(), library_view_data)        
+        views_repository.store_view(library.get_id(), library.get_type(), library_view_data)
 
     for rom in root_roms:
         try:

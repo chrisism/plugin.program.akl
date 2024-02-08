@@ -76,22 +76,22 @@ class ViewRepository(object):
         self.logger.debug('store_root_view(): Storing data in file {}'.format(repository_file.getPath()))
         repository_file.writeJson(view_data)
 
-    def store_view(self, view_id:str, object_type:int, view_data):        
+    def store_view(self, view_id: str, object_type: int, view_data):        
         repository_file = self._assemble_view_file_name(view_id, object_type)
-        if view_data is None: 
+        if view_data is None:
             if repository_file.exists():
-                self.logger.debug('store_view(): No data for file {}. Removing file'.format(repository_file.getPath()))
+                self.logger.debug(f'store_view(): No data for file {repository_file.getPath()}. Removing file')
                 repository_file.unlink()
             return
 
         self.logger.debug(f'store_view(): Storing data in file {repository_file.getPath()}')
         repository_file.writeJson(view_data)
 
-    def cleanup_views(self, view_ids_to_keep:typing.List[str]):
+    def cleanup_views(self, view_ids_to_keep: typing.List[str]):
         view_files = self.paths.VIEWS_DIR.scanFilesInPath('*.json')
         for view_file in view_files:
             view_id = view_file.getBaseNoExt().replace('collection_', '').replace('category_', '').replace('library_', '')
-            if not view_id in view_ids_to_keep:
+            if view_id not in view_ids_to_keep:
                 self.logger.info(f'Removing file for view "{view_id}"')
                 view_file.unlink()
 

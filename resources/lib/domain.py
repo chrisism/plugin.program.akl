@@ -478,11 +478,14 @@ class Library(ROMAddon):
     def __init__(self,
                  entity_data: dict = None,
                  addon: AelAddon = None,
-                 asset_paths: typing.List[AssetPath] = [],
+                 asset_paths_data: typing.List[AssetPath] = [],
                  launchers_data: typing.List[ROMLauncherAddon] = []):
         
-        self.asset_paths = asset_paths
         self.launchers_data = launchers_data
+        self.asset_paths: typing.Dict[str, AssetPath] = {}
+        if asset_paths_data is not None:
+            for path in asset_paths_data:
+                self.asset_paths[path.get_asset_info_id()] = path
         
         if entity_data is None:
             entity_data = {
@@ -1889,16 +1892,16 @@ class ROM(MetaDataItemABC):
         # See https://docs.python.org/2/library/re.html#re.findall
         # If RE has no groups it returns a list of strings with the matches.
         # If RE has groups then it returns a list of groups.
-        item_title     = re.findall('<title>(.*?)</title>', nfo_str)
-        item_year      = re.findall('<year>(.*?)</year>', nfo_str)
-        item_genre     = re.findall('<genre>(.*?)</genre>', nfo_str)
+        item_title = re.findall('<title>(.*?)</title>', nfo_str)
+        item_year = re.findall('<year>(.*?)</year>', nfo_str)
+        item_genre = re.findall('<genre>(.*?)</genre>', nfo_str)
         item_developer = re.findall('<developer>(.*?)</developer>', nfo_str)
-        item_nplayers  = re.findall('<nplayers>(.*?)</nplayers>', nfo_str)
-        item_esrb      = re.findall('<esrb>(.*?)</esrb>', nfo_str)
-        item_pegi      = re.findall('<pegi>(.*?)</pegi>', nfo_str)
-        item_rating    = re.findall('<rating>(.*?)</rating>', nfo_str)
-        item_plot      = re.findall('<plot>(.*?)</plot>', nfo_str)
-        item_trailer   = re.findall('<trailer>(.*?)</trailer>', nfo_str)
+        item_nplayers = re.findall('<nplayers>(.*?)</nplayers>', nfo_str)
+        item_esrb = re.findall('<esrb>(.*?)</esrb>', nfo_str)
+        item_pegi = re.findall('<pegi>(.*?)</pegi>', nfo_str)
+        item_rating = re.findall('<rating>(.*?)</rating>', nfo_str)
+        item_plot = re.findall('<plot>(.*?)</plot>', nfo_str)
+        item_trailer = re.findall('<trailer>(.*?)</trailer>', nfo_str)
 
         # >> Future work: ESRB and maybe nplayer fields must be sanitized.
         if len(item_title) > 0:     self.set_name(text.unescape_XML(item_title[0]))

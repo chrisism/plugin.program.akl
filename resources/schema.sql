@@ -249,7 +249,7 @@ CREATE TABLE IF NOT EXISTS rom_assetpaths(
 CREATE TABLE IF NOT EXISTS library_assetpaths(
     library_id TEXT,
     assetpaths_id TEXT,
-    FOREIGN KEY (library_id) REFERENCES library (id) 
+    FOREIGN KEY (library_id) REFERENCES libraries (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY (assetpaths_id) REFERENCES assetpaths (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
@@ -383,7 +383,7 @@ CREATE VIEW IF NOT EXISTS vw_library_asset_paths AS SELECT
     a.asset_type
 FROM assetpaths AS a
  INNER JOIN library_assetpaths AS la ON a.id = la.assetpaths_id 
- INNER JOIN library AS l ON la.library_id = l.id;
+ INNER JOIN libraries AS l ON la.library_id = l.id;
 
 CREATE VIEW IF NOT EXISTS vw_rom_asset_paths AS SELECT
     a.id as id,

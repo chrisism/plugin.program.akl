@@ -71,6 +71,7 @@ def qry_get_root_items():
             'overlay': 4
         },
         'art': {
+        'art': {
             'fanart': listitem_fanart,
             'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
             'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
@@ -118,7 +119,14 @@ def qry_get_root_items():
                 'fanart': listitem_fanart,
                 'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_icon.png').getPath(),
                 'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_poster.png').getPath()
+            'art': {
+                'fanart': listitem_fanart,
+                'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_icon.png').getPath(),
+                'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_poster.png').getPath()
             },
+            'properties': {
+                'obj_type': constants.OBJ_NONE
+            }
             'properties': {
                 'obj_type': constants.OBJ_NONE
             }
@@ -282,9 +290,9 @@ def qry_get_view_scanned_data(rom_id: str):
         scanned_data = rom.get_scanned_data()
         items = []
         for key, value in scanned_data.items():
-            items.append({ 
+            items.append({
                 'is_folder': False, 'type': 'game',
-                'name': key, 'name2': value, 
+                'name': key, 'name2': value,
                 'url': globals.router.url_for_path(
                     f'/rom/{rom.get_id()}/view/scanneddata?field={key}'),
                 'info': {}, 'art': {}, 'properties': {}})
@@ -320,6 +328,7 @@ def qry_get_libraries():
         for library in libraries:
             listitem_name = library.get_name()
             container['items'].append({
+                'id': library.get_id(),
                 'name': listitem_name,
                 'url': globals.router.url_for_path(f'library/{library.get_id()}'),
                 'is_folder': True,
@@ -373,7 +382,9 @@ def qry_get_utilities_items():
             'overlay': 4
         },
         'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE}
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40856),
@@ -586,7 +597,7 @@ def qry_get_globalreport_items():
             'plot': kodi.translate(44030),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
+        'art': {'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
         'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
     })
     
@@ -600,8 +611,10 @@ def qry_get_globalreport_items():
             'plot': kodi.translate(44031),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     return container
 
@@ -696,9 +709,9 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
         commands.append((kodi.translate(40892), _context_menu_url_for(f'/romcollection/edit/{item_id}')))
     
     if is_library:
-        if container_is_root:
+        if not item_id or len(item_id) == 0:
             commands.append((kodi.translate(40916), _context_menu_url_for('/execute/command/add_library')))
-        if item_id:
+        if item_id and len(item_id) > 0:
             commands.append((kodi.translate(40915), _context_menu_url_for(f'/library/edit/{item_id}')))
         
     if not is_category and container_is_category:

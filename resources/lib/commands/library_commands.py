@@ -163,7 +163,7 @@ def cmd_library_metadata_platform(args):
 
             uow.commit()
             AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
-    AppMediator.sync_cmd('ROMCOLLECTION_EDIT_METADATA', args)
+    AppMediator.sync_cmd('EDIT_LIBRARY', args)
 
 
 @AppMediator.register('LIBRARY_EDIT_SCANNER')
@@ -210,7 +210,7 @@ def cmd_library_delete(args):
     for collection_id in collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})
     AppMediator.async_cmd('CLEANUP_VIEWS')
-    AppMediator.sync_cmd('EDIT_ROMCOLLECTION', args)
+    AppMediator.sync_cmd('EDIT_LIBRARY', args)
 
 
 # -------------------------------------------------------------------------------------------------
