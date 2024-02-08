@@ -240,7 +240,7 @@ def cmd_manage_library_roms(args):
     options['EXPORT_ROMS'] = kodi.translate(42051)
     options['SCRAPE_LIBRARY_ROMS'] = kodi.translate(42052)
     options['DELETE_ROMS_NFO'] = kodi.translate(42053)
-    options['CLEAR_LIBRARY_ROMS'] = kodi.translate(42054)
+    options['CLEAR_LIBRARY_ROMS'] = kodi.translate(42080)
 
     s = kodi.translate(41161).format(library.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
@@ -342,7 +342,7 @@ def cmd_clear_library_roms(args):
         library = library_repository.find(library_id)
         roms = roms_repository.find_roms_by_library(library)
         
-        # If collection is empty (no ROMs) do nothing
+        # If library is empty (no ROMs) do nothing
         num_roms = len([*roms])
         if num_roms == 0:
             kodi.dialog_OK(kodi.translate(41163))
@@ -383,4 +383,4 @@ def cmd_execute_rom_scanner(args):
     kodi.notify(kodi.translate(40980))
     kodi.run_script(
         library.addon.get_addon_id(),
-        library.get_scan_command(library))
+        library.get_scan_command())

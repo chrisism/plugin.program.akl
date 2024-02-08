@@ -1728,10 +1728,7 @@ class LibrariesRepository(object):
         
         self._uow.execute(qry.SELECT_LIBRARY, id)
         result_set = self._uow.single_result()
-        
-        self._uow.execute(qry.SELECT_ADDON, id)
-        addon_data = self._uow.single_result()
-        
+                
         self._uow.execute(qry.SELECT_LIBRARY_ASSET_PATHS, id)
         asset_paths_result_set = self._uow.result_set()
         asset_paths = []
@@ -1746,7 +1743,8 @@ class LibrariesRepository(object):
             launcher = ROMLauncherAddonFactory.create(addon, launcher_data)
             launchers.append(launcher)
         
-        return Library(result_set, AelAddon(addon_data), asset_paths, launchers)
+        addon = AelAddon(result_set.copy())
+        return Library(result_set, addon, asset_paths, launchers)
 
     def find_all(self) -> typing.Iterator[Library]:
         self._uow.execute(qry.SELECT_LIBRARIES)

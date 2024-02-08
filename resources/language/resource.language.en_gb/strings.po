@@ -1932,10 +1932,9 @@ msgctxt "#42074"
 msgid "Browse by Rating"
 msgstr ""
 
-# TODO: oboslete
-# msgctxt "#42080"
-# msgid "Add new scanner"
-# msgstr ""
+msgctxt "#42080"
+msgid "Clear ROMs from Library"
+msgstr ""
 
 msgctxt "#42081"
 msgid "Edit scanner"

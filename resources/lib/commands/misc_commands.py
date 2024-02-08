@@ -21,7 +21,6 @@ import logging
 import typing
 import collections
 
-from datetime import datetime
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
 from distutils.version import LooseVersion
@@ -41,8 +40,8 @@ def cmd_execute_import_launchers(args):
 
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        addon_repository      = AelAddonRepository(uow)
-        available_launchers   = [*addon_repository.find_all_launchers()]
+        addon_repository = AelAddonRepository(uow)
+        available_launchers = [*addon_repository.find_all_launchers()]
         
         categories_repository = CategoryRepository(uow)
         existing_categories   = [*categories_repository.find_all_categories()]

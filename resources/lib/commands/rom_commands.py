@@ -673,6 +673,7 @@ def cmd_rom_save_nfo_file(args):
     
     AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
 
+
 @AppMediator.register('MANAGE_ROM_TAGS')
 def cmd_manage_rom_tags(args):
 
@@ -716,6 +717,7 @@ def cmd_manage_rom_tags(args):
         if did_tag_change:
             uow.commit()
 
+
 # -------------------------------------------------------------------------------------------------
 # ROM ADD
 # -------------------------------------------------------------------------------------------------
@@ -734,7 +736,9 @@ def cmd_add_rom(args):
         
         if grand_parent_category is not None:
             options_dialog = kodi.ListDialog()
-            selected_option = options_dialog.select(kodi.translate(41098),[parent_category.get_name(), grand_parent_category.get_name()])
+            selected_option = options_dialog.select(kodi.translate(41098), [
+                parent_category.get_name(),
+                grand_parent_category.get_name()])
             if selected_option > 0:
                 parent_category = grand_parent_category
         

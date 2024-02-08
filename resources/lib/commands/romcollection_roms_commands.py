@@ -157,62 +157,6 @@ def cmd_set_roms_default_artwork(args):
         'selected_asset': selected_asset_info.id})
 
 
-@AppMediator.register('SET_ROMS_ASSET_DIRS')
-def cmd_set_rom_asset_dirs(args):
-    romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
-    
-    list_items = collections.OrderedDict()
-    assets = g_assetFactory.get_assets_for_type(constants.KIND_ASSET_ROM)
-
-    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
-    with uow:
-        repository = ROMCollectionRepository(uow)
-        romcollection = repository.find_romcollection(romcollection_id)
-        
-        root_path = romcollection.get_assets_root_path()
-        root_path_str = root_path.getPath() if root_path else kodi.translate(41158)
-        list_items[AssetInfo()] = kodi.translate(42083).format(root_path_str)
-        for asset_info in assets:
-            path = romcollection.get_asset_path(asset_info)
-            if path:
-                list_items[asset_info] = kodi.translate(42084).format(asset_info.plural, path.getPath())
-
-        dialog = kodi.OrdDictionaryDialog()
-        selected_asset: AssetInfo = dialog.select(kodi.translate(41129), list_items)
-
-        if selected_asset is None:
-            AppMediator.sync_cmd('ROMCOLLECTION_MANAGE_ROMS', args)
-            return
-
-        # rootpath?
-        if selected_asset.id == '':
-            dir_path = kodi.browse(type=0, text=kodi.translate(41159), preselected_path=root_path.getPath() if root_path else None)
-            if not dir_path or (root_path is not None and dir_path == root_path.getPath()):
-                AppMediator.sync_cmd('SET_ROMS_ASSET_DIRS', args)
-                return
-            
-            root_path = io.FileName(dir_path)
-            apply_to_all = kodi.dialog_yesno(kodi.translate(41062))
-            romcollection.set_assets_root_path(root_path, constants.ROM_ASSET_ID_LIST, create_default_subdirectories=apply_to_all)
-        else:
-            selected_asset_path = romcollection.get_asset_path(selected_asset)
-            dir_path = kodi.browse(type=0, text=kodi.translate(41160).format(selected_asset.plural),
-                                   preselected_path=selected_asset_path.getPath())
-            if not dir_path or dir_path == selected_asset_path.getPath():
-                AppMediator.sync_cmd('SET_ROMS_ASSET_DIRS', args)
-                return
-            romcollection.set_asset_path(selected_asset, dir_path)
-            
-        repository.update_romcollection(romcollection)
-        uow.commit()
-                
-    # >> Check for duplicate paths and warn user.
-    AppMediator.async_cmd('CHECK_DUPLICATE_ASSET_DIRS', args)
-
-    kodi.notify(kodi.translate(40984).format(selected_asset.name, dir_path))
-    AppMediator.sync_cmd('SET_ROMS_ASSET_DIRS', args)
-
-
 @AppMediator.register('IMPORT_ROMS')
 def cmd_import_roms(args):
     logger.debug('IMPORT_ROMS: cmd_import_roms() SHOW MENU')

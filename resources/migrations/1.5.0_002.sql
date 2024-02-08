@@ -51,10 +51,11 @@ CREATE TABLE IF NOT EXISTS library_launchers(
 -- --------------------------------------
 -- MIGRATE EXISTING DATA INTO NEW TABLES
 -- --------------------------------------
-INSERT INTO libraries (id, name, akl_addon_id, settings)
-    SELECT rcs.id, rc.name || ' ' || aa.name || ' (' || rcs.id || ')' , rcs.akl_addon_id, rcs.settings
+INSERT INTO libraries (id, name, platform, assets_path, akl_addon_id, settings)
+    SELECT rcs.id, rc.name || ' (' || rcs.id || ')', rc.platform, m.assets_path, rcs.akl_addon_id, rcs.settings
     FROM romcollection_scanners as rcs
         LEFT JOIN romcollections as rc ON rc.id = rcs.romcollection_id
+        INNER JOIN metadata as m ON m.id = rc.metadata_id
         LEFT JOIN akl_addon as aa ON rcs.akl_addon_id = aa.id;
 
 INSERT INTO collection_library_ruleset (ruleset_id, library_id, collection_id)

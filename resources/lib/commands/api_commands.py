@@ -32,15 +32,16 @@ from resources.lib.domain import ROM
 
 logger = logging.getLogger(__name__)
 
+
 # -------------------------------------------------------------------------------------------------
 # ROMCollection API commands
-# -------------------------------------------------------------------------------------------------      
+# -------------------------------------------------------------------------------------------------
 def cmd_set_launcher_args(args) -> bool:
-    romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
-    rom_id:str           = args['rom_id'] if 'rom_id' in args else None
-    launcher_id:str      = args['akl_addon_id'] if 'akl_addon_id' in args else None
-    addon_id:str         = args['addon_id'] if 'addon_id' in args else None
-    launcher_settings    = args['settings'] if 'settings' in args else None
+    romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
+    rom_id: str = args['rom_id'] if 'rom_id' in args else None
+    launcher_id: str = args['akl_addon_id'] if 'akl_addon_id' in args else None
+    addon_id: str = args['addon_id'] if 'addon_id' in args else None
+    launcher_settings = args['settings'] if 'settings' in args else None
         
     metadata_updated = False
         
@@ -86,7 +87,7 @@ def cmd_set_launcher_args(args) -> bool:
 
 
 # -------------------------------------------------------------------------------------------------
-# ROMCollection scanner API commands
+# Library scanner API commands
 # -------------------------------------------------------------------------------------------------
 def cmd_set_scanner_settings(args) -> bool:
     # TODO: backwards compatiblity
@@ -111,7 +112,7 @@ def cmd_set_scanner_settings(args) -> bool:
     if kodi.dialog_yesno(kodi.translate(41051)):
         AppMediator.async_cmd('SCAN_ROMS', {'library_id': library_id})
     else:
-        AppMediator.async_cmd('EDIT_LIBRARY', {'library_id': library_id})
+        AppMediator.async_cmd('LIBRARY_MANAGE_ROMS', {'library_id': library_id})
     return True
 
 
@@ -124,6 +125,7 @@ def cmd_store_scanned_roms(args) -> bool:
     new_roms: list = args['roms'] if 'roms' in args else None
     
     if new_roms is None:
+        AppMediator.async_cmd('LIBRARY_MANAGE_ROMS', {'library_id': library_id})
         return
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
@@ -148,14 +150,17 @@ def cmd_store_scanned_roms(args) -> bool:
 
     AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
     AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': constants.VCATEGORY_TITLE_ID})
-    AppMediator.async_cmd('EDIT_LIBRARY', {'library_id': library_id})
+    AppMediator.async_cmd('LIBRARY_MANAGE_ROMS', {'library_id': library_id})
     return True
 
+
 def cmd_remove_roms(args) -> bool:
-    romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
-    scanner_id:str = args['akl_addon_id'] if 'akl_addon_id' in args else None
-    rom_ids:list = args['rom_ids'] if 'rom_ids' in args else None
+    # TODO: backwards compatiblity
+    romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
+    library_id: str = args['library_id'] if 'library_id' in args else None
+    library_id = romcollection_id if not library_id else library_id
     
+    rom_ids: list = args['rom_ids'] if 'rom_ids' in args else None
     if rom_ids is None:
         return
     
@@ -176,6 +181,7 @@ def cmd_remove_roms(args) -> bool:
     AppMediator.async_cmd('RENDER_VCATEGORY_VIEWS')
     AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id})
     return True
+
 
 def cmd_store_scraped_roms(args) -> bool:
     romcollection_id:str = args['romcollection_id'] if 'romcollection_id' in args else None
@@ -275,8 +281,8 @@ def cmd_store_scraped_single_rom(args) -> bool:
         logger.debug('Assets updated:       {}'.format('Yes' if assets_are_updated else 'No'))
 
         rom.update_with(scraped_rom,
-            metadata_to_update, 
-            assets_to_update, 
+            metadata_to_update,
+            assets_to_update,
             overwrite_existing_metadata=applied_settings.overwrite_existing_meta,
             overwrite_existing_assets=applied_settings.overwrite_existing_assets)
         #rom_obj.scraped_with(scraper_id)

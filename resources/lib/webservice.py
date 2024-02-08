@@ -192,7 +192,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.end_headers()
 
             elif 'query/' in api_path:
-               self.handle_queries(api_path)
+                self.handle_queries(api_path)
             elif 'store/' in api_path:
                 if self.handle_posts(api_path):
                     self.send_response(200)
@@ -219,15 +219,18 @@ class RequestHandler(BaseHTTPRequestHandler):
         if 'query/rom/' in api_path:
             obj = 'ROM'
             response_data = self.handle_rom_queries(api_path)
-        elif 'query/romcollection/':
+        elif 'query/romcollection/' in api_path:
             obj = 'ROMCollection'
             response_data = self.handle_romcollection_queries(api_path)
+        elif 'query/library/' in api_path:
+            obj = 'Library'
+            response_data = self.handle_library_queries(api_path)
                         
-        if response_data is None: 
+        if response_data is None:
             self.send_response(404)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write('{} entity not found'.format(obj))
+            self.wfile.write(f'{obj} entity not found'.encode(encoding='utf-8'))
             return
         
         self.send_response(200)
@@ -252,13 +255,30 @@ class RequestHandler(BaseHTTPRequestHandler):
         
         if 'romcollection/launcher/settings/' in api_path:
             return apiqueries.qry_get_collection_launcher_settings(id, params.get('launcher_id'))
-        if 'romcollection/scanner/settings/' in api_path:
-            return apiqueries.qry_get_collection_scanner_settings(id, params.get('scanner_id'))
+        # if 'romcollection/scanner/settings/' in api_path:
+        #    return apiqueries.qry_get_collection_scanner_settings(id, params.get('scanner_id'))
         if 'romcollection/launchers/' in api_path:
             return apiqueries.qry_get_launchers(id)
         if 'romcollection/roms/' in api_path:
             return apiqueries.qry_get_roms(id)
         if 'romcollection/' in api_path:
+            return apiqueries.qry_get_rom_collection(id)
+        
+        return None
+     
+    def handle_library_queries(self, api_path):
+        params = self.get_params()
+        id = params.get('id')
+        
+        if 'library/launcher/settings/' in api_path:
+            return apiqueries.qry_get_collection_launcher_settings(id, params.get('launcher_id'))
+        if 'library/scanner/settings/' in api_path:
+            return apiqueries.qry_get_library_scanner_settings(id)
+        if 'library/launchers/' in api_path:
+            return apiqueries.qry_get_library_launchers(id)
+        if 'library/roms/' in api_path:
+            return apiqueries.qry_get_roms(id)
+        if 'library/' in api_path:
             return apiqueries.qry_get_rom_collection(id)
         
         return None

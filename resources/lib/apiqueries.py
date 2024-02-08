@@ -55,17 +55,18 @@ def qry_get_rom_collection(collection_id: str) -> str:
         return json.dumps(data)
 
     
-def qry_get_roms(collection_id: str) -> str:
+def qry_get_roms(library_id: str) -> str:
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        collection_repository = ROMCollectionRepository(uow)
+        library_repository = LibrariesRepository(uow)
         rom_repository = ROMsRepository(uow)
-
-        collection = collection_repository.find_romcollection(collection_id)
-        roms = rom_repository.find_roms_by_romcollection(collection)
+        
+        library = library_repository.find(library_id)
+        roms = rom_repository.find_roms_by_library(library)
         
         if roms is None:
             return None
+        
         data = []
         for rom in roms:
             rom_dto = rom.create_dto()
@@ -123,7 +124,24 @@ def qry_get_collection_launcher_settings(collection_id: str, launcher_id: str) -
         
         launcher = rom_collection.get_launcher(launcher_id)
         return launcher.get_settings_str()
-    
+
+
+def qry_get_library_launchers(library_id: str) -> str:
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        library_repository = LibrariesRepository(uow)
+        library = library_repository.find(library_id)
+        
+        if library is None:
+            return None
+        
+        launchers_data = {}
+        launchers = library.get_launchers()
+        for launcher in launchers:
+            launchers_data[launcher.get_id()] = launcher.get_settings()
+            
+        return json.dumps(launchers_data)
+
 
 def qry_get_library_scanner_settings(library_id: str) -> str:
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)

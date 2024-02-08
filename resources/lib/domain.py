@@ -144,19 +144,20 @@ class EntityABC(object):
         return self._to_filename(self.entity_data[field], isdir=True)
     
     #  helper method to convert a value to filename
-    def _to_filename(self, value, isdir = False) -> io.FileName:
-        if not value or value == '': return None
+    def _to_filename(self, value, isdir=False) -> io.FileName:
+        if not value or value == '':
+            return None
         return io.FileName(value, isdir)
 
 
 # Addons that can be used as AKL plugin (launchers, scrapers)
 class AelAddon(EntityABC):
     
-    def __init__(self, addon_dic=None):        
+    def __init__(self, addon_dic=None):
         if addon_dic is None:
             addon_dic = {}
             
-        if 'associated_addon_id' in addon_dic: 
+        if 'associated_addon_id' in addon_dic:
             addon_dic['id'] = addon_dic['associated_addon_id']
             
         if 'id' not in addon_dic:
@@ -346,7 +347,7 @@ class ROMAddon(EntityABC):
     __metaclass__ = abc.ABCMeta
     
     def __init__(self, addon: AelAddon, entity_data: dict):
-        self.addon = addon 
+        self.addon = addon
         super(ROMAddon, self).__init__(entity_data)
         
     def get_name(self):
@@ -634,9 +635,7 @@ class Library(ROMAddon):
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--romcollection_id': self.get_id(),  # backwards compatiblity, TODO: remove
-            '--library_id': self.get_id(),
-            '--akl_addon_id': self.get_id()
+            '--library_id': self.get_id()
         }
         
     def get_configure_command(self) -> dict:
@@ -645,18 +644,16 @@ class Library(ROMAddon):
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--romcollection_id': self.get_id(),  # backwards compatiblity, TODO: remove
-            '--library_id': self.get_id(),
-            '--akl_addon_id': self.get_id()
+            '--library_id': self.get_id()
         }
 
 
 class ScraperAddon(ROMAddon):
     
-    def __init__(self, addon: AelAddon, scraper_settings: ScraperSettings):        
+    def __init__(self, addon: AelAddon, scraper_settings: ScraperSettings):
         entity_data = {
             'settings': json.dumps(scraper_settings.get_data_dic())
-        }        
+        }
         super(ScraperAddon, self).__init__(addon, entity_data)
     
     def settings_are_applicable(self) -> bool:
