@@ -1946,11 +1946,11 @@ msgstr ""
 # msgstr ""
 
 msgctxt "#42083"
-msgid "Change root assets path: '{}'"
+msgid "Change root assets path"
 msgstr ""
 
 msgctxt "#42084"
-msgid "Change {} path: '{}'"
+msgid "Change {} path"
 msgstr ""
 
 msgctxt "#42085"

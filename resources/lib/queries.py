@@ -332,7 +332,7 @@ INSERT_LIBRARY = """
 UPDATE_LIBRARY = "UPDATE libraries SET name=?, platform=?, assets_path=?, last_scan_timestamp=?, settings=? WHERE id =?"
 DELETE_LIBRARY = "DELETE FROM libraries WHERE id = ?"
 
-INSERT_LIBRARY_ASSET_PATH = "INSERT INTO libraries_assetpaths (library_id, assetpaths_id) VALUES (?, ?)"
+INSERT_LIBRARY_ASSET_PATH = "INSERT INTO library_assetpaths (library_id, assetpaths_id) VALUES (?, ?)"
 REMOVE_ROMS_FROM_LIBRARY = "DELETE FROM roms WHERE scanned_by_id = ?"
 
 SELECT_LIBRARY_LAUNCHERS = "SELECT * FROM vw_library_launchers WHERE library_id = ?"

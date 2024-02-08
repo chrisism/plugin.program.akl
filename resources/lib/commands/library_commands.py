@@ -20,6 +20,8 @@ from __future__ import division
 import logging
 import collections
 
+import xbmcgui
+
 from akl import constants, platforms
 from akl.utils import kodi, io
 
@@ -270,14 +272,19 @@ def cmd_set_rom_asset_dirs(args):
         
         root_path = library.get_assets_root_path()
         root_path_str = root_path.getPath() if root_path else kodi.translate(41158)
-        list_items[AssetInfo()] = kodi.translate(42083).format(root_path_str)
+        
+        gui_listitem = xbmcgui.ListItem(label=kodi.translate(42083), label2=root_path_str)
+        gui_listitem.setArt({'icon': 'DefaultFolder.png'})
+        list_items[AssetInfo()] = gui_listitem
         for asset_info in assets:
             path = library.get_asset_path(asset_info)
             if path:
-                list_items[asset_info] = kodi.translate(42084).format(asset_info.plural, path.getPath())
+                gui_listitem = xbmcgui.ListItem(label=kodi.translate(42084).format(asset_info.plural), label2=path.getPath())
+                gui_listitem.setArt({'icon' : 'DefaultFolder.png'})
+                list_items[asset_info] = gui_listitem
 
         dialog = kodi.OrdDictionaryDialog()
-        selected_asset: AssetInfo = dialog.select(kodi.translate(41129), list_items)
+        selected_asset: AssetInfo = dialog.select(kodi.translate(41129), list_items, use_details=True)
 
         if selected_asset is None:
             AppMediator.sync_cmd('LIBRARY_MANAGE_ROMS', args)
