@@ -84,7 +84,7 @@ def cmd_show_addons(args):
 
 @AppMediator.register('ADDON_DETAILS')
 def cmd_addon_details(args):
-    addon_id:str = args['addon_id'] if 'addon_id' in args else None
+    addon_id: str = args['addon_id'] if 'addon_id' in args else None
     
     options = collections.OrderedDict()
     options["UPDATE"] = kodi.translate(42009)
