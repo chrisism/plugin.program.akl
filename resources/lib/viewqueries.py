@@ -70,7 +70,7 @@ def qry_get_root_items():
             'plot': kodi.translate(44032),
             'overlay': 4
         },
-        'art': { 
+        'art': {
             'fanart': listitem_fanart,
             'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
             'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
@@ -114,12 +114,14 @@ def qry_get_root_items():
                 'plot': kodi.translate(44002),
                 'overlay': 4
             },
-            'art': { 
-                'fanart' : listitem_fanart, 
-                'icon' : globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_icon.png').getPath(),
-                'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_poster.png').getPath() 
+            'art': {
+                'fanart': listitem_fanart,
+                'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_icon.png').getPath(),
+                'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Global_Reports_poster.png').getPath()
             },
-            'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_CATEGORY, 'obj_type': constants.OBJ_NONE }
+            'properties': {
+                'obj_type': constants.OBJ_NONE
+            }
         })
     
     return container
@@ -163,59 +165,59 @@ def qry_get_view_metadata(rom_id: str):
         rom = roms_repository.find_rom(rom_id)
 
         items = []
-        items.append({ 
-                'id': 40801, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/{constants.VCATEGORY_GENRE_ID}/items?value={rom.get_genre()}'),
-                'name': kodi.translate(40801), 'name2': rom.get_genre(),
-                'info': {}, 'art': {}, 'properties': {'field': 'genre'}})
-        items.append({ 
-                'id': 40803, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/{constants.VCATEGORY_YEARS_ID}/items?value={rom.get_releaseyear()}'),
-                'name': kodi.translate(40803), 'name2': rom.get_releaseyear(),
-                'info': {}, 'art': {}, 'properties': {'field': 'releaseyear'}})
-        items.append({ 
-                'id': 40802, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/{constants.VCATEGORY_DEVELOPER_ID}/items?value={rom.get_developer()}'),
-                'name': kodi.translate(40802), 'name2': rom.get_developer(),
-                'info': {}, 'art': {}, 'properties': {'field': 'developer'}})
-        items.append({ 
-                'id': 40806, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/{constants.VCATEGORY_RATING_ID}/items?value={rom.get_rating()}'),
-                'name': kodi.translate(40806), 'name2': str(rom.get_rating()),
-                'info': {}, 'art': {}, 'properties': {'field': 'rating'}})
-        items.append({ 
-                'id': 40804, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/{constants.VCATEGORY_ESRB_ID}/items?value={rom.get_esrb_rating()}'),
-                'name': kodi.translate(40804), 'name2': rom.get_esrb_rating(),
-                'info': {}, 'art': {}, 'properties': {'field': 'esrb'}})
-        items.append({ 
-                'id': 40805, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/{constants.VCATEGORY_PEGI_ID}/items?value={rom.get_pegi_rating()}'),
-                'name': kodi.translate(40805), 'name2': rom.get_pegi_rating(),
-                'info': {}, 'art': {}, 'properties': {'field': 'pegi'}})
-        items.append({ 
-                'id': 40808, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/{constants.VCATEGORY_NPLAYERS_ID}/items?value={rom.get_number_of_players()}'),
-                'name': kodi.translate(40808), 'name2': str(rom.get_number_of_players()),
-                'info': {}, 'art': {}, 'properties': {'field': 'nplayers'}})
-        items.append({ 
-                'id': 40809, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path('execute/command/reset_database'),
-                'name': kodi.translate(40809), 'name2': str(rom.get_number_of_players_online()),
-                'info': {}, 'art': {}, 'properties': {'field': 'nplayers_online'}})
-        items.append({ 
-                'id': 40810, 'is_folder': False, 'type': 'game',
-                'url': globals.router.url_for_path(
-                    f'/collection/virtual/items?value={rom.get_genre()}'),
-                'name': kodi.translate(40810), 'name2': ','.join(rom.get_tags()),
-                'info': {}, 'art': {}, 'properties': {'field': 'tags'}})
+        items.append({
+            'id': 40801, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/{constants.VCATEGORY_GENRE_ID}/items?value={rom.get_genre()}'),
+            'name': kodi.translate(40801), 'name2': rom.get_genre(),
+            'info': {}, 'art': {}, 'properties': {'field': 'genre'}})
+        items.append({
+            'id': 40803, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/{constants.VCATEGORY_YEARS_ID}/items?value={rom.get_releaseyear()}'),
+            'name': kodi.translate(40803), 'name2': rom.get_releaseyear(),
+            'info': {}, 'art': {}, 'properties': {'field': 'releaseyear'}})
+        items.append({
+            'id': 40802, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/{constants.VCATEGORY_DEVELOPER_ID}/items?value={rom.get_developer()}'),
+            'name': kodi.translate(40802), 'name2': rom.get_developer(),
+            'info': {}, 'art': {}, 'properties': {'field': 'developer'}})
+        items.append({
+            'id': 40806, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/{constants.VCATEGORY_RATING_ID}/items?value={rom.get_rating()}'),
+            'name': kodi.translate(40806), 'name2': str(rom.get_rating()),
+            'info': {}, 'art': {}, 'properties': {'field': 'rating'}})
+        items.append({
+            'id': 40804, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/{constants.VCATEGORY_ESRB_ID}/items?value={rom.get_esrb_rating()}'),
+            'name': kodi.translate(40804), 'name2': rom.get_esrb_rating(),
+            'info': {}, 'art': {}, 'properties': {'field': 'esrb'}})
+        items.append({
+            'id': 40805, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/{constants.VCATEGORY_PEGI_ID}/items?value={rom.get_pegi_rating()}'),
+            'name': kodi.translate(40805), 'name2': rom.get_pegi_rating(),
+            'info': {}, 'art': {}, 'properties': {'field': 'pegi'}})
+        items.append({
+            'id': 40808, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/{constants.VCATEGORY_NPLAYERS_ID}/items?value={rom.get_number_of_players()}'),
+            'name': kodi.translate(40808), 'name2': str(rom.get_number_of_players()),
+            'info': {}, 'art': {}, 'properties': {'field': 'nplayers'}})
+        items.append({
+            'id': 40809, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path('execute/command/reset_database'),
+            'name': kodi.translate(40809), 'name2': str(rom.get_number_of_players_online()),
+            'info': {}, 'art': {}, 'properties': {'field': 'nplayers_online'}})
+        items.append({
+            'id': 40810, 'is_folder': False, 'type': 'game',
+            'url': globals.router.url_for_path(
+                f'/collection/virtual/items?value={rom.get_genre()}'),
+            'name': kodi.translate(40810), 'name2': ','.join(rom.get_tags()),
+            'info': {}, 'art': {}, 'properties': {'field': 'tags'}})
 
         container = {
             'id': rom_id,
@@ -240,7 +242,7 @@ def qry_get_view_assets(rom_id: str):
         for asset_id in asset_ids:
             asset = next((a for a in assigned_assets if a.get_asset_info_id() == asset_id), None)
             asset_info = asset.asset_info if asset else g_assetFactory.get_asset_info(asset_id)
-            items.append({ 
+            items.append({
                 'id': asset_id,
                 'is_folder': False,
                 'type': 'pictures',
@@ -252,10 +254,10 @@ def qry_get_view_assets(rom_id: str):
                     'title': kodi.translate(asset_info.name_id),
                     'picturepath': asset.get_path() if asset else None,
                 },
-                'art': { 
+                'art': {
                     'thumb': asset.get_path() if asset else 'DefaultAddonImages.png'
                 },
-                'properties': { 
+                'properties': {
                     'is_set': str(asset and asset.is_assigned()),
                     'assetid': asset_id
                 }
@@ -383,8 +385,10 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44004),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40900),
@@ -396,8 +400,10 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44018),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40901),
@@ -409,8 +415,10 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44019),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40902),
@@ -422,8 +430,10 @@ def qry_get_utilities_items():
             'plot': kodi.translate(44020),
             'overlay': 4
         },
-        'art': { 'icon' : listitem_icon, 'fanart' : listitem_fanart, 'poster' : listitem_poster  },
-        'properties': { constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_NONE, 'obj_type': constants.OBJ_NONE }
+        'art': {'icon': listitem_icon, 'fanart': listitem_fanart, 'poster': listitem_poster},
+        'properties': {
+            'obj_type': constants.OBJ_NONE
+        }
     })
     container['items'].append({
         'name': kodi.translate(40903),
