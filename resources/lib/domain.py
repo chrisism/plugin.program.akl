@@ -22,7 +22,7 @@ from __future__ import annotations
 import abc
 import typing
 import logging
-import re 
+import re
 import time
 import datetime
 import json
@@ -92,7 +92,7 @@ class EntityABC(object):
     def __init__(self, entity_data: typing.Dict[str, typing.Any]):
         self.entity_data = entity_data
         
-        if not "extra" in self.entity_data or not self.entity_data["extra"]:
+        if "extra" not in self.entity_data or not self.entity_data["extra"]:
             self.entity_data["extra"] = {}
         elif isinstance(self.entity_data["extra"], str):
             self.entity_data["extra"] = json.loads(self.entity_data["extra"])
@@ -121,11 +121,12 @@ class EntityABC(object):
     def set_custom_attribute(self, key, value):
         self.entity_data[key] = value
 
-    def get_custom_attribute(self, key, default_value = None):
+    def get_custom_attribute(self, key, default_value=None):
         return self.entity_data[key] if key in self.entity_data else default_value
 
     def import_data_dic(self, data):
-        if data is None: return
+        if data is None:
+            return
         for key in data:
             self.entity_data[key] = data[key]
 
@@ -136,11 +137,13 @@ class EntityABC(object):
 
     # helper method to convert a dictionary value to a FileName object
     def _get_filename_from_field(self, field) -> io.FileName:
-        if not field in self.entity_data: return None
+        if field not in self.entity_data:
+            return None
         return self._to_filename(self.entity_data[field])
 
     def _get_directory_filename_from_field(self, field) -> io.FileName:
-        if not field in self.entity_data: return None
+        if field not in self.entity_data:
+            return None
         return self._to_filename(self.entity_data[field], isdir=True)
     
     #  helper method to convert a value to filename
@@ -819,11 +822,11 @@ class RuleSet(object):
 class MetaDataItemABC(EntityABC):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, 
-                 entity_data: typing.Dict[str, typing.Any], 
+    def __init__(self,
+                 entity_data: typing.Dict[str, typing.Any],
                  assets: typing.List[Asset],
                  asset_paths_data: typing.List[AssetPath] = None,
-                 asset_mappings: typing.List[AssetMapping] = []):     
+                 asset_mappings: typing.List[AssetMapping] = []):
         self.assets: typing.Dict[str, Asset] = {}
         if assets is not None:
             for asset in assets:
@@ -879,7 +882,7 @@ class MetaDataItemABC(EntityABC):
     def set_rating(self, rating):
         try:
             self.entity_data['m_rating'] = int(rating)
-        except:
+        except Exception:
             self.entity_data['m_rating'] = ''
 
     def get_plot(self):
@@ -1005,9 +1008,9 @@ class MetaDataItemABC(EntityABC):
     def get_assets_root_path(self) -> io.FileName:
         return self._get_directory_filename_from_field('assets_path')
     
-    def set_assets_root_path(self, path: io.FileName, asset_ids = [], create_default_subdirectories = False):
-        path_str = path.getPath() if path else ''        
-        self.entity_data['assets_path'] = path_str    
+    def set_assets_root_path(self, path: io.FileName, asset_ids=[], create_default_subdirectories=False):
+        path_str = path.getPath() if path else ''
+        self.entity_data['assets_path'] = path_str
         
         if create_default_subdirectories:
             asset_ids = self.get_asset_ids_list() if not asset_ids else asset_ids
@@ -1015,7 +1018,8 @@ class MetaDataItemABC(EntityABC):
                 asset_info = g_assetFactory.get_asset_info(asset_info_id)
                 new_path = path.pjoin(asset_info.plural.lower(), isdir=True)
                 self.set_asset_path(asset_info, new_path.getPath())
-                if not new_path.exists(): new_path.makedirs()
+                if not new_path.exists():
+                    new_path.makedirs()
                     
     
     def get_asset_paths(self) -> typing.List[AssetPath]:
@@ -1120,7 +1124,7 @@ class MetaDataItemABC(EntityABC):
 class Category(MetaDataItemABC):
     __metaclass__ = abc.ABCMeta
     
-    def __init__(self, 
+    def __init__(self,
                  category_dic: typing.Dict[str, typing.Any] = None, 
                  assets: typing.List[Asset] = None,
                  asset_mappings: typing.List[AssetMapping] = []):
@@ -1287,9 +1291,8 @@ class ROMCollection(MetaDataItemABC):
     __metaclass__ = abc.ABCMeta
     
     def __init__(self,
-                 entity_data: dict = None, 
+                 entity_data: dict = None,
                  assets_data: typing.List[Asset] = None,
-                 asset_paths: typing.List[AssetPath] = None,
                  asset_mappings: typing.List[AssetMapping] = [],
                  rom_asset_mappings: typing.List[RomAssetMapping] = [],
                  launchers_data: typing.List[ROMLauncherAddon] = [],
@@ -1306,13 +1309,13 @@ class ROMCollection(MetaDataItemABC):
         self.rom_asset_mappings = rom_asset_mappings
         mappable_assets = self.get_ROM_mappable_asset_list()
         if len(rom_asset_mappings) != len(mappable_assets):
-           already_mapped_assets_ids = [m.asset_info.id for m in rom_asset_mappings]
-           for asset_info in [a for a in mappable_assets if a.id not in already_mapped_assets_ids]:
-               mapping = RomAssetMapping()
-               mapping.asset_info = asset_info
-               self.rom_asset_mappings.append(mapping)
+            already_mapped_assets_ids = [m.asset_info.id for m in rom_asset_mappings]
+            for asset_info in [a for a in mappable_assets if a.id not in already_mapped_assets_ids]:
+                mapping = RomAssetMapping()
+                mapping.asset_info = asset_info
+                self.rom_asset_mappings.append(mapping)
            
-        super(ROMCollection, self).__init__(entity_data, assets_data, asset_paths, asset_mappings)
+        super(ROMCollection, self).__init__(entity_data, assets_data, None, asset_mappings)
 
     def get_object_name(self):
         return "ROM Collection"
@@ -1346,7 +1349,7 @@ class ROMCollection(MetaDataItemABC):
         return constants.MAPPABLE_LAUNCHER_ASSET_ID_LIST
 
     def get_default_icon(self) -> str:
-        return 'DefaultGameAddons.png'   
+        return 'DefaultGameAddons.png'
     
     def get_ROM_mappable_asset_list(self) -> typing.List[AssetInfo]:
         return g_assetFactory.get_asset_list_by_IDs(constants.MAPPABLE_ROM_ASSET_ID_LIST)
@@ -1365,7 +1368,7 @@ class ROMCollection(MetaDataItemABC):
                 return g_assetFactory.get_asset_info(constants.ASSET_FLYER_ID)
             return asset_info
         return mapped_asset.to_asset_info
-	
+
     def set_mapped_ROM_asset(self, asset_info: AssetInfo, mapped_to_info: AssetInfo):
         mapped_asset = next((m for m in self.rom_asset_mappings if m.asset_info.id == asset_info.id), None)
         if not mapped_asset:
@@ -1399,13 +1402,13 @@ class ROMCollection(MetaDataItemABC):
     def get_launchers(self) -> typing.List[ROMLauncherAddon]:
         return self.launchers_data
 
-    def get_launcher(self, id:svtr) -> ROMLauncherAddon:
+    def get_launcher(self, id: str) -> ROMLauncherAddon:
         return next((l for l in self.launchers_data if l.get_id() == id), None)
 
     def get_default_launcher(self) -> ROMLauncherAddon:
         if len(self.launchers_data) == 0:
             return None
-        default_launcher = next((l for l in self.launchers_data if l.is_default()), None)
+        default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
         if default_launcher is None:
             return self.launchers_data[0]
         
@@ -1415,8 +1418,9 @@ class ROMCollection(MetaDataItemABC):
         if len(self.launchers_data) == 0:
             return
         
-        current_default_launcher = next((l for l in self.launchers_data if l.is_default()), None)
-        if current_default_launcher: current_default_launcher.set_default(False)
+        current_default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
+        if current_default_launcher:
+            current_default_launcher.set_default(False)
         
         launcher_to_be_default = next((l for l in self.launchers_data if l.get_id() == launcher_id), None)
         if launcher_to_be_default:

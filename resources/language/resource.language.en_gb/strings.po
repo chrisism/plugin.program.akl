@@ -1625,7 +1625,7 @@ msgid "No launchers configured for this library!"
 msgstr ""
 
 msgctxt "#41169"
-msgid "Library '{0}' has {1} ROMs. These will be deleted also."
+msgid "Library '{0}' has {1} ROMs. All the references to these ROMs will be deleted also from the database. "
 msgstr "" 
 
 msgctxt "#41170"

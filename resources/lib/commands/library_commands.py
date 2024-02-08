@@ -202,17 +202,14 @@ def cmd_library_delete(args):
         if not ret:
             return
             
-        logger.info(f'Deleting library "{library_name}" ID {library.id}')
-        repository.delete(library.get_id())
+        logger.info(f'Deleting library "{library_name}" ID {library.get_id()}')
+        repository.delete_library(library.get_id())
         uow.commit()
-
-    AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
         
     kodi.notify(kodi.translate(41170).format(library_name))
     for collection_id in collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})
     AppMediator.async_cmd('CLEANUP_VIEWS')
-    AppMediator.sync_cmd('EDIT_LIBRARY', args)
 
 
 # -------------------------------------------------------------------------------------------------

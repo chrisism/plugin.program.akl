@@ -96,7 +96,6 @@ SELECT_ROOT_ROMCOLLECTION_ASSETS = "SELECT * FROM vw_romcollection_assets WHERE 
 SELECT_ROMCOLLECTIONS_ASSETS_BY_PARENT = "SELECT * FROM vw_romcollection_assets WHERE parent_id = ?"
 SELECT_ROMCOLLECTION_ASSETS_BY_ROM = "SELECT ra.* FROM vw_romcollection_assets AS ra INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = ra.romcollection_id WHERE rr.rom_id = ?"
 SELECT_ROMCOLLECTION_ASSETS = "SELECT * FROM vw_romcollection_assets"
-SELECT_ROMCOLLECTION_ASSETS_PATHS_BY_ROM = "SELECT rap.* FROM vw_romcollection_asset_paths AS rap INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rap.romcollection_id WHERE rr.rom_id = ?"
 SELECT_ROMCOLLECTION_ASSET_MAPPINGS = """
                                     SELECT am.*, mm.metadata_id FROM assetmappings AS am 
                                     INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
@@ -150,7 +149,6 @@ SELECT_ROMCOLLECTION_ROM_ASSET_MAPPINGS_BY_ROM = """
                                     """
 
 INSERT_ROMCOLLECTION_ASSET = "INSERT INTO romcollection_assets (romcollection_id, asset_id) VALUES (?, ?)"
-INSERT_ROMCOLLECTION_ASSET_PATH = "INSERT INTO romcollection_assetpaths (romcollection_id, assetpaths_id) VALUES (?, ?)"
 INSERT_ROMCOLLECTION_ROM_ASSET_MAPPING = "INSERT INTO romcollection_roms_assetmappings (romcollection_id, assetmapping_id) VALUES (?,?)"
 
 INSERT_ROM_IN_ROMCOLLECTION = "INSERT INTO roms_in_romcollection (rom_id, romcollection_id) VALUES (?,?)"
@@ -320,13 +318,12 @@ UPDATE_ADDON = "UPDATE akl_addon SET name = ?, addon_id = ?, version = ?, addon_
 SELECT_LIBRARY = "SELECT * FROM vw_libraries WHERE id = ?"
 SELECT_LIBRARIES = "SELECT * FROM vw_libraries"
 SELECT_LIBRARY_BY_ROM = "SELECT * FROM vw_libraries WHERE scanned_by_id = ?"
-SELECT_ROMCOLLECTION_IDS_BY_LIBRARY = "SELECT r.id as collection_id FROM romcollections LEFT JOIN collection_library_ruleset as clr ON clr.collection_id = r.id WHERE clr.library_id = ?"
-
-
+SELECT_ROMCOLLECTION_IDS_BY_LIBRARY = "SELECT collection_id FROM collection_library_ruleset WHERE library_id = ?"
+    
 SELECT_LIBRARY_ASSET_PATHS = "SELECT * FROM vw_library_asset_paths WHERE library_id = ?"
 
 INSERT_LIBRARY = """
-                INSERT INTO libraries (id,name,platform,assets_path,last_scan_timestamp,settings,akl_addon_id) 
+                INSERT INTO libraries (id,name,platform,assets_path,last_scan_timestamp,settings,akl_addon_id)
                 VALUES (?,?,?,?,?,?,?)
                 """
 UPDATE_LIBRARY = "UPDATE libraries SET name=?, platform=?, assets_path=?, last_scan_timestamp=?, settings=? WHERE id =?"

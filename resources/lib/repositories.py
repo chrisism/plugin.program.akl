@@ -769,13 +769,7 @@ class ROMCollectionRepository(object):
         assets = []
         for asset_data in assets_result_set:
             assets.append(Asset(asset_data))
-            
-        self._uow.execute(qry.SELECT_ROMCOLLECTION_ASSET_PATHS, romcollection_id)
-        asset_paths_result_set = self._uow.result_set()
-        asset_paths = []
-        for asset_paths_data in asset_paths_result_set:
-            asset_paths.append(AssetPath(asset_paths_data))
-        
+                    
         self._uow.execute(qry.SELECT_ITEM_ASSET_MAPPINGS, romcollection_data['metadata_id'])
         asset_mappings_result_set = self._uow.result_set()
         asset_mappings = []
@@ -795,15 +789,8 @@ class ROMCollectionRepository(object):
             addon = AelAddon(launcher_data.copy())
             launcher = ROMLauncherAddonFactory.create(addon, launcher_data)
             launchers.append(launcher)
-        
-        self._uow.execute(qry.SELECT_ROMCOLLECTION_SCANNERS, romcollection_id)
-        scanners_data = self._uow.result_set()
-        scanners = []
-        for scanner_data in scanners_data:
-            addon = AelAddon(scanner_data.copy())
-            scanners.append(ROMCollectionScanner(addon, scanner_data))
-            
-        return ROMCollection(romcollection_data, assets, asset_paths, asset_mappings, rom_asset_mappings, launchers, scanners)
+                    
+        return ROMCollection(romcollection_data, assets, asset_mappings, rom_asset_mappings, launchers)
     
     def find_all_romcollections(self) -> typing.Iterator[ROMCollection]:
         self._uow.execute(qry.SELECT_ROMCOLLECTIONS)
@@ -896,14 +883,16 @@ class ROMCollectionRepository(object):
 
     def find_virtualcollections_by_category(self, vcategory_id:  str) -> typing.Iterator[VirtualCollection]:
         query = self._get_collections_query_by_vcategory_id(vcategory_id)
-        if query is None: return []
+        if query is None:
+            return []
         
         self._uow.execute(query)
         result_set = self._uow.result_set()
         
         for result in result_set:
             option_value = str(result['option_value'])
-            if not option_value: option_value = 'Undefined'
+            if not option_value:
+                option_value = 'Undefined'
             yield VirtualCollectionFactory.create_by_category(vcategory_id, option_value)
             
     def find_romcollections_by_rom(self, rom_id: str) -> typing.Iterator[ROMCollection]:
@@ -913,9 +902,6 @@ class ROMCollectionRepository(object):
         self._uow.execute(qry.SELECT_ROMCOLLECTION_ASSETS_BY_ROM, rom_id)
         assets_result_set = self._uow.result_set()
 
-        self._uow.execute(qry.SELECT_ROMCOLLECTION_ASSETS_PATHS_BY_ROM, rom_id)
-        asset_paths_result_set = self._uow.result_set()
-        
         self._uow.execute(qry.SELECT_ROMCOLLECTION_ASSET_MAPPINGS_BY_ROM, rom_id)
         asset_mappings_result_set = self._uow.result_set()
         
@@ -931,12 +917,8 @@ class ROMCollectionRepository(object):
         for romcollection_data in result_set:
             assets = []
             for asset_data in filter(lambda a: a['romcollection_id'] == romcollection_data['id'], assets_result_set):
-                assets.append(Asset(asset_data))      
-            
-            asset_paths = []
-            for asset_path_data in filter(lambda a: a['romcollection_id'] == romcollection_data['id'], asset_paths_result_set):
-                asset_paths.append(AssetPath(asset_path_data))      
-                        
+                assets.append(Asset(asset_data))
+                                    
             asset_mappings = []
             for mapping_data in filter(lambda a: a['metadata_id'] == romcollection_data['metadata_id'], asset_mappings_result_set):
                 asset_mappings.append(AssetMapping(mapping_data))
@@ -950,42 +932,37 @@ class ROMCollectionRepository(object):
                 addon = AelAddon(launcher_data.copy())
                 launcher = ROMLauncherAddonFactory.create(addon, launcher_data)
                 launchers.append(launcher)
-            
-            scanners = []
-            for scanner_data in scanners_data:
-                addon = AelAddon(scanner_data.copy())
-                scanners.append(ROMCollectionScanner(addon, scanner_data))
-                    
-            yield ROMCollection(romcollection_data, assets, asset_paths, asset_mappings, rom_asset_mappings, launchers, scanners)                       
+                
+            yield ROMCollection(romcollection_data, assets, asset_mappings, rom_asset_mappings, launchers)                       
     
     def insert_romcollection(self, romcollection_obj: ROMCollection, parent_obj: Category = None):
-        self.logger.info("ROMCollectionRepository.insert_romcollection(): Inserting new romcollection '{}'".format(romcollection_obj.get_name()))
+        self.logger.info(f"ROMCollectionRepository: Inserting new romcollection '{romcollection_obj.get_name()}'")
         metadata_id = text.misc_generate_random_SID()
         assets_path = romcollection_obj.get_assets_root_path()
         parent_category_id = parent_obj.get_id() if parent_obj is not None and parent_obj.get_id() != constants.VCATEGORY_ADDONROOT_ID else None
         
         self._uow.execute(qry.INSERT_METADATA,
-            metadata_id,
-            romcollection_obj.get_releaseyear(),
-            romcollection_obj.get_genre(),
-            romcollection_obj.get_developer(),
-            romcollection_obj.get_rating(),
-            romcollection_obj.get_plot(),
-            json.dumps(romcollection_obj.get_extras()),
-            assets_path.getPath() if assets_path is not None else None,
-            romcollection_obj.is_finished())
+                          metadata_id,
+                          romcollection_obj.get_releaseyear(),
+                          romcollection_obj.get_genre(),
+                          romcollection_obj.get_developer(),
+                          romcollection_obj.get_rating(),
+                          romcollection_obj.get_plot(),
+                          json.dumps(romcollection_obj.get_extras()),
+                          assets_path.getPath() if assets_path is not None else None,
+                          romcollection_obj.is_finished())
 
         self._uow.execute(qry.INSERT_ROMCOLLECTION,
-            romcollection_obj.get_id(),
-            romcollection_obj.get_name(),
-            parent_category_id,
-            metadata_id,
-            romcollection_obj.get_platform(),
-            romcollection_obj.get_box_sizing())
+                          romcollection_obj.get_id(),
+                          romcollection_obj.get_name(),
+                          parent_category_id,
+                          metadata_id,
+                          romcollection_obj.get_platform(),
+                          romcollection_obj.get_box_sizing())
         
         romcollection_assets = romcollection_obj.get_assets()
         for asset in romcollection_assets: 
-            self._insert_asset(asset, romcollection_obj)  
+            self._insert_asset(asset, romcollection_obj)
             
         asset_paths = romcollection_obj.get_asset_paths()
         for asset_path in asset_paths:
@@ -1001,21 +978,12 @@ class ROMCollectionRepository(object):
         for romcollection_launcher in romcollection_launchers:
             romcollection_launcher.set_id(text.misc_generate_random_SID())
             self._uow.execute(qry.INSERT_ROMCOLLECTION_LAUNCHER,
-                romcollection_launcher.get_id(),
-                romcollection_obj.get_id(), 
-                romcollection_launcher.addon.get_id(), 
-                romcollection_launcher.get_settings_str(), 
-                romcollection_launcher.is_default())
-            
-        romcollection_scanners = romcollection_obj.get_scanners()
-        for romcollection_scanner in romcollection_scanners:
-            romcollection_scanner.set_id(text.misc_generate_random_SID())
-            self._uow.execute(qry.INSERT_ROMCOLLECTION_SCANNER,
-                romcollection_scanner.get_id(),
-                romcollection_obj.get_id(), 
-                romcollection_scanner.addon.get_id(), 
-                romcollection_scanner.get_settings_str())
-              
+                              romcollection_launcher.get_id(),
+                              romcollection_obj.get_id(),
+                              romcollection_launcher.addon.get_id(),
+                              romcollection_launcher.get_settings_str(),
+                              romcollection_launcher.is_default())
+                      
     def update_romcollection(self, romcollection_obj: ROMCollection):
         self.logger.info("ROMCollectionRepository.update_romcollection(): Updating romcollection '{}'".format(romcollection_obj.get_name()))
         assets_path = romcollection_obj.get_assets_root_path()
@@ -1053,27 +1021,17 @@ class ROMCollectionRepository(object):
                     romcollection_launcher.is_default(),
                     romcollection_launcher.get_id())
                 
-        romcollection_scanners = romcollection_obj.get_scanners()
-        for romcollection_scanner in romcollection_scanners:
-            if romcollection_scanner.get_id() is None:
-                romcollection_scanner.set_id(text.misc_generate_random_SID())
-                self._uow.execute(qry.INSERT_ROMCOLLECTION_SCANNER,
-                    romcollection_scanner.get_id(),
-                    romcollection_obj.get_id(), 
-                    romcollection_scanner.addon.get_id(), 
-                    romcollection_scanner.get_settings_str())
-            else:
-                self._uow.execute(qry.UPDATE_ROMCOLLECTION_SCANNER,
-                    romcollection_scanner.get_settings_str(), 
-                    romcollection_scanner.get_id())
-
         for asset in romcollection_obj.get_assets():
-            if asset.get_id() == '': self._insert_asset(asset, romcollection_obj)
-            else: self._update_asset(asset, romcollection_obj)   
+            if asset.get_id() == '':
+                self._insert_asset(asset, romcollection_obj)
+            else:
+                self._update_asset(asset, romcollection_obj)   
                   
         for asset_path in romcollection_obj.get_asset_paths():
-            if asset_path.get_id() == '': self._insert_asset_path(asset_path, romcollection_obj)
-            else: self._update_asset_path(asset_path, romcollection_obj)           
+            if asset_path.get_id() == '':
+                self._insert_asset_path(asset_path, romcollection_obj)
+            else:
+                self._update_asset_path(asset_path, romcollection_obj)
             
         for mapping in romcollection_obj.asset_mappings:
             if mapping.get_id() == '':
@@ -1088,7 +1046,7 @@ class ROMCollectionRepository(object):
                 self._update_rom_asset_mapping(mapping, romcollection_obj)
 
     def update_romcollection_parent_reference(self, romcollection_obj: ROMCollection, parent_obj: Category = None):
-        self.logger.info(f"ROMCollectionRepository.update_romcollection_parent_reference(): Updating romcollection '{romcollection_obj.get_name()}'")
+        self.logger.info(f"ROMCollectionRepository: Updating romcollection '{romcollection_obj.get_name()}'")
         parent_category_id = parent_obj.get_id() if parent_obj is not None and parent_obj.get_id() != constants.VCATEGORY_ADDONROOT_ID else None
         self._uow.execute(qry.UPDATE_ROMCOLLECTION_PARENT, parent_category_id, romcollection_obj.get_id())
             
@@ -1105,11 +1063,8 @@ class ROMCollectionRepository(object):
         self.logger.info("ROMCollectionRepository.delete_romcollection(): Deleting romcollection '{}'".format(romcollection_id))
         self._uow.execute(qry.DELETE_ROMCOLLECTION, romcollection_id)
 
-    def remove_launcher(self, romcollection_id: str, launcher_id:str):
+    def remove_launcher(self, romcollection_id: str, launcher_id: str):
         self._uow.execute(qry.DELETE_ROMCOLLECTION_LAUNCHER, romcollection_id, launcher_id)
-
-    def remove_scanner(self, romcollection_id: str, scanner_id:str):
-        self._uow.execute(qry.DELETE_ROMCOLLECTION_SCANNER, romcollection_id, scanner_id)
 
     def _insert_asset(self, asset: Asset, romcollection_obj: ROMCollection):
         asset_db_id = text.misc_generate_random_SID()
@@ -1157,7 +1112,7 @@ class ROMCollectionRepository(object):
             return
         self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())   
                  
-    def _get_collections_query_by_vcategory_id(self, vcategory_id:str) -> str:            
+    def _get_collections_query_by_vcategory_id(self, vcategory_id: str) -> str:
         if vcategory_id == constants.VCATEGORY_TITLE_ID:
             return qry.SELECT_VCOLLECTION_TITLES   
         if vcategory_id == constants.VCATEGORY_GENRE_ID:
@@ -1175,7 +1130,7 @@ class ROMCollectionRepository(object):
         if vcategory_id == constants.VCATEGORY_RATING_ID:
             return qry.SELECT_VCOLLECTION_RATING
 
-        return None             
+        return None
 
 
 class ROMsRepository(object):
@@ -1184,7 +1139,7 @@ class ROMsRepository(object):
         self._uow = uow
         self.logger = logging.getLogger(__name__)
 
-    def find_root_roms(self)-> typing.Iterator[ROM]:
+    def find_root_roms(self) -> typing.Iterator[ROM]:
         self._uow.execute(qry.SELECT_ROMS_BY_ROOT_CATEGORY)
         result_set = self._uow.result_set()
         
@@ -1456,8 +1411,10 @@ class ROMsRepository(object):
             self._insert_asset(asset, rom_obj)
             
         for asset_path in rom_obj.get_asset_paths():
-            if not asset_path.get_id(): self._insert_asset_path(asset_path, rom_obj)
-            else: self._update_asset_path(asset_path, rom_obj)
+            if not asset_path.get_id():
+                self._insert_asset_path(asset_path, rom_obj)
+            else:
+                self._update_asset_path(asset_path, rom_obj)
 
         for mapping in rom_obj.asset_mappings:
             self._insert_asset_mapping(mapping, rom_obj)
