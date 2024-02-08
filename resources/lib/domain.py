@@ -1789,7 +1789,8 @@ class ROM(MetaDataItemABC):
             return
         
         current_default_launcher = next((l for l in self.launchers_data if l.is_default()), None)
-        if current_default_launcher: current_default_launcher.set_default(False)
+        if current_default_launcher:
+            current_default_launcher.set_default(False)
         
         launcher_to_be_default = next((l for l in self.launchers_data if l.get_id() == launcher_id), None)
         if launcher_to_be_default:
@@ -1828,9 +1829,10 @@ class ROM(MetaDataItemABC):
         return 'DefaultProgram.png'    
     
     def create_dto(self) -> api.ROMObj:
-        dto_data:dict = api.ROMObj.get_data_template()
+        dto_data: dict = api.ROMObj.get_data_template()
         for key in list(dto_data.keys()):
-            if key in self.entity_data: dto_data[key] = self.entity_data[key]
+            if key in self.entity_data:
+                dto_data[key] = self.entity_data[key]
 
         dto_data['tags'] = self.get_tags()
 

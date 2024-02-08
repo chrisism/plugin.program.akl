@@ -504,7 +504,7 @@ def vw_get_object_type_by_url(url: str):
     if 'collection' in url:
         if 'virtual' in url:
             return constants.OBJ_COLLECTION_VIRTUAL
-        return constants.OBJ_LAUNCHER_COLLECTION
+        return constants.OBJ_ROMCOLLECTION
     if 'rom' in url:
         return constants.OBJ_ROM
     if 'library' in url:
