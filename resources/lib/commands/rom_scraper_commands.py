@@ -179,7 +179,12 @@ def cmd_scrape_roms_in_collection_or_library(args):
             AppMediator.sync_cmd(selected_option, args)
             return
 
-        _check_collection_unset_asset_dirs(collection, scraper_settings)
+        if not library:
+            libraries = library_repository.find_libraries_by_collection(romcollection_id)
+            for library in libraries:
+                _check_collection_unset_asset_dirs(library, scraper_settings)
+        else:
+            _check_collection_unset_asset_dirs(library, scraper_settings)
 
     selected_addon.set_scraper_settings(scraper_settings)
     kodi.notify(kodi.translate(40979))
@@ -563,17 +568,14 @@ def _select_scraper(uow: UnitOfWork, title: str, scraper_settings: ScraperSettin
     return selected_addon
 
 
-def _check_collection_unset_asset_dirs(romcollection: ROMCollection, library: Library, scraper_settings: ScraperSettings) -> bool:
+def _check_collection_unset_asset_dirs(library: Library, scraper_settings: ScraperSettings) -> bool:
     logger.debug('_check_launcher_unset_asset_dirs() BEGIN ...')
     
     unconfigured_name_list = []
     enabled_asset_list = []
     for asset_id in scraper_settings.asset_IDs_to_scrape:
         rom_asset = g_assetFactory.get_asset_info(asset_id)
-        if romcollection:
-            asset_path = romcollection.get_asset_path(rom_asset, False)
-        else:
-            asset_path = library.get_asset_path(rom_asset, False)
+        asset_path = library.get_asset_path(rom_asset, False)
         
         if asset_path is None:
             logger.debug(f'Directory not set. Asset "{rom_asset}" will be disabled')

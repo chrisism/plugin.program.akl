@@ -319,6 +319,12 @@ SELECT_LIBRARY = "SELECT * FROM vw_libraries WHERE id = ?"
 SELECT_LIBRARIES = "SELECT * FROM vw_libraries"
 SELECT_LIBRARY_BY_ROM = "SELECT * FROM vw_libraries WHERE scanned_by_id = ?"
 SELECT_ROMCOLLECTION_IDS_BY_LIBRARY = "SELECT collection_id FROM collection_library_ruleset WHERE library_id = ?"
+SELECT_LIBRARIES_BY_ROMCOLLECTION = """
+    SELECT l.* FROM vw_libraries AS l WHERE l.id IN (
+        SELECT DISTINCT(r.scanned_by_id)
+        FROM roms AS r
+        INNER JOIN roms_in_romcollection AS rrs ON r.id = rrs.rom_id AND rrs.romcollection_id = ?)
+    """
     
 SELECT_LIBRARY_ASSET_PATHS = "SELECT * FROM vw_library_asset_paths WHERE library_id = ?"
 

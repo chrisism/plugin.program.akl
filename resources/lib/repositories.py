@@ -1733,6 +1733,14 @@ class LibrariesRepository(object):
         
         return Library(result_set, AelAddon(addon_data), asset_paths, launchers)
 
+    def find_libraries_by_collection(self, romcollection_id) -> typing.Iterator[Library]:
+        self._uow.execute(qry.SELECT_LIBRARIES_BY_ROMCOLLECTION, romcollection_id)
+        result_sets = self._uow.result_set()
+        
+        for result_set in result_sets:
+            addon = AelAddon(result_set.copy())
+            yield Library(result_set, addon)
+
     def find_romcollection_ids_by_library(self, library_id):
         self._uow.execute(qry.SELECT_ROMCOLLECTION_IDS_BY_LIBRARY, library_id)
         result_sets = self._uow.result_set()
