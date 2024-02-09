@@ -359,7 +359,7 @@ SELECT_LAUNCHER = """
 SELECT_LAUNCHERS = """
     SELECT l.*,
         a.id AS associated_addon_id,
-        a.name,
+        a.name AS addon_name,
         a.addon_id,
         a.version,
         a.addon_type,

@@ -388,7 +388,7 @@ def qry_get_launchers():
             container['items'].append({
                 'id': launcher.get_id(),
                 'name': listitem_name,
-                'url': '',
+                'url': globals.router.url_for_path(f'/launcher/edit/{launcher.get_id()}'),
                 'is_folder': False,
                 'type': 'video',
                 'info': {

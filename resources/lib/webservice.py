@@ -280,12 +280,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         params = self.get_params()
         id = params.get('launcher_id')
         
-        if 'library/scanner/settings/' in api_path:
-            return apiqueries.qry_get_library_scanner_settings(id)
-        if 'library/roms/' in api_path:
-            return apiqueries.qry_get_roms(id)
-        if 'library/' in api_path:
-            return apiqueries.qry_get_rom_collection(id)
+        if 'query/launcher/' in api_path:
+            return apiqueries.qry_get_launcher_settings(id)
         
         return None
             

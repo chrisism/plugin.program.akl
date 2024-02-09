@@ -27,7 +27,7 @@ from akl.utils import kodi, io
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
 from resources.lib.repositories import UnitOfWork, ROMCollectionRepository, ROMsRepository, ROMsJsonFileRepository
-from resources.lib.domain import ROM, AssetInfo, g_assetFactory
+from resources.lib.domain import ROM, g_assetFactory
 
 logger = logging.getLogger(__name__)
 
@@ -57,14 +57,6 @@ def cmd_manage_roms(args):
 
     options = collections.OrderedDict()
     options['SET_ROMS_DEFAULT_ARTWORK'] = kodi.translate(42044)
-    
-    # if romcollection.has_scanners():
-    #     options['SCAN_ROMS'] = kodi.translate(42046)
-    #     options['REMOVE_DEAD_ROMS'] = kodi.translate(42047)
-    #     options['EDIT_ROMCOLLECTION_SCANNERS'] = kodi.translate(42048)
-    # else:
-    #     options['ADD_SCANNER'] = kodi.translate(42049)
-    
     options['IMPORT_ROMS'] = kodi.translate(42050)
     if has_roms:
         options['EXPORT_ROMS'] = kodi.translate(42051)

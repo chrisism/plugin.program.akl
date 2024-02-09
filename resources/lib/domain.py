@@ -163,6 +163,9 @@ class AelAddon(EntityABC):
         if 'associated_addon_id' in addon_dic:
             addon_dic['id'] = addon_dic['associated_addon_id']
             
+        if 'addon_name' in addon_dic:
+            addon_dic['name'] = addon_dic['addon_name']
+            
         if 'id' not in addon_dic:
             addon_dic['id'] = text.misc_generate_random_SID()
             
@@ -384,6 +387,9 @@ class ROMAddon(EntityABC):
     
     def set_settings(self, addon_settings: dict):
         self.entity_data['settings'] = json.dumps(addon_settings)
+        new_name = self.get_setting('name')
+        if new_name:
+            self.entity_data['name'] = new_name
     
     def get_addon(self) -> AelAddon:
         return self.addon
