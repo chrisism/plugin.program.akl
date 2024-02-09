@@ -414,7 +414,7 @@ FROM tags AS t
 
 CREATE VIEW IF NOT EXISTS vw_romcollection_launchers AS SELECT
     l.id AS id,
-    l.name AS name
+    l.name AS name,
     rcl.romcollection_id,
     a.id AS associated_addon_id,
     a.name,
@@ -430,7 +430,7 @@ FROM romcollection_launchers AS rcl
     
 CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
     l.id AS id,
-    l.name AS name
+    l.name AS name,
     ll.library_id,
     a.id AS associated_addon_id,
     a.name,
@@ -446,7 +446,7 @@ FROM library_launchers AS ll
 
 CREATE VIEW IF NOT EXISTS vw_rom_launchers AS SELECT
     l.id AS id,
-    l.name AS name
+    l.name AS name,
     rl.rom_id,
     a.id AS associated_addon_id,
     a.name,

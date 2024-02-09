@@ -750,6 +750,10 @@ msgctxt "#40919"
 msgid "Remove Launcher"
 msgstr ""
 
+msgctxt "#40920"
+msgid "Launchers"
+msgstr ""
+
 ############################
 # Headers and texts / notifications / dialogs
 ############################
@@ -2101,4 +2105,8 @@ msgstr "viewqueries"
 
 msgctxt "#44032"
 msgid "Manage your game [COLOR orange]libraries[/COLOR] and sources."
+msgstr "viewqueries"
+
+msgctxt "#44033"
+msgid "Manage your game [COLOR orange]launchers[/COLOR]."
 msgstr "viewqueries"

@@ -352,7 +352,7 @@ SELECT_LAUNCHER = """
         a.addon_id,
         a.version,
         a.addon_type,
-        a.extra_settings,
+        a.extra_settings
     FROM launchers AS l INNER JOIN akl_addon AS a on l.akl_addon_id = a.id
     WHERE l.id = ?
 """
@@ -363,7 +363,7 @@ SELECT_LAUNCHERS = """
         a.addon_id,
         a.version,
         a.addon_type,
-        a.extra_settings,
+        a.extra_settings
     FROM launchers AS l INNER JOIN akl_addon AS a on l.akl_addon_id = a.id
 """
 INSERT_LAUNCHER = "INSERT INTO launchers (id, name, akl_addon_id, settings) VALUES (?,?,?,?)"

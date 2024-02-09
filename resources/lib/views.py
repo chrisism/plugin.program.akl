@@ -298,7 +298,7 @@ def vw_view_rom(rom_id):
     xbmc.executebuiltin('Dialog.Close(busydialog)')
     container = viewqueries.qry_get_view_item(rom_id)
     ui = ViewRomGUI('script-akl-romdetails.xml', globals.addon_path, 'default', '1080i', True,
-                    container_id=19801,container_data=container)
+                    container_id=19801, container_data=container)
     ui.doModal()
     del ui
 
@@ -365,7 +365,7 @@ def _render_list_items(container_data: dict, container_context_items=[], filter_
             item_context_items = viewqueries.qry_listitem_context_menu_items(list_item_data, container_data)
             list_item.addContextMenuItems(item_context_items + container_context_items)
 
-        xbmcplugin.addDirectoryItem(handle = router.handle, url = url_str, listitem = list_item, isFolder = folder_flag)
+        xbmcplugin.addDirectoryItem(handle=router.handle, url=url_str, listitem=list_item, isFolder=folder_flag)
 
 
 def _render_list_item(list_item_data: dict) -> xbmcgui.ListItem:

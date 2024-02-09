@@ -75,12 +75,12 @@ INSERT INTO library_assetpaths (library_id, assetpaths_id)
     FROM romcollection_assetpaths as ra;
 
 INSERT INTO launchers (id, name, akl_addon_id, settings)
-    SELECT rl.id, a.name || ' (' || rl.id || ')', rl.settings
+    SELECT rl.id, a.name || ' (' || rl.id || ')', a.id, rl.settings
     FROM rom_launchers AS rl
         INNER JOIN akl_addon AS a ON rl.akl_addon_id = a.id;
 
 INSERT INTO launchers (id, name, akl_addon_id, settings)
-    SELECT rcl.id, a.name || ' (' || rcl.id || ')', rcl.settings
+    SELECT rcl.id, a.name || ' (' || rcl.id || ')', a.id, rcl.settings
     FROM romcollection_launchers AS rcl
         INNER JOIN akl_addon AS a ON rcl.akl_addon_id = a.id;
 
@@ -294,7 +294,7 @@ FROM tags AS t
  
 CREATE VIEW IF NOT EXISTS vw_romcollection_launchers AS SELECT
     l.id AS id,
-    l.name AS name
+    l.name AS name,
     rcl.romcollection_id,
     a.id AS associated_addon_id,
     a.name,
@@ -310,7 +310,7 @@ FROM romcollection_launchers AS rcl
     
 CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
     l.id AS id,
-    l.name AS name
+    l.name AS name,
     ll.library_id,
     a.id AS associated_addon_id,
     a.name,
@@ -326,7 +326,7 @@ FROM library_launchers AS ll
 
 CREATE VIEW IF NOT EXISTS vw_rom_launchers AS SELECT
     l.id AS id,
-    l.name AS name
+    l.name AS name,
     rl.rom_id,
     a.id AS associated_addon_id,
     a.name,

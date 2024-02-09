@@ -79,7 +79,28 @@ def qry_get_root_items():
             'obj_type': constants.OBJ_LIBRARY
         }
     })
-               
+
+    listitem_name = kodi.translate(40920)
+    container['items'].append({
+        'name': listitem_name,
+        'url': globals.router.url_for_path('launchers'),
+        'is_folder': True,
+        'type': 'video',
+        'info': {
+            'title': listitem_name,
+            'plot': kodi.translate(44033),
+            'overlay': 4
+        },
+        'art': {
+            'fanart': listitem_fanart,
+            'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
+            'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
+        },
+        'properties': {
+            'obj_type': constants.OBJ_LAUNCHER
+        }
+    })
+    
     if not settings.getSettingAsBool('display_hide_utilities'):
         listitem_name = kodi.translate(40897)
         container['items'].append({
@@ -367,6 +388,7 @@ def qry_get_launchers():
             container['items'].append({
                 'id': launcher.get_id(),
                 'name': listitem_name,
+                'url': '',
                 'is_folder': False,
                 'type': 'video',
                 'info': {
