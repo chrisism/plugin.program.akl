@@ -510,7 +510,8 @@ class UnitOfWork(object):
         self.open_session()
 
     def __exit__(self, type, value, traceback):
-        if type is not None: # errors raised
+        if type is not None:
+            # errors raised
             self.logger.error("type: %s value: %s", type, value)
         self.close_session()
 

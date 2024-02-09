@@ -274,7 +274,7 @@ class AssetPath(EntityABC):
     def set_path(self, path_str):
         self.entity_data['path'] = path_str
     
-    def set_asset_info(self, info:AssetInfo): 
+    def set_asset_info(self, info: AssetInfo):
         self.asset_info = info
     
     def clear(self):
@@ -284,14 +284,14 @@ class AssetPath(EntityABC):
 class AssetMapping(EntityABC):
         
     def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
-        self.asset_info:AssetInfo = None
-        self.to_asset_info:AssetInfo = None
+        self.asset_info: AssetInfo = None
+        self.to_asset_info: AssetInfo = None
 
         if entity_data is None:
             entity_data = {
-                'id' : '',
-                'mapped_asset_type' : '',
-                'to_asset_type' : ''
+                'id': '',
+                'mapped_asset_type': '',
+                'to_asset_type': ''
             }
         
         if 'mapped_asset_type' in entity_data and entity_data['mapped_asset_type']:
@@ -302,7 +302,7 @@ class AssetMapping(EntityABC):
         super(AssetMapping, self).__init__(entity_data)
     
     def get_asset_info_id(self) -> str:
-        return self.asset_info.id 
+        return self.asset_info.id
     
     def get_asset_info(self) -> AssetInfo:
         return self.asset_info
@@ -310,7 +310,7 @@ class AssetMapping(EntityABC):
     def get_mapped_to_asset_info(self) -> str:
         return self.to_asset_info
     
-    def set_mapping(self, info:AssetInfo, to:AssetInfo): 
+    def set_mapping(self, info: AssetInfo, to: AssetInfo):
         self.asset_info = info
         self.to_asset_info = to
     
@@ -331,13 +331,10 @@ class RomAssetMapping(AssetMapping):
         if self.to_asset_info is None:
             return False
         
-        if self.asset_info.id == constants.ASSET_ICON_ID or \
-            self.asset_info.id == constants.ASSET_POSTER_ID:
-            if self.asset_info.id == constants.ASSET_ICON_ID and \
-                self.to_asset_info.id == constants.ASSET_BOXFRONT_ID:
+        if self.asset_info.id == constants.ASSET_ICON_ID or self.asset_info.id == constants.ASSET_POSTER_ID:
+            if self.asset_info.id == constants.ASSET_ICON_ID and self.to_asset_info.id == constants.ASSET_BOXFRONT_ID:
                 return False
-            if self.asset_info.id == constants.ASSET_POSTER_ID and \
-                self.to_asset_info.id == constants.ASSET_FLYER_ID:
+            if self.asset_info.id == constants.ASSET_POSTER_ID and self.to_asset_info.id == constants.ASSET_FLYER_ID:
                 return False
             return True
         
@@ -1339,7 +1336,7 @@ class ROMCollection(MetaDataItemABC):
     #
     def get_ROM_asset_mapping(self, asset_info: AssetInfo):
         mapped_asset = next((m for m in self.rom_asset_mappings if m.asset_info.id == asset_info.id), None)
-        if not mapped_asset:
+        if not mapped_asset or not mapped_asset.is_mapped():
             # exception cases
             if asset_info.id == constants.ASSET_ICON_ID:
                 return g_assetFactory.get_asset_info(constants.ASSET_BOXFRONT_ID)
@@ -1548,7 +1545,7 @@ class VirtualCollection(ROMCollection):
 # -------------------------------------------------------------------------------------------------
 class ROM(MetaDataItemABC):
         
-    def __init__(self, 
+    def __init__(self,
                  rom_data: dict = None,
                  tag_data: dict = None, 
                  assets_data: typing.List[Asset] = None,
@@ -1570,11 +1567,11 @@ class ROM(MetaDataItemABC):
         
         mappable_assets = self.get_mappable_asset_list()
         if len(asset_mappings) != len(mappable_assets):
-           already_mapped_assets_ids = [m.asset_info.id for m in asset_mappings]
-           for asset_info in [a for a in mappable_assets if a.id not in already_mapped_assets_ids]:
-               mapping = RomAssetMapping()
-               mapping.asset_info = asset_info
-               asset_mappings.append(mapping)
+            already_mapped_assets_ids = [m.asset_info.id for m in asset_mappings]
+            for asset_info in [a for a in mappable_assets if a.id not in already_mapped_assets_ids]:
+                mapping = RomAssetMapping()
+                mapping.asset_info = asset_info
+                asset_mappings.append(mapping)
            
         super(ROM, self).__init__(rom_data, assets_data, asset_paths_data, asset_mappings)
         
@@ -1826,7 +1823,7 @@ class ROM(MetaDataItemABC):
         mapped_asset.set_mapping(asset_info, mapped_to_info)
 
     def get_default_icon(self) -> str:
-        return 'DefaultProgram.png'    
+        return 'DefaultProgram.png'
     
     def create_dto(self) -> api.ROMObj:
         dto_data: dict = api.ROMObj.get_data_template()

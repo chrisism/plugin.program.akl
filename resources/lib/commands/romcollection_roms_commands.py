@@ -117,7 +117,7 @@ def cmd_set_roms_default_artwork(args):
             AppMediator.async_cmd('ROMCOLLECTION_MANAGE_ROMS', args)
             return
         
-        logger.debug('Main select() returned {0}'.format(selected_asset_info.name))
+        logger.debug(f'Main select() returned {selected_asset_info.name}')
         mapped_asset_info = romcollection.get_ROM_asset_mapping(selected_asset_info)
         mappable_asset_list = g_assetFactory.get_asset_list_by_IDs(constants.ROM_ASSET_ID_LIST, 'image')
         logger.debug(f'{selected_asset_info.name} currently is mapped to {mapped_asset_info.name}')
