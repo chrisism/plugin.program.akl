@@ -155,12 +155,6 @@ INSERT_ROM_IN_ROMCOLLECTION = "INSERT INTO roms_in_romcollection (rom_id, romcol
 REMOVE_ROM_FROM_ROMCOLLECTION = "DELETE FROM roms_in_romcollection WHERE rom_id = ? AND romcollection_id = ?"
 REMOVE_ROMS_FROM_ROMCOLLECTION = "DELETE FROM roms_in_romcollection WHERE romcollection_id = ?"
 
-SELECT_ROMCOLLECTION_LAUNCHERS = "SELECT * FROM vw_romcollection_launchers WHERE romcollection_id = ?"
-INSERT_ROMCOLLECTION_LAUNCHER = "INSERT INTO romcollection_launchers (id, romcollection_id, akl_addon_id, settings, is_default) VALUES (?,?,?,?,?)"
-UPDATE_ROMCOLLECTION_LAUNCHER = "UPDATE romcollection_launchers SET settings = ?, is_default = ? WHERE id = ?"
-DELETE_ROMCOLLECTION_LAUNCHERS = "DELETE FROM romcollection_launchers WHERE romcollection_id = ?"
-DELETE_ROMCOLLECTION_LAUNCHER = "DELETE FROM romcollection_launchers WHERE romcollection_id = ? AND id = ?"
-
 SELECT_ROMCOLLECTION_LAUNCHERS_BY_ROM = "SELECT rl.* FROM vw_romcollection_launchers AS rl INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rl.romcollection_id WHERE rr.rom_id = ?"
 SELECT_ROMCOLLECTION_SCANNERS_BY_ROM = "SELECT rs.* FROM vw_romcollection_scanners AS rs INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rs.romcollection_id WHERE rr.rom_id = ?"
 
@@ -290,17 +284,11 @@ SELECT_ROM_SCANNED_DATA_BY_LIBRARY = "SELECT s.* FROM scanned_roms_data AS s INN
 SELECT_ROM_SCANNED_DATA_BY_ROOT_CATEGORY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_category AS rc ON rc.rom_id = s.rom_id AND rc.category_id IS NULL"
 DELETE_SCANNED_DATA = "DELETE FROM scanned_roms_data WHERE rom_id = ?"
 
-SELECT_ROM_LAUNCHERS     = "SELECT * FROM vw_rom_launchers WHERE rom_id = ?"
-INSERT_ROM_LAUNCHER      = "INSERT INTO rom_launchers (id, rom_id, akl_addon_id, settings, is_default) VALUES (?,?,?,?,?)"
-UPDATE_ROM_LAUNCHER      = "UPDATE rom_launchers SET settings = ?, is_default = ? WHERE id = ?"
-DELETE_ROM_LAUNCHERS     = "DELETE FROM rom_launchers WHERE rom_id = ?"
-DELETE_ROM_LAUNCHER      = "DELETE FROM rom_launchers WHERE rom_id = ? AND id = ?"
-
-SELECT_TAGS               = "SELECT * FROM tags"
-INSERT_TAG                = "INSERT INTO tags (id, tag) VALUES (?,?)" 
-ADD_TAG_TO_ROM            = "INSERT INTO metatags (metadata_id, tag_id) VALUES (?,?)"
-DELETE_EXISTING_ROM_TAGS  = "DELETE FROM metatags WHERE metadata_id = ?"
-DELETE_TAG                = "DELETE FROM tags WHERE id = ?"
+SELECT_TAGS = "SELECT * FROM tags"
+INSERT_TAG = "INSERT INTO tags (id, tag) VALUES (?,?)" 
+ADD_TAG_TO_ROM = "INSERT INTO metatags (metadata_id, tag_id) VALUES (?,?)"
+DELETE_EXISTING_ROM_TAGS = "DELETE FROM metatags WHERE metadata_id = ?"
+DELETE_TAG = "DELETE FROM tags WHERE id = ?"
 
 #
 # AelAddonRepository -> AKL Adoon objects from SQLite DB
@@ -338,8 +326,46 @@ DELETE_LIBRARY = "DELETE FROM libraries WHERE id = ?"
 INSERT_LIBRARY_ASSET_PATH = "INSERT INTO library_assetpaths (library_id, assetpaths_id) VALUES (?, ?)"
 REMOVE_ROMS_FROM_LIBRARY = "DELETE FROM roms WHERE scanned_by_id = ?"
 
+# Launchers
 SELECT_LIBRARY_LAUNCHERS = "SELECT * FROM vw_library_launchers WHERE library_id = ?"
-INSERT_LIBRARY_LAUNCHER = "INSERT INTO library_launchers (id, library_id, akl_addon_id, settings, is_default) VALUES (?,?,?,?,?)"
-UPDATE_LIBRARY_LAUNCHER = "UPDATE library_launchers SET settings = ?, is_default = ? WHERE id = ?"
+INSERT_LIBRARY_LAUNCHER = "INSERT INTO library_launchers (launcher_id, library_id, is_default) VALUES (?,?,?)"
+UPDATE_LIBRARY_LAUNCHER = "UPDATE library_launchers SET is_default = ? WHERE library_id = ? AND launcher_id = ?"
 DELETE_LIBRARY_LAUNCHERS = "DELETE FROM library_launchers WHERE library_id = ?"
-DELETE_LIBRARY_LAUNCHER = "DELETE FROM library_launchers WHERE library_id = ? AND id = ?"
+DELETE_LIBRARY_LAUNCHER = "DELETE FROM library_launchers WHERE library_id = ? AND launcher_id = ?"
+
+SELECT_ROM_LAUNCHERS = "SELECT * FROM vw_rom_launchers WHERE rom_id = ?"
+INSERT_ROM_LAUNCHER = "INSERT INTO rom_launchers (launcher_id, rom_id, is_default) VALUES (?,?,?)"
+UPDATE_ROM_LAUNCHER = "UPDATE rom_launchers SET is_default = ? WHERE rom_id = ? AND launcher_id = ?"
+DELETE_ROM_LAUNCHERS = "DELETE FROM rom_launchers WHERE rom_id = ?"
+DELETE_ROM_LAUNCHER = "DELETE FROM rom_launchers WHERE rom_id = ? AND launcher_id = ?"
+
+SELECT_ROMCOLLECTION_LAUNCHERS = "SELECT * FROM vw_romcollection_launchers WHERE romcollection_id = ?"
+INSERT_ROMCOLLECTION_LAUNCHER = "INSERT INTO romcollection_launchers (launcher_id, romcollection_id, is_default) VALUES (?,?,?)"
+UPDATE_ROMCOLLECTION_LAUNCHER = "UPDATE romcollection_launchers SET is_default = ? WHERE romcollection_id = ? AND launcher_id = ?"
+DELETE_ROMCOLLECTION_LAUNCHERS = "DELETE FROM romcollection_launchers WHERE romcollection_id = ?"
+DELETE_ROMCOLLECTION_LAUNCHER = "DELETE FROM romcollection_launchers WHERE romcollection_id = ? AND launcher_id = ?"
+
+SELECT_LAUNCHER = """
+    SELECT l.*,
+        a.id AS associated_addon_id,
+        a.name,
+        a.addon_id,
+        a.version,
+        a.addon_type,
+        a.extra_settings,
+    FROM launchers AS l INNER JOIN akl_addon AS a on l.akl_addon_id = a.id
+    WHERE l.id = ?
+"""
+SELECT_LAUNCHERS = """
+    SELECT l.*,
+        a.id AS associated_addon_id,
+        a.name,
+        a.addon_id,
+        a.version,
+        a.addon_type,
+        a.extra_settings,
+    FROM launchers AS l INNER JOIN akl_addon AS a on l.akl_addon_id = a.id
+"""
+INSERT_LAUNCHER = "INSERT INTO launchers (id, name, akl_addon_id, settings) VALUES (?,?,?,?)"
+UPDATE_LAUNCHER = "UPDATE launchers SET name = ?, settings = ? WHERE id = ?"
+DELETE_LAUNCHER = "DELETE FROM launchers WHERE id = ?"

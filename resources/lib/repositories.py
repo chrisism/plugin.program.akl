@@ -14,7 +14,8 @@ from akl import constants
 
 from resources.lib import globals
 from resources.lib import queries as qry
-from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, Asset, AssetPath, AssetMapping, RomAssetMapping, VirtualCollection
+from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, VirtualCollection
+from resources.lib.domain import Asset, AssetPath, AssetMapping, RomAssetMapping
 from resources.lib.domain import VirtualCategoryFactory, VirtualCollectionFactory, ROMLauncherAddonFactory, g_assetFactory
 from resources.lib.domain import Library, ROMLauncherAddon, AelAddon
 
@@ -986,41 +987,38 @@ class ROMCollectionRepository(object):
                               romcollection_launcher.is_default())
                       
     def update_romcollection(self, romcollection_obj: ROMCollection):
-        self.logger.info("ROMCollectionRepository.update_romcollection(): Updating romcollection '{}'".format(romcollection_obj.get_name()))
+        self.logger.info(f"ROMCollectionRepository.update_romcollection(): Updating romcollection '{romcollection_obj.get_name()}'")
         assets_path = romcollection_obj.get_assets_root_path()
         
         self._uow.execute(qry.UPDATE_METADATA,
-            romcollection_obj.get_releaseyear(),
-            romcollection_obj.get_genre(),
-            romcollection_obj.get_developer(),
-            romcollection_obj.get_rating(),
-            romcollection_obj.get_plot(),
-            json.dumps(romcollection_obj.get_extras()),
-            assets_path.getPath() if assets_path is not None else None,
-            romcollection_obj.is_finished(),
-            romcollection_obj.get_custom_attribute('metadata_id'))
+                          romcollection_obj.get_releaseyear(),
+                          romcollection_obj.get_genre(),
+                          romcollection_obj.get_developer(),
+                          romcollection_obj.get_rating(),
+                          romcollection_obj.get_plot(),
+                          json.dumps(romcollection_obj.get_extras()),
+                          assets_path.getPath() if assets_path is not None else None,
+                          romcollection_obj.is_finished(),
+                          romcollection_obj.get_custom_attribute('metadata_id'))
 
         self._uow.execute(qry.UPDATE_ROMCOLLECTION,
-            romcollection_obj.get_name(),
-            romcollection_obj.get_platform(),
-            romcollection_obj.get_box_sizing(),
-            romcollection_obj.get_id())
-         
+                          romcollection_obj.get_name(),
+                          romcollection_obj.get_platform(),
+                          romcollection_obj.get_box_sizing(),
+                          romcollection_obj.get_id())
+                     
         romcollection_launchers = romcollection_obj.get_launchers()
         for romcollection_launcher in romcollection_launchers:
-            if romcollection_launcher.get_id() is None:
-                romcollection_launcher.set_id(text.misc_generate_random_SID())
+            if romcollection_launcher.get_custom_attribute("romcollection_id") is None:
                 self._uow.execute(qry.INSERT_ROMCOLLECTION_LAUNCHER,
-                    romcollection_launcher.get_id(),
-                    romcollection_obj.get_id(), 
-                    romcollection_launcher.addon.get_id(), 
-                    romcollection_launcher.get_settings_str(),
-                    romcollection_launcher.is_default())
+                                  romcollection_launcher.get_id(),
+                                  romcollection_obj.get_id(),
+                                  romcollection_launcher.is_default())
             else:
                 self._uow.execute(qry.UPDATE_ROMCOLLECTION_LAUNCHER,
-                    romcollection_launcher.get_settings_str(), 
-                    romcollection_launcher.is_default(),
-                    romcollection_launcher.get_id())
+                                  romcollection_launcher.is_default(),
+                                  romcollection_obj.get_id(),
+                                  romcollection_launcher.get_id())
                 
         for asset in romcollection_obj.get_assets():
             if asset.get_id() == '':
@@ -1429,40 +1427,44 @@ class ROMsRepository(object):
         assets_path = rom_obj.get_assets_root_path()
         
         self._uow.execute(qry.UPDATE_METADATA,
-            rom_obj.get_releaseyear(),
-            rom_obj.get_genre(),
-            rom_obj.get_developer(),
-            rom_obj.get_rating(),
-            rom_obj.get_plot(),
-            json.dumps(rom_obj.get_extras()),
-            assets_path.getPath() if assets_path is not None else None,
-            rom_obj.is_finished(),
-            rom_obj.get_custom_attribute('metadata_id'))
+                          rom_obj.get_releaseyear(),
+                          rom_obj.get_genre(),
+                          rom_obj.get_developer(),
+                          rom_obj.get_rating(),
+                          rom_obj.get_plot(),
+                          json.dumps(rom_obj.get_extras()),
+                          assets_path.getPath() if assets_path is not None else None,
+                          rom_obj.is_finished(),
+                          rom_obj.get_custom_attribute('metadata_id'))
 
         self._uow.execute(qry.UPDATE_ROM,
-            rom_obj.get_name(),
-            rom_obj.get_number_of_players(),
-            rom_obj.get_number_of_players_online(),
-            rom_obj.get_esrb_rating(),
-            rom_obj.get_pegi_rating(),
-            rom_obj.get_platform(),
-            rom_obj.get_box_sizing(),
-            rom_obj.get_nointro_status(),
-            rom_obj.get_clone(),
-            rom_obj.get_rom_status(),
-            rom_obj.get_launch_count(),
-            rom_obj.get_last_launch_date(),
-            rom_obj.is_favourite(),
-            rom_obj.get_scanned_with(),
-            rom_obj.get_id())
+                          rom_obj.get_name(),
+                          rom_obj.get_number_of_players(),
+                          rom_obj.get_number_of_players_online(),
+                          rom_obj.get_esrb_rating(),
+                          rom_obj.get_pegi_rating(),
+                          rom_obj.get_platform(),
+                          rom_obj.get_box_sizing(),
+                          rom_obj.get_nointro_status(),
+                          rom_obj.get_clone(),
+                          rom_obj.get_rom_status(),
+                          rom_obj.get_launch_count(),
+                          rom_obj.get_last_launch_date(),
+                          rom_obj.is_favourite(),
+                          rom_obj.get_scanned_with(),
+                          rom_obj.get_id())
         
         for asset in rom_obj.get_assets():
-            if not asset.get_id(): self._insert_asset(asset, rom_obj)
-            else: self._update_asset(asset, rom_obj)            
+            if not asset.get_id():
+                self._insert_asset(asset, rom_obj)
+            else:
+                self._update_asset(asset, rom_obj)
         
         for asset_path in rom_obj.get_asset_paths():
-            if not asset_path.get_id(): self._insert_asset_path(asset_path, rom_obj)
-            else: self._update_asset_path(asset_path, rom_obj)    
+            if not asset_path.get_id():
+                self._insert_asset_path(asset_path, rom_obj)
+            else:
+                self._update_asset_path(asset_path, rom_obj)
             
         for mapping in rom_obj.asset_mappings:
             if mapping.get_id() == '':
@@ -1473,17 +1475,17 @@ class ROMsRepository(object):
         tag_data = rom_obj.get_tag_data()
         self._update_tags(tag_data, rom_obj.get_custom_attribute('metadata_id'))
 
-        self._update_scanned_data(rom_obj.get_id(),rom_obj.scanned_data)
+        self._update_scanned_data(rom_obj.get_id(), rom_obj.scanned_data)
         self._update_launchers(rom_obj.get_id(), rom_obj.get_launchers())
               
     def delete_rom(self, rom_id: str):
         self.logger.info("ROMsRepository.delete_rom(): Deleting ROM '{}'".format(rom_id))
         self._uow.execute(qry.DELETE_ROM, rom_id)
 
-    def delete_roms_by_romcollection(self, romcollection_id:str):
+    def delete_roms_by_romcollection(self, romcollection_id: str):
         self._uow.execute(qry.DELETE_ROMS_BY_COLLECTION, romcollection_id)
 
-    def remove_launcher(self, rom_id: str, launcher_id:str):
+    def remove_launcher(self, rom_id: str, launcher_id: str):
         self._uow.execute(qry.DELETE_ROM_LAUNCHER, rom_id, launcher_id)
 
     def insert_tag(self, tag: str) -> str:
@@ -1527,33 +1529,25 @@ class ROMsRepository(object):
             return
         self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())          
 
-    def _update_launchers(self, rom_id: str, rom_launchers: typing.List[ROMLauncherAddon]):        
+    def _update_launchers(self, rom_id: str, rom_launchers: typing.List[ROMLauncherAddon]):
         for rom_launcher in rom_launchers:
-            if rom_launcher.get_id() is None:
-                rom_launcher.set_id(text.misc_generate_random_SID())
-                self._uow.execute(qry.INSERT_ROM_LAUNCHER,
-                    rom_launcher.get_id(),
-                    rom_id, 
-                    rom_launcher.addon.get_id(), 
-                    rom_launcher.get_settings_str(), 
-                    rom_launcher.is_default())
+            if rom_launcher.get_custom_attribute("rom_id") is None:
+                self._uow.execute(qry.INSERT_ROM_LAUNCHER, rom_launcher.get_id(), rom_id, rom_launcher.is_default())
             else:
-                self._uow.execute(qry.UPDATE_ROM_LAUNCHER,
-                    rom_launcher.get_settings_str(), 
-                    rom_launcher.is_default(),
-                    rom_launcher.get_id())
-    
-    def _update_scanned_data(self, rom_id:str, scanned_data:dict):
+                self._uow.execute(qry.UPDATE_ROM_LAUNCHER, rom_launcher.is_default(), rom_id, rom_launcher.get_id())
+     
+    def _update_scanned_data(self, rom_id: str, scanned_data: dict):
         self._uow.execute(qry.DELETE_SCANNED_DATA, rom_id)
         for key, value in scanned_data.items():
             self._uow.execute(qry.INSERT_ROM_SCANNED_DATA, rom_id, key, value)
 
-    def _update_tags(self, tag_data:dict, metadata_id:str):
+    def _update_tags(self, tag_data: dict, metadata_id: str):
         self._uow.execute(qry.DELETE_EXISTING_ROM_TAGS, metadata_id)
         self._insert_tags(tag_data, metadata_id)
 
-    def _insert_tags(self, tag_data:dict, metadata_id:str):
-        if tag_data is None: return
+    def _insert_tags(self, tag_data: dict, metadata_id: str):
+        if tag_data is None:
+            return
 
         existing_tags = self.find_all_tags()
         for tag_name, tag_id in tag_data.items():
@@ -1564,7 +1558,7 @@ class ROMsRepository(object):
                     tag_id = existing_tags[tag_name]
             self._uow.execute(qry.ADD_TAG_TO_ROM, metadata_id, tag_id)
 
-    def _get_queries_by_vcollection_type(self, vcollection:VirtualCollection) -> typing.Tuple[str, str]:
+    def _get_queries_by_vcollection_type(self, vcollection: VirtualCollection) -> typing.Tuple[str, str]:
         
         vcollection_id  = vcollection.get_id()
         vcategory_id    = vcollection.get_parent_id()
@@ -1632,19 +1626,19 @@ class AelAddonRepository(object):
         for addon_data in result_set:
             yield AelAddon(addon_data)
 
-    def find_all_launchers(self) -> typing.Iterator[AelAddon]:
+    def find_all_launcher_addons(self) -> typing.Iterator[AelAddon]:
         self._uow.execute(qry.SELECT_LAUNCHER_ADDONS)
         result_set = self._uow.result_set()
         for addon_data in result_set:
             yield AelAddon(addon_data)
 
-    def find_all_scanners(self) -> typing.Iterator[AelAddon]:        
+    def find_all_scanner_addons(self) -> typing.Iterator[AelAddon]:
         self._uow.execute(qry.SELECT_SCANNER_ADDONS)
         result_set = self._uow.result_set()
         for addon_data in result_set:
             yield AelAddon(addon_data)
 
-    def find_all_scrapers(self) -> typing.Iterator[AelAddon]:        
+    def find_all_scraper_addons(self) -> typing.Iterator[AelAddon]:
         self._uow.execute(qry.SELECT_SCRAPER_ADDONS)
         result_set = self._uow.result_set()
         for addon_data in result_set:
@@ -1808,18 +1802,47 @@ class LibrariesRepository(object):
         if asset_path.get_custom_attribute('library_id') is None:
             self._uow.execute(qry.INSERT_LIBRARY_ASSET_PATH, library.get_id(), asset_path.get_id())
 
-    def _update_launchers(self, library_id: str, rom_launchers: typing.List[ROMLauncherAddon]):        
+    def _update_launchers(self, library_id: str, rom_launchers: typing.List[ROMLauncherAddon]):
         for rom_launcher in rom_launchers:
-            if rom_launcher.get_id() is None:
-                rom_launcher.set_id(text.misc_generate_random_SID())
-                self._uow.execute(qry.INSERT_LIBRARY_LAUNCHER,
-                                  rom_launcher.get_id(),
-                                  library_id,
-                                  rom_launcher.addon.get_id(),
-                                  rom_launcher.get_settings_str(),
-                                  rom_launcher.is_default())
+            if rom_launcher.get_custom_attribute("library_id") is None:
+                self._uow.execute(qry.INSERT_LIBRARY_LAUNCHER, rom_launcher.get_id(), library_id, rom_launcher.is_default())
             else:
-                self._uow.execute(qry.UPDATE_LIBRARY_LAUNCHER,
-                                  rom_launcher.get_settings_str(),
-                                  rom_launcher.is_default(),
-                                  rom_launcher.get_id())
+                self._uow.execute(qry.UPDATE_LIBRARY_LAUNCHER, rom_launcher.is_default(), library_id, rom_launcher.get_id())
+
+
+class LaunchersRepository(object):
+
+    def __init__(self, uow: UnitOfWork):
+        self._uow = uow
+        self.logger = logging.getLogger(__name__)
+
+    def find(self, id: str) -> ROMLauncherAddon:
+        if id is None:
+            return None
+        
+        self._uow.execute(qry.SELECT_LAUNCHER, id)
+        result_set = self._uow.single_result()
+        addon = AelAddon(result_set.copy())
+        
+        return ROMLauncherAddon(result_set, addon)
+    
+    def find_all(self) -> typing.Iterator[ROMLauncherAddon]:
+        self._uow.execute(qry.SELECT_LAUNCHERS)
+        result_sets = self._uow.result_set()
+        
+        for result_set in result_sets:
+            addon = AelAddon(result_set.copy())
+            yield ROMLauncherAddon(result_set, addon)
+  
+    def insert_launcher(self, launcher: ROMLauncherAddon):
+        self.logger.info(f"LaunchersRepository.insert_launcher(): Inserting new launcher '{launcher.get_name()}'")
+        addon = launcher.get_addon()
+        self._uow.execute(qry.INSERT_LAUNCHER, launcher.get_id(), launcher.get_name(), addon.get_id(), launcher.get_settings_str())
+                  
+    def update_launcher(self, launcher: ROMLauncherAddon):
+        self.logger.info(f"LaunchersRepository.update_launcher(): Updating launcher '{launcher.get_name()}'")
+        self._uow.execute(qry.UPDATE_LAUNCHER, launcher.get_name(), launcher.get_settings_str(), launcher.get_id())
+        
+    def delete_launcher(self, launcher: ROMLauncherAddon):
+        self.logger.info(f"LaunchersRepository.delete_launcher(): Deleting library '{launcher.get_id()}'")
+        self._uow.execute(qry.DELETE_LAUNCHER, launcher.get_id())

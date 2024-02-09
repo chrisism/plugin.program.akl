@@ -738,6 +738,18 @@ msgctxt "#40916"
 msgid "Add Library"
 msgstr ""
 
+msgctxt "#40917"
+msgid "Add Launcher"
+msgstr ""
+
+msgctxt "#40918"
+msgid "Edit Launcher"
+msgstr ""
+
+msgctxt "#40919"
+msgid "Remove Launcher"
+msgstr ""
+
 ############################
 # Headers and texts / notifications / dialogs
 ############################
@@ -954,7 +966,7 @@ msgid "No launchers configured for this ROM!"
 msgstr ""
 
 msgctxt "#41003"
-msgid "No launchers configured for this collection."
+msgid "No launchers associated for this collection."
 msgstr ""
 
 msgctxt "#41004"
@@ -1178,7 +1190,7 @@ msgid "Clear all tags from ROM '{0}'?"
 msgstr ""
 
 msgctxt "#41059"
-msgid "Are you sure to delete launcher '{}'?"
+msgid "Are you sure to unassociate launcher '{}'?"
 msgstr ""
 
 # TODO: obsolete
@@ -1366,10 +1378,9 @@ msgctxt "#41105"
 msgid "Choose launcher"
 msgstr "" 
 
-# TODO: obsolete
-# msgctxt "#41106"
-# msgid "Manage ROM scanners for {}"
-# msgstr "" 
+msgctxt "#41106"
+msgid "Choose launcher addon type"
+msgstr "" 
 
 msgctxt "#41107"
 msgid "Choose scanner to associate"
@@ -1379,10 +1390,9 @@ msgctxt "#41108"
 msgid "Choose scanner to edit"
 msgstr "" 
 
-# TODO: obsolete
-# msgctxt "#41109"
-# msgid "Choose scanner to remove"
-# msgstr "" 
+msgctxt "#41109"
+msgid "Added launcher '{0}'"
+msgstr ""
 
 msgctxt "#41110"
 msgid "Scrape library '{0}' ROMs"
@@ -1630,6 +1640,10 @@ msgstr ""
 
 msgctxt "#41170"
 msgid "Deleted library {0}"
+msgstr ""
+
+msgctxt "#41171"
+msgid "Set launcher '{0}' as default?"
 msgstr ""
 
 ############################

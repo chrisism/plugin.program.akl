@@ -37,15 +37,22 @@ CREATE TABLE IF NOT EXISTS library_assetpaths(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-CREATE TABLE IF NOT EXISTS library_launchers(
-    id TEXT PRIMARY KEY, 
-    library_id TEXT,
+CREATE TABLE IF NOT EXISTS launchers(
+    id TEXT PRIMARY KEY,
+    name TEXT,
     akl_addon_id TEXT,
     settings TEXT,
+    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS library_launchers(
+    library_id TEXT,
+    launcher_id TEXT,
     is_default INTEGER DEFAULT 0 NOT NULL,
     FOREIGN KEY (library_id) REFERENCES libraries (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
+    FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 -- --------------------------------------
@@ -67,13 +74,30 @@ INSERT INTO library_assetpaths (library_id, assetpaths_id)
     SELECT ra.romcollection_id, ra.assetpaths_id
     FROM romcollection_assetpaths as ra;
 
+INSERT INTO launchers (id, name, akl_addon_id, settings)
+    SELECT rl.id, a.name || ' (' || rl.id || ')', rl.settings
+    FROM rom_launchers AS rl
+        INNER JOIN akl_addon AS a ON rl.akl_addon_id = a.id;
+
+INSERT INTO launchers (id, name, akl_addon_id, settings)
+    SELECT rcl.id, a.name || ' (' || rcl.id || ')', rcl.settings
+    FROM romcollection_launchers AS rcl
+        INNER JOIN akl_addon AS a ON rcl.akl_addon_id = a.id;
+
+INSERT INTO library_launchers(library_id, launcher_id, is_default)
+    SELECT rcl.romcollection_id, rcl.id, rcl.is_default
+    FROM romcollection_launchers AS rcl;
+
 -- --------------------------------------
 -- ASSOCIATE ROMS WITH LIBRARY INSTEAD OF SCANNER
+-- AND ALTER LAUNCHER TABLES
 -- --------------------------------------
 PRAGMA foreign_keys=off;
 BEGIN TRANSACTION;
 
 ALTER TABLE roms RENAME TO _roms_old;
+ALTER TABLE romcollection_launchers RENAME TO _romcollection_launchers_old;
+ALTER TABLE rom_launchers RENAME TO _rom_launchers_old;
 
 CREATE TABLE IF NOT EXISTS roms(
     id TEXT PRIMARY KEY, 
@@ -99,6 +123,26 @@ CREATE TABLE IF NOT EXISTS roms(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
+CREATE TABLE IF NOT EXISTS romcollection_launchers(
+    romcollection_id TEXT,
+    launcher_id TEXT,
+    is_default INTEGER DEFAULT 0 NOT NULL,
+    FOREIGN KEY (romcollection_id) REFERENCES romcollections (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+CREATE TABLE IF NOT EXISTS rom_launchers(
+    rom_id TEXT,
+    launcher_id TEXT,
+    is_default INTEGER DEFAULT 0 NOT NULL,
+    FOREIGN KEY (rom_id) REFERENCES roms (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
 INSERT INTO roms (
     id,name,num_of_players,num_of_players_online,esrb_rating,pegi_rating,nointro_status,pclone_status,cloneof,
     platform,box_size,rom_status,is_favourite, launch_count, last_launch_timestamp, metadata_id, scanned_by_id
@@ -107,12 +151,22 @@ INSERT INTO roms (
     platform,box_size,rom_status,is_favourite, launch_count, last_launch_timestamp, metadata_id, scanned_by_id
  FROM _roms_old;
 
+INSERT INTO romcollection_launchers(romcollection_id, launcher_id, is_default)
+    SELECT rcl.romcollection_id, rcl.id, rcl.is_default
+    FROM _romcollection_launchers_old AS rcl;
+
+INSERT INTO rom_launchers(rom_id, launcher_id, is_default)
+    SELECT rc.rom_id, rc.id, rc.is_default
+    FROM _rom_launchers_old AS rc;
+
 -- --------------------------------------
 -- CLEANUP OLD TABLES
 -- --------------------------------------
 DROP TABLE romcollection_scanners;
 DROP TABLE romcollection_assetpaths;
 DROP TABLE _roms_old;
+DROP TABLE _romcollection_launchers_old;
+DROP TABLE _rom_launchers_old;
 
 COMMIT;
 
@@ -128,6 +182,8 @@ DROP VIEW vw_roms;
 DROP VIEW vw_rom_assets;
 DROP VIEW vw_rom_asset_paths;
 DROP VIEW vw_rom_tags;
+DROP VIEW vw_romcollection_launchers;
+DROP VIEW vw_rom_launchers;
 
 CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT 
     l.id AS id, 
@@ -144,20 +200,6 @@ CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT
     a.extra_settings,
     (SELECT COUNT(*) FROM roms AS rms WHERE rms.scanned_by_id = l.id) as num_roms
 FROM libraries AS l
-    INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
-
-CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
-    l.id AS id,
-    l.library_id,
-    a.id AS associated_addon_id,
-    a.name,
-    a.addon_id,
-    a.version,
-    a.addon_type,
-    a.extra_settings,
-    l.settings,
-    l.is_default
-FROM library_launchers AS l
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
 
 CREATE VIEW IF NOT EXISTS vw_library_asset_paths AS SELECT
@@ -249,3 +291,51 @@ CREATE VIEW IF NOT EXISTS vw_rom_tags AS SELECT
 FROM tags AS t
  INNER JOIN metatags AS mt ON t.id = mt.tag_id
  INNER JOIN roms AS r ON mt.metadata_id = r.metadata_id;
+ 
+CREATE VIEW IF NOT EXISTS vw_romcollection_launchers AS SELECT
+    l.id AS id,
+    l.name AS name
+    rcl.romcollection_id,
+    a.id AS associated_addon_id,
+    a.name,
+    a.addon_id,
+    a.version,
+    a.addon_type,
+    a.extra_settings,
+    l.settings,
+    rcl.is_default
+FROM romcollection_launchers AS rcl
+    INNER JOIN launchers AS l ON rcl.launcher_id = l.id
+    INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
+    
+CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
+    l.id AS id,
+    l.name AS name
+    ll.library_id,
+    a.id AS associated_addon_id,
+    a.name,
+    a.addon_id,
+    a.version,
+    a.addon_type,
+    a.extra_settings,
+    l.settings,
+    ll.is_default
+FROM library_launchers AS ll
+    INNER JOIN launchers AS l ON ll.library_id = l.id
+    INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
+
+CREATE VIEW IF NOT EXISTS vw_rom_launchers AS SELECT
+    l.id AS id,
+    l.name AS name
+    rl.rom_id,
+    a.id AS associated_addon_id,
+    a.name,
+    a.addon_id,
+    a.version,
+    a.addon_type,
+    a.extra_settings,
+    l.settings,
+    rl.is_default
+FROM rom_launchers AS rl
+    INNER JOIN launchers AS l ON rl.rom_id = l.id
+    INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;

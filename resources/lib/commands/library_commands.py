@@ -44,7 +44,7 @@ def cmd_add_library(args):
         addon_repository = AelAddonRepository(uow)
         library_repository = LibrariesRepository(uow)
         
-        addons = addon_repository.find_all_scanners()
+        addons = addon_repository.find_all_scanner_addons()
         for addon in addons:
             options[addon] = addon.get_name()
     

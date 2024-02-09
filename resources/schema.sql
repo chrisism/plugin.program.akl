@@ -1,3 +1,6 @@
+-------------------------------------------------
+-- MAIN ENTITIES
+-------------------------------------------------
 CREATE TABLE IF NOT EXISTS metadata(
     id TEXT PRIMARY KEY, 
     year TEXT,
@@ -10,38 +13,6 @@ CREATE TABLE IF NOT EXISTS metadata(
     finished INTEGER DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS tags(
-    id TEXT PRIMARY KEY, 
-    tag TEXT
-);
-
-CREATE TABLE IF NOT EXISTS metatags(
-    metadata_id TEXT,
-    tag_id TEXT,
-    FOREIGN KEY (metadata_id) REFERENCES metadata (id) 
-        ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (tag_id) REFERENCES tags (id) 
-        ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
-CREATE TABLE IF NOT EXISTS assets(
-    id TEXT PRIMARY KEY,
-    filepath TEXT NOT NULL,
-    asset_type TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS assetpaths(
-    id TEXT PRIMARY KEY,
-    path TEXT NOT NULL,
-    asset_type TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS assetmappings (
-    id TEXT PRIMARY KEY,
-    mapped_asset_type TEXT NOT NULL,
-    to_asset_type TEXT NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS akl_addon(
     id TEXT PRIMARY KEY, 
     name TEXT,
@@ -50,7 +21,6 @@ CREATE TABLE IF NOT EXISTS akl_addon(
     addon_type TEXT,
     extra_settings TEXT
 );
-
 
 CREATE TABLE IF NOT EXISTS libraries(
     id TEXT PRIMARY KEY,
@@ -112,11 +82,58 @@ CREATE TABLE IF NOT EXISTS roms(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
+CREATE TABLE IF NOT EXISTS tags(
+    id TEXT PRIMARY KEY, 
+    tag TEXT
+);
+
+CREATE TABLE IF NOT EXISTS assets(
+    id TEXT PRIMARY KEY,
+    filepath TEXT NOT NULL,
+    asset_type TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS assetpaths(
+    id TEXT PRIMARY KEY,
+    path TEXT NOT NULL,
+    asset_type TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS assetmappings (
+    id TEXT PRIMARY KEY,
+    mapped_asset_type TEXT NOT NULL,
+    to_asset_type TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS launchers(
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    akl_addon_id TEXT,
+    settings TEXT,
+    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+-------------------------------------------------
+-- SECONDARY ENTITIES
+-------------------------------------------------
 CREATE TABLE IF NOT EXISTS scanned_roms_data(
     rom_id TEXT,
     data_key TEXT NOT NULL,
     data_value TEXT NULL,
     FOREIGN KEY (rom_id) REFERENCES roms (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+-------------------------------------------------
+-- ENTITY JOIN TABLES
+-------------------------------------------------
+CREATE TABLE IF NOT EXISTS metatags(
+    metadata_id TEXT,
+    tag_id TEXT,
+    FOREIGN KEY (metadata_id) REFERENCES metadata (id) 
+        ON DELETE CASCADE ON UPDATE NO ACTION,
+    FOREIGN KEY (tag_id) REFERENCES tags (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -154,41 +171,34 @@ CREATE TABLE IF NOT EXISTS import_rule(
 );
 
 CREATE TABLE IF NOT EXISTS romcollection_launchers(
-    id TEXT PRIMARY KEY, 
     romcollection_id TEXT,
-    akl_addon_id TEXT,
-    settings TEXT,
+    launcher_id TEXT,
     is_default INTEGER DEFAULT 0 NOT NULL,
     FOREIGN KEY (romcollection_id) REFERENCES romcollections (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
+    FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS library_launchers(
-    id TEXT PRIMARY KEY, 
     library_id TEXT,
-    akl_addon_id TEXT,
-    settings TEXT,
+    launcher_id TEXT,
     is_default INTEGER DEFAULT 0 NOT NULL,
     FOREIGN KEY (library_id) REFERENCES libraries (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
+    FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS rom_launchers(
-    id TEXT PRIMARY KEY, 
     rom_id TEXT,
-    akl_addon_id TEXT,
-    settings TEXT,
+    launcher_id TEXT,
     is_default INTEGER DEFAULT 0 NOT NULL,
     FOREIGN KEY (rom_id) REFERENCES roms (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (akl_addon_id) REFERENCES akl_addon (id) 
+    FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
-
 -------------------------------------------------
 -- ASSETS JOIN TABLES
 -------------------------------------------------
@@ -404,7 +414,8 @@ FROM tags AS t
 
 CREATE VIEW IF NOT EXISTS vw_romcollection_launchers AS SELECT
     l.id AS id,
-    l.romcollection_id,
+    l.name AS name
+    rcl.romcollection_id,
     a.id AS associated_addon_id,
     a.name,
     a.addon_id,
@@ -412,13 +423,15 @@ CREATE VIEW IF NOT EXISTS vw_romcollection_launchers AS SELECT
     a.addon_type,
     a.extra_settings,
     l.settings,
-    l.is_default
-FROM romcollection_launchers AS l
+    rcl.is_default
+FROM romcollection_launchers AS rcl
+    INNER JOIN launchers AS l ON rcl.launcher_id = l.id
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
     
 CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
     l.id AS id,
-    l.library_id,
+    l.name AS name
+    ll.library_id,
     a.id AS associated_addon_id,
     a.name,
     a.addon_id,
@@ -426,21 +439,25 @@ CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
     a.addon_type,
     a.extra_settings,
     l.settings,
-    l.is_default
-FROM library_launchers AS l
+    ll.is_default
+FROM library_launchers AS ll
+    INNER JOIN launchers AS l ON ll.library_id = l.id
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
 
 CREATE VIEW IF NOT EXISTS vw_rom_launchers AS SELECT
     l.id AS id,
-    l.rom_id,
+    l.name AS name
+    rl.rom_id,
     a.id AS associated_addon_id,
     a.name,
     a.addon_id,
     a.version,
     a.addon_type,
+    a.extra_settings,
     l.settings,
-    l.is_default
-FROM rom_launchers AS l
+    rl.is_default
+FROM rom_launchers AS rl
+    INNER JOIN launchers AS l ON rl.rom_id = l.id
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
 
 CREATE TABLE IF NOT EXISTS akl_version(

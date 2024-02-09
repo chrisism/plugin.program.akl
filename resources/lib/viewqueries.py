@@ -34,7 +34,7 @@ from akl.utils import kodi
 from resources.lib import globals
 from resources.lib.commands.mediator import AppMediator
 from resources.lib.commands import view_rendering_commands
-from resources.lib.repositories import ViewRepository, UnitOfWork, ROMsRepository, LibrariesRepository, g_assetFactory
+from resources.lib.repositories import ViewRepository, UnitOfWork, ROMsRepository, LibrariesRepository, LaunchersRepository, g_assetFactory
 
 
 logger = logging.getLogger(__name__)
@@ -342,7 +342,51 @@ def qry_get_libraries():
         
         return container
 
-    
+   
+#
+# Launcher items
+#
+def qry_get_launchers():
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    container = None
+    with uow:
+        repository = LaunchersRepository(uow)
+        launchers = repository.find_all()
+        
+        container = {
+            'id': '',
+            'name': kodi.translate(constants.OBJ_LAUNCHER),
+            'obj_type': constants.OBJ_LAUNCHER,
+            'items': []
+        }
+        
+        listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()
+
+        for launcher in launchers:
+            listitem_name = launcher.get_name()
+            container['items'].append({
+                'id': launcher.get_id(),
+                'name': listitem_name,
+                'is_folder': False,
+                'type': 'video',
+                'info': {
+                    'title': listitem_name,
+                    'plot': f'Launcher of type {launcher.addon.get_addon_type()}',
+                    'overlay': 4
+                },
+                'art': {
+                    'fanart': listitem_fanart,
+                    'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
+                    'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
+                },
+                'properties': {
+                    'obj_type': constants.OBJ_LAUNCHER
+                }
+            })
+        
+        return container
+
+     
 #
 # Utilities items
 #
@@ -643,29 +687,27 @@ def qry_container_context_menu_items(container_data) -> typing.List[typing.Tuple
     container_id = container_data['id'] if 'id' in container_data else ''
     container_parentid = container_data['parent_id'] if 'parent_id' in container_data else ''
     
-    is_category: bool = container_type == constants.OBJ_CATEGORY
-    is_romcollection: bool = container_type == constants.OBJ_ROMCOLLECTION
-    is_library: bool = container_type == constants.OBJ_LIBRARY
-    is_virtual_category: bool = container_type == constants.OBJ_CATEGORY_VIRTUAL
-    is_virtual_collection: bool = container_type == constants.OBJ_COLLECTION_VIRTUAL
     is_root: bool = container_data['id'] == ''
     
     commands = []
-    if is_category:
+    if container_type == constants.OBJ_CATEGORY:
         commands.append((kodi.translate(40893).format(container_name),
                         _context_menu_url_for('execute/command/render_category_view', {'category_id': container_id})))
        
-    if is_library and is_root:
+    if container_type == constants.OBJ_LIBRARY and is_root:
         commands.append((kodi.translate(40916), _context_menu_url_for('/execute/command/add_library')))
         
-    if is_romcollection:
+    if container_type == constants.OBJ_LAUNCHER and is_root:
+        commands.append((kodi.translate(40917), _context_menu_url_for('/execute/command/add_launcher')))
+        
+    if container_type == constants.OBJ_ROMCOLLECTION:
         commands.append((kodi.translate(40894), _context_menu_url_for(f'/collection/{container_id}/search')))
         commands.append((kodi.translate(40893).format(container_name),
                          _context_menu_url_for('execute/command/render_romcollection_view', {'romcollection_id': container_id})))
-    if is_virtual_category and not is_root:
+    if container_type == constants.OBJ_CATEGORY_VIRTUAL and not is_root:
         commands.append((kodi.translate(40893).format(container_name),
                         _context_menu_url_for('execute/command/render_vcategory_view', {'vcategory_id': container_id})))
-    if is_virtual_collection:
+    if container_type == constants.OBJ_COLLECTION_VIRTUAL:
         commands.append((kodi.translate(40893).format(container_name),
                         _context_menu_url_for('execute/command/render_vcategory_view', {'vcategory_id': container_parentid})))
     
@@ -696,6 +738,7 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
     
     is_category: bool = item_type == constants.OBJ_CATEGORY
     is_library: bool = item_type == constants.OBJ_LIBRARY
+    is_launcher: bool = item_type == constants.OBJ_LAUNCHER
     is_romcollection: bool = item_type == constants.OBJ_ROMCOLLECTION
     is_virtual_category: bool = item_type == constants.OBJ_CATEGORY_VIRTUAL
     is_rom: bool = item_type == constants.OBJ_ROM
@@ -725,6 +768,13 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
             commands.append((kodi.translate(40916), _context_menu_url_for('/execute/command/add_library')))
         if item_id and len(item_id) > 0:
             commands.append((kodi.translate(40915), _context_menu_url_for(f'/library/edit/{item_id}')))
+        
+    if is_launcher:
+        if not item_id or len(item_id) == 0:
+            commands.append((kodi.translate(40917), _context_menu_url_for('/execute/command/add_launcher')))
+        if item_id and len(item_id) > 0:
+            commands.append((kodi.translate(40918), _context_menu_url_for(f'/launcher/edit/{item_id}')))
+            commands.append((kodi.translate(40919), _context_menu_url_for(f'/launcher/delete/{item_id}')))
         
     if not is_category and container_is_category:
         if container_is_root:

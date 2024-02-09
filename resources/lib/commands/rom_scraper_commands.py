@@ -555,7 +555,7 @@ def cmd_configure_scraper_ignore_mode(args):
 def _select_scraper(uow: UnitOfWork, title: str, scraper_settings: ScraperSettings) -> ScraperAddon:
     selected_addon = None
     repository = AelAddonRepository(uow)
-    addons = repository.find_all_scrapers()
+    addons = repository.find_all_scraper_addons()
     
     # --- Make a menu list of available metadata scrapers ---
     options = {}

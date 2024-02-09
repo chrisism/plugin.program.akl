@@ -27,8 +27,9 @@ from akl import constants
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
-from resources.lib.repositories import UnitOfWork, AelAddonRepository, ROMCollectionRepository, ROMsRepository, LibrariesRepository
-from resources.lib.domain import ROM
+from resources.lib.repositories import UnitOfWork, ROMCollectionRepository, ROMsRepository, LibrariesRepository
+from resources.lib.repositories import AelAddonRepository, LaunchersRepository
+from resources.lib.domain import ROM, ROMLauncherAddon
 
 logger = logging.getLogger(__name__)
 
@@ -37,53 +38,30 @@ logger = logging.getLogger(__name__)
 # ROMCollection API commands
 # -------------------------------------------------------------------------------------------------
 def cmd_set_launcher_args(args) -> bool:
-    romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
-    rom_id: str = args['rom_id'] if 'rom_id' in args else None
-    launcher_id: str = args['akl_addon_id'] if 'akl_addon_id' in args else None
+    launcher_id: str = args['launcher_id'] if 'launcher_id' in args else None
     addon_id: str = args['addon_id'] if 'addon_id' in args else None
     launcher_settings = args['settings'] if 'settings' in args else None
-        
-    metadata_updated = False
         
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         addon_repository = AelAddonRepository(uow)
-        romcollection_repository = ROMCollectionRepository(uow)
-        rom_repository = ROMsRepository(uow)
+        launchers_repository = LaunchersRepository(uow)
         
         addon = addon_repository.find_by_addon_id(addon_id, constants.AddonType.LAUNCHER)
+        launcher = launchers_repository.find(launcher_id)
         
-        if romcollection_id is not None:
-            romcollection = romcollection_repository.find_romcollection(romcollection_id)
-            if launcher_id is None:
-                romcollection.add_launcher(addon, launcher_settings, True)
-            else:
-                launcher = romcollection.get_launcher(launcher_id)
-                launcher.set_settings(launcher_settings)
-                
-            if 'romcollection' in launcher_settings \
-                    and kodi.dialog_yesno(kodi.translate(41050)):
-                romcollection.import_data_dic(launcher_settings['romcollection'])
-                metadata_updated = True
-                
-            romcollection_repository.update_romcollection(romcollection)
-            uow.commit()
-            
-            if metadata_updated:
-                AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})
-            AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id})
+        if launcher is None:
+            launcher = ROMLauncherAddon(None, addon)
+            launcher.set_settings(launcher_settings)
+            launchers_repository.insert_launcher(launcher)
         else:
-            rom = rom_repository.find_rom(rom_id)
-            if launcher_id is None:
-                rom.add_launcher(addon, launcher_settings, True)
-            else: 
-                launcher = rom.get_launcher(launcher_id)
-                launcher.set_settings(launcher_settings)
-                
-            rom_repository.update_rom(rom)
-            uow.commit()
+            launcher.set_settings(launcher_settings)
+            launchers_repository.update_launcher(launcher)
+        
+        uow.commit()
     
-    kodi.notify(kodi.translate(41005).format(addon.get_name()))
+    kodi.refresh_container()
+    kodi.notify(kodi.translate(41005).format(launcher.get_name()))
     return True
 
 

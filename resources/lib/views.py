@@ -183,6 +183,18 @@ def vw_route_render_libraries():
     _render_list_items(container, container_context_items)
     xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
 
+
+# -------------------------------------------------------------------------------------------------
+# Launchers
+# -------------------------------------------------------------------------------------------------
+@router.route('/launchers')
+def vw_route_render_launchers():
+    container = viewqueries.qry_get_launchers()
+    container_context_items = viewqueries.qry_container_context_menu_items(container)
+
+    _render_list_items(container, container_context_items)
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
+
        
 # -------------------------------------------------------------------------------------------------
 # Utilities and Global reports
@@ -224,7 +236,7 @@ def vw_add_category(category_id: str = None, parent_category_id: str = None):
 
 @router.route('/categories/edit/<category_id>')
 def vw_edit_category(category_id: str):
-    AppMediator.async_cmd('EDIT_CATEGORY', {'category_id': category_id })
+    AppMediator.async_cmd('EDIT_CATEGORY', {'category_id': category_id})
 
 
 @router.route('/categories/addrom/<category_id>')
@@ -258,9 +270,19 @@ def vw_edit_library(library_id: str):
     AppMediator.async_cmd('EDIT_LIBRARY', {'library_id': library_id})
 
 
+@router.route('/launcher/edit/<launcher_id>')
+def vw_edit_launcher(launcher_id: str):
+    AppMediator.async_cmd('EDIT_LAUNCHER', {'launcher_id': launcher_id})
+
+
+@router.route('/launcher/delete/<launcher_id>')
+def vw_delete_launcher(launcher_id: str):
+    AppMediator.async_cmd('DELETE_LAUNCHER', {'launcher_id': launcher_id})
+
+
 @router.route('/rom/edit/<rom_id>')
 def vw_edit_rom(rom_id: str):
-    AppMediator.async_cmd('EDIT_ROM', {'rom_id': rom_id })
+    AppMediator.async_cmd('EDIT_ROM', {'rom_id': rom_id})
 
 
 # -------------------------------------------------------------------------------------------------
@@ -285,14 +307,14 @@ def vw_view_rom(rom_id):
 def vw_view_rom_metadata(rom_id):
     container = viewqueries.qry_get_view_metadata(rom_id)
     _render_list_items(container)
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
 
 
 @router.route('/rom/<rom_id>/assets')
 def vw_view_rom_assets(rom_id):
     container = viewqueries.qry_get_view_assets(rom_id)
     _render_list_items(container)
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
 
 
 @router.route('/rom/<rom_id>/scanneddata')

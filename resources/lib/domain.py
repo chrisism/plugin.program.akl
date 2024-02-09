@@ -246,7 +246,7 @@ class Asset(EntityABC):
 class AssetPath(EntityABC):
         
     def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
-        self.asset_info:AssetInfo = None
+        self.asset_info: AssetInfo = None
         if entity_data is None:
             entity_data =  {
                 'id' : '',
@@ -356,6 +356,9 @@ class ROMAddon(EntityABC):
             return '{} ({})'.format(self.addon.get_name(), secondary_name)
         return self.addon.get_name()
     
+    def get_addon_name(self):
+        return self.addon.get_name()
+    
     def get_secondary_name(self):
         settings = self.get_settings()
         return settings['secname'] if 'secname' in settings else None
@@ -369,8 +372,15 @@ class ROMAddon(EntityABC):
             return {}
         return json.loads(settings)
     
+    def get_setting(self, setting_key: str, default_value=None):
+        settings = self.get_settings()
+        return settings[setting_key] if setting_key in settings else default_value
+    
     def set_settings_str(self, addon_settings: str):
         self.entity_data['settings'] = addon_settings
+        new_name = self.get_setting('name')
+        if new_name:
+            self.entity_data['name'] = new_name
     
     def set_settings(self, addon_settings: dict):
         self.entity_data['settings'] = json.dumps(addon_settings)
@@ -381,7 +391,22 @@ class ROMAddon(EntityABC):
 
 class ROMLauncherAddon(ROMAddon):
     __metaclass__ = abc.ABCMeta
-    
+      
+    def __init__(self,
+                 entity_data: dict = None,
+                 addon: AelAddon = None):
+        
+        if entity_data is None:
+            entity_data = {
+                'id': text.misc_generate_random_SID(),
+                'name': '',
+                'is_default': False
+            }
+        super(ROMLauncherAddon, self).__init__(addon, entity_data)
+        
+    def get_name(self):
+        return self.entity_data["name"]
+        
     def is_default(self) -> bool:
         return self.entity_data['is_default'] if 'is_default' in self.entity_data else False
     
@@ -398,26 +423,24 @@ class ROMLauncherAddon(ROMAddon):
             '--rom_id': rom.get_id()
         }
 
-    def get_configure_command(self, entity: EntityABC) -> dict:
+    def get_configure_command(self) -> dict:
         return {
             '--cmd': 'configure',
             '--type': constants.AddonType.LAUNCHER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--entity_id': entity.get_id(),
-            '--entity_type': entity.get_type(),
             '--akl_addon_id': self.get_id()
         }
     
     def launch(self, rom: ROM):
         kodi.run_script(
-            self.addon.get_addon_id(), 
+            self.addon.get_addon_id(),
             self.get_launch_command(rom))
 
-    def configure(self, entity: EntityABC):
+    def configure(self):
         kodi.run_script(
             self.addon.get_addon_id(),
-            self.get_configure_command(entity))
+            self.get_configure_command())
 
 
 class RetroplayerLauncherAddon(ROMLauncherAddon):
@@ -437,9 +460,9 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
             
         # >> How to fill gameclient = string (game.libretro.fceumm) ???
         game_info = {
-            'title' : rom.get_name(),
+            'title': rom.get_name(),
             'platform': rom.get_platform(),
-            'genres' : [rom.get_genre()],
+            'genres': [rom.get_genre()],
             'developer': rom.get_developer(),
             'overview': rom.get_plot(),
             'year': rom.get_releaseyear()
@@ -585,20 +608,15 @@ class Library(ROMAddon):
     def has_launchers(self) -> bool:
         return len(self.launchers_data) > 0
 
-    def add_launcher(self, addon: AelAddon, settings: dict, is_non_blocking=True, is_default: bool = False):
-        launcher = ROMLauncherAddonFactory.create(addon, { 
-            'settings': json.dumps(settings),
-            'is_non_blocking': is_non_blocking,
-            'is_default': is_default
-        })
+    def add_launcher(self, launcher: ROMLauncherAddon, is_default: bool = False):
         if is_default:
             current_default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
             if current_default_launcher:
                 current_default_launcher.set_default(False)
             
         self.launchers_data.append(launcher)
-        logger.debug(f'Adding addon "{addon.get_addon_id()}" to library "{self.get_name()}"')
-
+        logger.debug(f'Adding launcher "{launcher.get_id()}" to Library "{self.get_name()}"')
+        
     def get_launchers(self) -> typing.List[ROMLauncherAddon]:
         return self.launchers_data
 
@@ -1257,7 +1275,7 @@ class VirtualCategory(Category):
         return constants.KIND_ASSET_CATEGORY
     
     def get_type(self):
-        return constants.OBJ_CATEGORY_VIRTUAL # 42502
+        return constants.OBJ_CATEGORY_VIRTUAL  # 42502
  
 
 # -------------------------------------------------------------------------------------------------
@@ -1362,19 +1380,15 @@ class ROMCollection(MetaDataItemABC):
     def has_launchers(self) -> bool:
         return len(self.launchers_data) > 0
 
-    def add_launcher(self, addon: AelAddon, settings: dict, is_non_blocking = True, is_default: bool = False):
-        launcher = ROMLauncherAddonFactory.create(addon, { 
-            'settings': json.dumps(settings),
-            'is_non_blocking': is_non_blocking,
-            'is_default': is_default
-        })        
+    def add_launcher(self, launcher: ROMLauncherAddon, is_default: bool = False):
         if is_default:
-            current_default_launcher = next((l for l in self.launchers_data if l.is_default()), None)
-            if current_default_launcher: current_default_launcher.set_default(False)
+            current_default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
+            if current_default_launcher:
+                current_default_launcher.set_default(False)
             
         self.launchers_data.append(launcher)
-        logger.debug(f'Adding addon "{addon.get_addon_id()}" to collection "{self.get_name()}"')
-
+        logger.debug(f'Adding launcher "{launcher.get_id()}" to collection "{self.get_name()}"')
+        
     def get_launchers(self) -> typing.List[ROMLauncherAddon]:
         return self.launchers_data
 
@@ -1398,12 +1412,12 @@ class ROMCollection(MetaDataItemABC):
         if current_default_launcher:
             current_default_launcher.set_default(False)
         
-        launcher_to_be_default = next((l for l in self.launchers_data if l.get_id() == launcher_id), None)
+        launcher_to_be_default = next((ldd for ldd in self.launchers_data if ldd.get_id() == launcher_id), None)
         if launcher_to_be_default:
             launcher_to_be_default.set_default(True)
 
     def get_NFO_name(self) -> io.FileName:
-        nfo_dir = io.FileName(settings.getSetting('launchers_asset_dir'), isdir = True)
+        nfo_dir = io.FileName(settings.getSetting('launchers_asset_dir'), isdir=True)
         nfo_file_path = nfo_dir.pjoin(self.get_name() + '.nfo')
         logger.debug("ROMCollection.get_NFO_name() nfo_file_path = '{0}'".format(nfo_file_path.getPath()))
         return nfo_file_path
@@ -1752,25 +1766,20 @@ class ROM(MetaDataItemABC):
     def has_launchers(self) -> bool:
         return len(self.launchers_data) > 0
 
-    def add_launcher(self, addon: AelAddon, settings: dict, is_non_blocking = True, is_default: bool = False):
-        launcher = ROMLauncherAddonFactory.create(addon, { 
-            'settings': json.dumps(settings),
-            'is_non_blocking': is_non_blocking,
-            'is_default': is_default
-        })        
+    def add_launcher(self, launcher: ROMLauncherAddon, is_default: bool = False):
         if is_default:
-            current_default_launcher = next((l for l in self.launchers_data if l.is_default()), None)
+            current_default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
             if current_default_launcher:
                 current_default_launcher.set_default(False)
             
         self.launchers_data.append(launcher)
-        logger.debug(f'Adding addon "{addon.get_addon_id()}" to ROM "{self.get_name()}"')
+        logger.debug(f'Adding launcher "{launcher.get_id()}" to ROM "{self.get_name()}"')
 
     def get_launchers(self) -> typing.List[ROMLauncherAddon]:
         return self.launchers_data
 
-    def get_launcher(self, id:str) -> ROMLauncherAddon:
-        return next((l for l in self.launchers_data if l.get_id() == id), None)
+    def get_launcher(self, id: str) -> ROMLauncherAddon:
+        return next((ld for ld in self.launchers_data if ld.get_id() == id), None)
 
     def get_default_launcher(self) -> ROMLauncherAddon:
         if len(self.launchers_data) == 0:
@@ -2650,9 +2659,9 @@ class ROMLauncherAddonFactory(object):
     @staticmethod
     def create(addon: AelAddon, data:dict) -> ROMLauncherAddon:
         if addon.get_addon_id() == constants.RETROPLAYER_LAUNCHER_APP_NAME:
-            return RetroplayerLauncherAddon(addon, data)
+            return RetroplayerLauncherAddon(data, addon)
                     
-        return ROMLauncherAddon(addon, data)
+        return ROMLauncherAddon(data, addon)
     
 # -------------------------------------------------------------------------------------------------
 # Data model used in the plugin

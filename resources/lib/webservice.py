@@ -225,7 +225,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         elif 'query/library/' in api_path:
             obj = 'Library'
             response_data = self.handle_library_queries(api_path)
-                        
+        elif 'query/launcher/' in api_path:
+            obj = 'Launcher'
+            response_data = self.handle_launcher_queries(api_path)
+            
         if response_data is None:
             self.send_response(404)
             self.send_header('Content-type', 'text/html')
@@ -253,12 +256,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         params = self.get_params()
         id = params.get('id')
         
-        if 'romcollection/launcher/settings/' in api_path:
-            return apiqueries.qry_get_collection_launcher_settings(id, params.get('launcher_id'))
-        # if 'romcollection/scanner/settings/' in api_path:
-        #    return apiqueries.qry_get_collection_scanner_settings(id, params.get('scanner_id'))
-        if 'romcollection/launchers/' in api_path:
-            return apiqueries.qry_get_launchers(id)
         if 'romcollection/roms/' in api_path:
             return apiqueries.qry_get_roms(id)
         if 'romcollection/' in api_path:
@@ -270,12 +267,21 @@ class RequestHandler(BaseHTTPRequestHandler):
         params = self.get_params()
         id = params.get('id')
         
-        if 'library/launcher/settings/' in api_path:
-            return apiqueries.qry_get_collection_launcher_settings(id, params.get('launcher_id'))
         if 'library/scanner/settings/' in api_path:
             return apiqueries.qry_get_library_scanner_settings(id)
-        if 'library/launchers/' in api_path:
-            return apiqueries.qry_get_library_launchers(id)
+        if 'library/roms/' in api_path:
+            return apiqueries.qry_get_roms(id)
+        if 'library/' in api_path:
+            return apiqueries.qry_get_rom_collection(id)
+        
+        return None
+            
+    def handle_launcher_queries(self, api_path):
+        params = self.get_params()
+        id = params.get('launcher_id')
+        
+        if 'library/scanner/settings/' in api_path:
+            return apiqueries.qry_get_library_scanner_settings(id)
         if 'library/roms/' in api_path:
             return apiqueries.qry_get_roms(id)
         if 'library/' in api_path:

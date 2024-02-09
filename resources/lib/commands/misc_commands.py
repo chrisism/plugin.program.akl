@@ -41,7 +41,7 @@ def cmd_execute_import_launchers(args):
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         addon_repository = AelAddonRepository(uow)
-        available_launchers = [*addon_repository.find_all_launchers()]
+        available_launchers = [*addon_repository.find_all_launcher_addons()]
         
         categories_repository = CategoryRepository(uow)
         existing_categories   = [*categories_repository.find_all_categories()]
