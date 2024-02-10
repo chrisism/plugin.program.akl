@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS metadata(
     rating INTEGER NULL,
     plot TEXT,
     extra TEXT,
-    assets_path TEXT,
     finished INTEGER DEFAULT 0
 );
 
@@ -280,7 +279,6 @@ CREATE VIEW IF NOT EXISTS vw_categories AS SELECT
     m.plot AS m_plot,
     m.extra AS extra,
     m.finished AS finished,
-    m.assets_path AS assets_path,
     (SELECT COUNT(*) FROM categories AS sc WHERE sc.parent_id = c.id) AS num_categories,
     (SELECT COUNT(*) FROM romcollections AS sr WHERE sr.parent_id = c.id) AS num_collections
 FROM categories AS c 
@@ -316,7 +314,6 @@ CREATE VIEW IF NOT EXISTS vw_romcollections AS SELECT
     m.plot AS m_plot,
     m.extra AS extra,
     m.finished AS finished,
-    m.assets_path AS assets_path,
     r.platform AS platform,
     r.box_size AS box_size,
     (SELECT COUNT(*) FROM roms AS rms INNER JOIN roms_in_romcollection AS rrs ON rms.id = rrs.rom_id AND rrs.romcollection_id = r.id) as num_roms
@@ -348,7 +345,6 @@ CREATE VIEW IF NOT EXISTS vw_roms AS SELECT
     r.is_favourite,
     r.launch_count,
     r.last_launch_timestamp,
-    m.assets_path AS assets_path,
     (
         SELECT group_concat(t.tag) AS rom_tags
         FROM tags AS t 

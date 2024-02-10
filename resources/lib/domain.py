@@ -71,7 +71,8 @@ class AssetInfo(object):
     path_key = ''
 
     def get_description(self):
-        if self.description == '': return self.name
+        if self.description == '':
+            return self.name
 
         return self.description
 
@@ -205,7 +206,7 @@ class AelAddon(EntityABC):
 class Asset(EntityABC):
 
     def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
-        self.asset_info:AssetInfo = None
+        self.asset_info: AssetInfo = None
         if entity_data is None:
             entity_data = _get_default_asset_data_model()
         
@@ -229,7 +230,7 @@ class Asset(EntityABC):
     def set_path(self, path_str):
         self.entity_data['filepath'] = path_str
     
-    def set_asset_info(self, info:AssetInfo): 
+    def set_asset_info(self, info: AssetInfo):
         self.asset_info = info
     
     def is_assigned(self) -> bool:
@@ -251,10 +252,10 @@ class AssetPath(EntityABC):
     def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
         self.asset_info: AssetInfo = None
         if entity_data is None:
-            entity_data =  {
-                'id' : '',
-                'path' : '',
-                'asset_type' : ''
+            entity_data = {
+                'id': '',
+                'path': '',
+                'asset_type': ''
             }
 
         if 'asset_type' in entity_data and entity_data['asset_type']:
@@ -263,7 +264,7 @@ class AssetPath(EntityABC):
         super(AssetPath, self).__init__(entity_data)
     
     def get_asset_info_id(self) -> str:
-        return self.asset_info.id 
+        return self.asset_info.id
     
     def get_asset_info(self) -> AssetInfo:
         return self.asset_info
@@ -908,7 +909,7 @@ class MetaDataItemABC(EntityABC):
                 video_id = matches.groups()[-1]
                 trailer_str = 'plugin://plugin.video.youtube/play/?video_id={}'.format(video_id)
 
-        trailer_asset = self.get_asset(constants.ASSET_TRAILER_ID)
+        trailer_asset = self.get_asset(constants.ASSET_TRAILER_ID) 
         if trailer_asset is None:
             self.assets[constants.ASSET_TRAILER_ID] = Asset.create(constants.ASSET_TRAILER_ID)
                         
@@ -920,7 +921,7 @@ class MetaDataItemABC(EntityABC):
 
     def get_finished_str_code(self):
         finished = self.is_finished()
-        finished_display = 42014 if finished == True else 42015
+        finished_display = 42014 if finished is True else 42015
 
         return finished_display
 
@@ -931,8 +932,9 @@ class MetaDataItemABC(EntityABC):
 
     # --- Assets/artwork --------------------------------------------------------------------------
     def has_asset(self, asset_info: AssetInfo) -> bool:
-        if not asset_info.id in self.assets: return False
-        return self.assets[asset_info.id] != None and self.assets[asset_info.id].get_path() != ''
+        if asset_info.id not in self.assets:
+            return False
+        return self.assets[asset_info.id] is not None and self.assets[asset_info.id].get_path() != ''
 
     def get_asset(self, asset_id: str) -> Asset:
         return self.assets[asset_id] if asset_id in self.assets else None
@@ -988,7 +990,8 @@ class MetaDataItemABC(EntityABC):
         path = path_FN.getPath() if path_FN else ''
         
         asset = self.get_asset(asset_info.id)
-        if asset is None: self.assets[asset_info.id] = Asset.create(asset_info.id)
+        if asset is None:
+            self.assets[asset_info.id] = Asset.create(asset_info.id)
                         
         self.assets[asset_info.id].set_path(path)
         
@@ -997,28 +1000,11 @@ class MetaDataItemABC(EntityABC):
         if asset is None:
             self.assets[asset_info.id] = Asset.create(asset_info.id)
         asset.clear()
-        
-    def get_assets_root_path(self) -> io.FileName:
-        return self._get_directory_filename_from_field('assets_path')
-    
-    def set_assets_root_path(self, path: io.FileName, asset_ids=[], create_default_subdirectories=False):
-        path_str = path.getPath() if path else ''
-        self.entity_data['assets_path'] = path_str
-        
-        if create_default_subdirectories:
-            asset_ids = self.get_asset_ids_list() if not asset_ids else asset_ids
-            for asset_info_id in asset_ids:
-                asset_info = g_assetFactory.get_asset_info(asset_info_id)
-                new_path = path.pjoin(asset_info.plural.lower(), isdir=True)
-                self.set_asset_path(asset_info, new_path.getPath())
-                if not new_path.exists():
-                    new_path.makedirs()
-                    
-    
+
     def get_asset_paths(self) -> typing.List[AssetPath]:
         return list(self.asset_paths.values())
 
-    def get_asset_path(self, asset_info: AssetInfo, fallback_to_root = True) -> io.FileName:
+    def get_asset_path(self, asset_info: AssetInfo, fallback_to_root=True) -> io.FileName:
         if not asset_info:
             return None
         if asset_info.id in self.asset_paths:
@@ -1443,7 +1429,7 @@ class ROMCollection(MetaDataItemABC):
             try:
                 item_nfo = nfo_FileName.loadFileToStr()
                 item_nfo = item_nfo.replace('\r', '').replace('\n', '')
-            except:
+            except Exception:
                 kodi.notify_warn(kodi.translate(41044).format(nfo_FileName.getPath()))
                 logger.error("ROMCollection.import_NFO_file() Exception reading NFO file '{0}'".format(nfo_FileName.getPath()))
                 return False
@@ -1452,19 +1438,24 @@ class ROMCollection(MetaDataItemABC):
             logger.error("ROMCollection.import_NFO_file() NFO file not found '{0}'".format(nfo_FileName.getPath()))
             return False
 
-        item_year      = re.findall('<year>(.*?)</year>',           item_nfo)
-        item_genre     = re.findall('<genre>(.*?)</genre>',         item_nfo)
+        item_year = re.findall('<year>(.*?)</year>', item_nfo)
+        item_genre = re.findall('<genre>(.*?)</genre>', item_nfo)
         item_developer = re.findall('<developer>(.*?)</developer>', item_nfo)
-        item_rating    = re.findall('<rating>(.*?)</rating>',       item_nfo)
-        item_plot      = re.findall('<plot>(.*?)</plot>',           item_nfo)
+        item_rating = re.findall('<rating>(.*?)</rating>', item_nfo)
+        item_plot = re.findall('<plot>(.*?)</plot>', item_nfo)
 
         # >> Careful about object mutability! This should modify the dictionary
         # >> passed as argument outside this function.
-        if len(item_year) > 0:      self.set_releaseyear(text.unescape_XML(item_year[0]))
-        if len(item_genre) > 0:     self.set_genre(text.unescape_XML(item_genre[0]))
-        if len(item_developer) > 0: self.set_developer(text.unescape_XML(item_developer[0]))
-        if len(item_rating) > 0:    self.set_rating(text.unescape_XML(item_rating[0]))
-        if len(item_plot) > 0:      self.set_plot(text.unescape_XML(item_plot[0]))
+        if len(item_year) > 0:
+            self.set_releaseyear(text.unescape_XML(item_year[0]))
+        if len(item_genre) > 0:
+            self.set_genre(text.unescape_XML(item_genre[0]))
+        if len(item_developer) > 0:
+            self.set_developer(text.unescape_XML(item_developer[0]))
+        if len(item_rating) > 0:
+            self.set_rating(text.unescape_XML(item_rating[0]))
+        if len(item_plot) > 0:
+            self.set_plot(text.unescape_XML(item_plot[0]))
 
         logger.debug("ROMCollection.import_NFO_file() Imported '{0}'".format(nfo_FileName.getPath()))
 
@@ -1479,11 +1470,11 @@ class ROMCollection(MetaDataItemABC):
         nfo_content.append('<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n')
         nfo_content.append('<!-- Exported by AKL on {0} -->\n'.format(time.strftime("%Y-%m-%d %H:%M:%S")))
         nfo_content.append('<romcollection>\n')
-        nfo_content.append(text.XML_line('year',      self.get_releaseyear()))
-        nfo_content.append(text.XML_line('genre',     self.get_genre())) 
+        nfo_content.append(text.XML_line('year', self.get_releaseyear()))
+        nfo_content.append(text.XML_line('genre', self.get_genre())) 
         nfo_content.append(text.XML_line('developer', self.get_developer()))
-        nfo_content.append(text.XML_line('rating',    self.get_rating()))
-        nfo_content.append(text.XML_line('plot',      self.get_plot()))
+        nfo_content.append(text.XML_line('rating', self.get_rating()))
+        nfo_content.append(text.XML_line('plot', self.get_plot()))
         
         nfo_content.append('</romcollection>\n')
         full_string = ''.join(nfo_content)
@@ -1504,7 +1495,7 @@ class ROMCollection(MetaDataItemABC):
         str_list.append(text.XML_line('developer', self.get_developer()))
         str_list.append(text.XML_line('rating', self.get_rating()))
         str_list.append(text.XML_line('plot', self.get_plot()))
-        #str_list.append(text.XML_line('Asset_Prefix', self.get_custom_attribute('Asset_Prefix')))
+        #  str_list.append(text.XML_line('Asset_Prefix', self.get_custom_attribute('Asset_Prefix')))
         str_list.append(text.XML_line('s_icon', self.get_asset_str(asset_id=constants.ASSET_ICON_ID)))
         str_list.append(text.XML_line('s_fanart', self.get_asset_str(asset_id=constants.ASSET_FANART_ID)))
         str_list.append(text.XML_line('s_banner', self.get_asset_str(asset_id=constants.ASSET_BANNER_ID)))
@@ -1523,9 +1514,9 @@ class ROMCollection(MetaDataItemABC):
      
 
 class VirtualCollection(ROMCollection):
-    def __init__(self, 
-                entity_data: dict = None, 
-                assets_data: typing.List[Asset] = None):
+    def __init__(self,
+                 entity_data: dict = None, 
+                 assets_data: typing.List[Asset] = None):
         # Concrete classes are responsible of creating a default entity_data dictionary
         # with sensible defaults.
         if entity_data is None:
@@ -1593,8 +1584,9 @@ class ROM(MetaDataItemABC):
 
     def get_assets_kind(self):
         return constants.KIND_ASSET_ROM
-    
-    def get_type(self): return constants.OBJ_ROM
+
+    def get_type(self):
+        return constants.OBJ_ROM
       
     def get_rom_identifier(self) -> str:
         identifier = self.get_scanned_data_element('identifier')
@@ -1737,11 +1729,11 @@ class ROM(MetaDataItemABC):
     def get_scanned_data_element(self, key:str):
         return self.scanned_data[key] if key in self.scanned_data else None
     
-    def get_scanned_data_element_as_file(self, key:str) -> io.FileName:
+    def get_scanned_data_element_as_file(self, key: str) -> io.FileName:
         scanned_value = self.scanned_data[key] if key in self.scanned_data else None
         return self._to_filename(scanned_value)
     
-    def set_scanned_data_element(self, key:str, data):
+    def set_scanned_data_element(self, key: str, data):
         self.scanned_data[key] = data
     
     def set_rom_status(self, state):
@@ -1804,7 +1796,7 @@ class ROM(MetaDataItemABC):
     def copy(self):
         data = self.copy_of_data_dic()
         return ROM(data)
-	
+
     def get_asset_ids_list(self):
         return constants.ROM_ASSET_ID_LIST
     
@@ -1858,7 +1850,7 @@ class ROM(MetaDataItemABC):
     # About reading files in Unicode http://stackoverflow.com/questions/147741/character-reading-from-file-in-python
     #
     # todo: Replace with nfo_file_path.readXml() and just use XPath
-    def update_with_nfo_file(self, nfo_file_path:io.FileName, verbose = True):
+    def update_with_nfo_file(self, nfo_file_path: io.FileName, verbose=True):
         logger.debug('Rom.update_with_nfo_file() Loading "{0}"'.format(nfo_file_path.getPath()))
         if not nfo_file_path.exists():
             if verbose:
@@ -1891,16 +1883,26 @@ class ROM(MetaDataItemABC):
         item_trailer = re.findall('<trailer>(.*?)</trailer>', nfo_str)
 
         # >> Future work: ESRB and maybe nplayer fields must be sanitized.
-        if len(item_title) > 0:     self.set_name(text.unescape_XML(item_title[0]))
-        if len(item_year) > 0:      self.set_releaseyear(text.unescape_XML(item_year[0]))
-        if len(item_genre) > 0:     self.set_genre(text.unescape_XML(item_genre[0]))
-        if len(item_developer) > 0: self.set_developer(text.unescape_XML(item_developer[0]))
-        if len(item_rating) > 0:    self.set_rating(text.unescape_XML(item_rating[0]))
-        if len(item_plot) > 0:      self.set_plot(text.unescape_XML(item_plot[0]))
-        if len(item_nplayers) > 0:  self.set_number_of_players(text.unescape_XML(item_nplayers[0]))
-        if len(item_esrb) > 0:      self.set_esrb_rating(text.unescape_XML(item_esrb[0]))
-        if len(item_pegi) > 0:      self.set_pegi_rating(text.unescape_XML(item_pegi[0]))
-        if len(item_trailer) > 0:   self.set_trailer(text.unescape_XML(item_trailer[0]))
+        if len(item_title) > 0:
+            self.set_name(text.unescape_XML(item_title[0]))
+        if len(item_year) > 0:
+            self.set_releaseyear(text.unescape_XML(item_year[0]))
+        if len(item_genre) > 0:
+            self.set_genre(text.unescape_XML(item_genre[0]))
+        if len(item_developer) > 0:
+            self.set_developer(text.unescape_XML(item_developer[0]))
+        if len(item_rating) > 0:
+            self.set_rating(text.unescape_XML(item_rating[0]))
+        if len(item_plot) > 0:
+            self.set_plot(text.unescape_XML(item_plot[0]))
+        if len(item_nplayers) > 0:
+            self.set_number_of_players(text.unescape_XML(item_nplayers[0]))
+        if len(item_esrb) > 0:
+            self.set_esrb_rating(text.unescape_XML(item_esrb[0]))
+        if len(item_pegi) > 0:
+            self.set_pegi_rating(text.unescape_XML(item_pegi[0]))
+        if len(item_trailer) > 0:
+            self.set_trailer(text.unescape_XML(item_trailer[0]))
 
         if verbose:
             kodi.notify(kodi.translate(41046).format(nfo_file_path.getPath()))
@@ -2041,13 +2043,7 @@ class ROM(MetaDataItemABC):
             # and kodi.dialog_yesno('Do you want to overwrite collection metadata properties with values from the launcher?'):
             # romcollection.import_data_dic(launcher_settings['romcollection'])
             # metadata_updated = True
-              
-    def apply_romcollection_asset_paths(self, romcollection: ROMCollection):
-        self.set_assets_root_path(romcollection.get_assets_root_path())
-        self.asset_paths = {}
-        for assetpath in romcollection.get_asset_paths():
-            self.asset_paths[assetpath.get_asset_info_id()] = assetpath
-    
+     
     def apply_library_asset_paths(self, library: Library):
         self.set_assets_root_path(library.get_assets_root_path())
         self.asset_paths = {}

@@ -1799,7 +1799,7 @@ msgid "No"
 msgstr ""
 
 msgctxt "#42037"
-msgid "Set the title of the launcher"
+msgid "Set the title of the ROM collection"
 msgstr ""
 
 msgctxt "#42038"

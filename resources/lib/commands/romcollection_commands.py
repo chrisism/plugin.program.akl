@@ -57,7 +57,6 @@ def cmd_add_collection(args):
         wizard = kodi.WizardDialog_Selection(None, 'platform', kodi.translate(41099), platforms.AKL_platform_list)
         wizard = kodi.WizardDialog_Dummy(wizard, 'm_name', '', _get_name_from_platform)
         wizard = kodi.WizardDialog_Keyboard(wizard, 'm_name', kodi.translate(42037))
-        wizard = kodi.WizardDialog_FileBrowse(wizard, 'assets_path', kodi.translate(42038), 0, '')
         
         romcollection = ROMCollection()
         entity_data = romcollection.get_data_dic()
@@ -67,11 +66,6 @@ def cmd_add_collection(args):
         
         romcollection.import_data_dic(entity_data)
         
-        # --- create assets directory ---
-        assets_path = entity_data['assets_path']
-        assets_path_FN = io.FileName(assets_path)
-        romcollection.set_assets_root_path(assets_path_FN, constants.ROM_ASSET_ID_LIST, create_default_subdirectories=True)
-                
         # --- Determine box size based on platform --
         platform = platforms.get_AKL_platform(entity_data['platform'])
         romcollection.set_box_sizing(platform.default_box_size)

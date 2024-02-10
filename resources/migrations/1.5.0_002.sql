@@ -99,6 +99,18 @@ BEGIN TRANSACTION;
 ALTER TABLE roms RENAME TO _roms_old;
 ALTER TABLE romcollection_launchers RENAME TO _romcollection_launchers_old;
 ALTER TABLE rom_launchers RENAME TO _rom_launchers_old;
+ALTER TABLE metadata TO _metadata_old;
+
+CREATE TABLE IF NOT EXISTS metadata(
+    id TEXT PRIMARY KEY, 
+    year TEXT,
+    genre TEXT,
+    developer TEXT,
+    rating INTEGER NULL,
+    plot TEXT,
+    extra TEXT,
+    finished INTEGER DEFAULT 0
+);
 
 CREATE TABLE IF NOT EXISTS roms(
     id TEXT PRIMARY KEY, 
@@ -133,9 +145,9 @@ CREATE TABLE IF NOT EXISTS romcollection_launchers(
     FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
-
 CREATE TABLE IF NOT EXISTS rom_launchers(
     rom_id TEXT,
+
     launcher_id TEXT,
     is_default INTEGER DEFAULT 0 NOT NULL,
     FOREIGN KEY (rom_id) REFERENCES roms (id) 
@@ -143,6 +155,10 @@ CREATE TABLE IF NOT EXISTS rom_launchers(
     FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
+
+INSERT INTO metadata (id, year, genre, developer, rating, plot, extra, finished) 
+SELECT id, year, genre, developer, rating, plot, extra, finished
+ FROM _metadata_old;
 
 INSERT INTO roms (
     id,name,num_of_players,num_of_players_online,esrb_rating,pegi_rating,nointro_status,pclone_status,cloneof,
@@ -185,6 +201,7 @@ DROP VIEW vw_rom_asset_paths;
 DROP VIEW vw_rom_tags;
 DROP VIEW vw_romcollection_launchers;
 DROP VIEW vw_rom_launchers;
+DROP VIEW vw_categories;
 
 CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT 
     l.id AS id, 
@@ -213,6 +230,23 @@ FROM assetpaths AS a
  INNER JOIN library_assetpaths AS la ON a.id = la.assetpaths_id 
  INNER JOIN libraries AS l ON la.library_id = l.id;
 
+CREATE VIEW IF NOT EXISTS vw_categories AS SELECT 
+    c.id AS id, 
+    c.parent_id AS parent_id,
+    c.metadata_id,
+    c.name AS m_name,
+    m.year AS m_year, 
+    m.genre AS m_genre,
+    m.developer AS m_developer,
+    m.rating AS m_rating,
+    m.plot AS m_plot,
+    m.extra AS extra,
+    m.finished AS finished,
+    (SELECT COUNT(*) FROM categories AS sc WHERE sc.parent_id = c.id) AS num_categories,
+    (SELECT COUNT(*) FROM romcollections AS sr WHERE sr.parent_id = c.id) AS num_collections
+FROM categories AS c 
+    INNER JOIN metadata AS m ON c.metadata_id = m.id;
+
 CREATE VIEW IF NOT EXISTS vw_romcollections AS SELECT 
     r.id AS id, 
     r.parent_id AS parent_id,
@@ -225,7 +259,6 @@ CREATE VIEW IF NOT EXISTS vw_romcollections AS SELECT
     m.plot AS m_plot,
     m.extra AS extra,
     m.finished AS finished,
-    m.assets_path AS assets_path,
     r.platform AS platform,
     r.box_size AS box_size,
     (SELECT COUNT(*) FROM roms AS rms INNER JOIN roms_in_romcollection AS rrs ON rms.id = rrs.rom_id AND rrs.romcollection_id = r.id) as num_roms
@@ -257,7 +290,6 @@ CREATE VIEW IF NOT EXISTS vw_roms AS SELECT
     r.is_favourite,
     r.launch_count,
     r.last_launch_timestamp,
-    m.assets_path AS assets_path,
     (
         SELECT group_concat(t.tag) AS rom_tags
         FROM tags AS t 

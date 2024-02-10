@@ -25,7 +25,9 @@ from akl.utils import kodi, text, io
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals, editors
-from resources.lib.repositories import CategoryRepository, ROMsRepository, ROMCollectionRepository, AelAddonRepository, UnitOfWork
+from resources.lib.repositories import CategoryRepository, ROMsRepository, ROMCollectionRepository, UnitOfWork
+from resources.lib.repositories import AelAddonRepository, LibrariesRepository
+
 from resources.lib.domain import g_assetFactory, ROM
 
 logger = logging.getLogger(__name__)
@@ -135,6 +137,9 @@ def cmd_rom_assets(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
         
+        library_repository = LibrariesRepository(uow)
+        library = library_repository.find_library_by_rom(rom.get_id())
+        
         romcollection_repository = ROMCollectionRepository(uow)
         rom_romcollections = romcollection_repository.find_romcollections_by_rom(rom_id)
         rom_collection_ids = [collection.get_id() for collection in rom_romcollections]
@@ -148,11 +153,11 @@ def cmd_rom_assets(args):
             AppMediator.sync_cmd(editors.SCRAPE_CMD, args)
             return
         
-        asset = g_assetFactory.get_asset_info(selected_asset_to_edit)    
+        asset = g_assetFactory.get_asset_info(selected_asset_to_edit)
         # >> Execute edit asset menu subcommand. Then, execute recursively this submenu again.
         # >> The menu dialog is instantiated again so it reflects the changes just edited.
         # >> If edit_asset() returns a command other than scrape or None changes were made.
-        cmd = editors.edit_asset(rom, asset)
+        cmd = editors.edit_asset(rom, asset, library.get_assets_root_path())
         if cmd is not None:
             if cmd == 'SCRAPE_ASSET':
                 args['selected_asset'] = asset.id
@@ -162,10 +167,11 @@ def cmd_rom_assets(args):
             repository.update_rom(rom)
             uow.commit()
             for romcollection_id in rom_collection_ids:
-                AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})   
+                AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})
 
-    AppMediator.sync_cmd('ROM_EDIT_ASSETS', {'rom_id': rom_id, 'selected_asset': asset.id})    
-    
+    AppMediator.sync_cmd('ROM_EDIT_ASSETS', {'rom_id': rom_id, 'selected_asset': asset.id})
+
+
 @AppMediator.register('ROM_EDIT_DEFAULT_ASSETS')
 def cmd_rom_edit_default_assets(args):
     rom_id: str = args['rom_id'] if 'rom_id' in args else None

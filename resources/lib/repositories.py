@@ -647,7 +647,6 @@ class CategoryRepository(object):
     def insert_category(self, category_obj: Category, parent_obj: Category = None):
         self.logger.info("CategoryRepository.insert_category(): Inserting new category '{}'".format(category_obj.get_name()))
         metadata_id = text.misc_generate_random_SID()
-        assets_path = category_obj.get_assets_root_path()
         parent_category_id = parent_obj.get_id() if parent_obj is not None and parent_obj.get_id() != constants.VCATEGORY_ADDONROOT_ID else None
         
         self._uow.execute(qry.INSERT_METADATA,
@@ -658,7 +657,6 @@ class CategoryRepository(object):
             category_obj.get_rating(),
             category_obj.get_plot(),
             json.dumps(category_obj.get_extras()),
-            assets_path.getPath() if assets_path is not None else None,
             category_obj.is_finished())
 
         self._uow.execute(qry.INSERT_CATEGORY,
@@ -676,7 +674,6 @@ class CategoryRepository(object):
 
     def update_category(self, category_obj: Category):
         self.logger.info(f" Updating category '{category_obj.get_name()}'")
-        assets_path = category_obj.get_assets_root_path()
         
         self._uow.execute(qry.UPDATE_METADATA,
             category_obj.get_releaseyear(),
@@ -685,7 +682,6 @@ class CategoryRepository(object):
             category_obj.get_rating(),
             category_obj.get_plot(),
             json.dumps(category_obj.get_extras()),
-            assets_path.getPath() if assets_path is not None else None,
             category_obj.is_finished(),
             category_obj.get_custom_attribute('metadata_id'))
 
@@ -940,7 +936,6 @@ class ROMCollectionRepository(object):
     def insert_romcollection(self, romcollection_obj: ROMCollection, parent_obj: Category = None):
         self.logger.info(f"ROMCollectionRepository: Inserting new romcollection '{romcollection_obj.get_name()}'")
         metadata_id = text.misc_generate_random_SID()
-        assets_path = romcollection_obj.get_assets_root_path()
         parent_category_id = parent_obj.get_id() if parent_obj is not None and parent_obj.get_id() != constants.VCATEGORY_ADDONROOT_ID else None
         
         self._uow.execute(qry.INSERT_METADATA,
@@ -951,7 +946,6 @@ class ROMCollectionRepository(object):
                           romcollection_obj.get_rating(),
                           romcollection_obj.get_plot(),
                           json.dumps(romcollection_obj.get_extras()),
-                          assets_path.getPath() if assets_path is not None else None,
                           romcollection_obj.is_finished())
 
         self._uow.execute(qry.INSERT_ROMCOLLECTION,
@@ -988,7 +982,6 @@ class ROMCollectionRepository(object):
                       
     def update_romcollection(self, romcollection_obj: ROMCollection):
         self.logger.info(f"ROMCollectionRepository.update_romcollection(): Updating romcollection '{romcollection_obj.get_name()}'")
-        assets_path = romcollection_obj.get_assets_root_path()
         
         self._uow.execute(qry.UPDATE_METADATA,
                           romcollection_obj.get_releaseyear(),
@@ -997,7 +990,6 @@ class ROMCollectionRepository(object):
                           romcollection_obj.get_rating(),
                           romcollection_obj.get_plot(),
                           json.dumps(romcollection_obj.get_extras()),
-                          assets_path.getPath() if assets_path is not None else None,
                           romcollection_obj.is_finished(),
                           romcollection_obj.get_custom_attribute('metadata_id'))
 
@@ -1375,7 +1367,6 @@ class ROMsRepository(object):
     def insert_rom(self, rom_obj: ROM): 
         self.logger.info(f"Inserting new ROM '{rom_obj.get_rom_identifier()}'")
         metadata_id = text.misc_generate_random_SID()
-        assets_path = rom_obj.get_assets_root_path()
         
         self._uow.execute(qry.INSERT_METADATA,
             metadata_id,
@@ -1385,7 +1376,6 @@ class ROMsRepository(object):
             rom_obj.get_rating(),
             rom_obj.get_plot(),
             json.dumps(rom_obj.get_extras()),
-            assets_path.getPath() if assets_path is not None else None,
             rom_obj.is_finished())
 
         self._uow.execute(qry.INSERT_ROM,
@@ -1424,7 +1414,6 @@ class ROMsRepository(object):
 
     def update_rom(self, rom_obj: ROM):
         self.logger.info(f"Updating ROM '{rom_obj.get_rom_identifier()}'")
-        assets_path = rom_obj.get_assets_root_path()
         
         self._uow.execute(qry.UPDATE_METADATA,
                           rom_obj.get_releaseyear(),
@@ -1433,7 +1422,6 @@ class ROMsRepository(object):
                           rom_obj.get_rating(),
                           rom_obj.get_plot(),
                           json.dumps(rom_obj.get_extras()),
-                          assets_path.getPath() if assets_path is not None else None,
                           rom_obj.is_finished(),
                           rom_obj.get_custom_attribute('metadata_id'))
 
