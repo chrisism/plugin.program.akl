@@ -91,6 +91,7 @@ def cmd_edit_library(args):
     options = collections.OrderedDict()
     options['LIBRARY_EDIT_TITLE'] = kodi.translate(40863).format(library.get_name())
     options['LIBRARY_EDIT_PLATFORM'] = kodi.translate(40864).format(library.get_platform())
+    options['LIBRARY_EDIT_BOXSIZE'] = kodi.translate(40875).format(library.get_box_sizing())
     options['LIBRARY_EDIT_SCANNER'] = kodi.translate(42081)
     if library.has_launchers():
         options['EDIT_LIBRARY_LAUNCHERS'] = kodi.translate(42016)
@@ -163,6 +164,22 @@ def cmd_library_metadata_platform(args):
                     rom.set_platform(platform_to_apply)
                     roms_repository.update_rom(rom)
 
+            uow.commit()
+            AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
+    AppMediator.sync_cmd('EDIT_LIBRARY', args)
+
+
+@AppMediator.register('LIBRARY_EDIT_BOXSIZE')
+def cmd_library_boxsize(args):
+    library_id: str = args['library_id'] if 'library_id' in args else None
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        repository = LibrariesRepository(uow)
+        library = repository.find(library_id)
+
+        if editors.edit_field_by_list(library, kodi.translate(40816), constants.BOX_SIZES,
+                                      library.get_box_sizing, library.set_box_sizing):
+            repository.update_library(library)
             uow.commit()
             AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
     AppMediator.sync_cmd('EDIT_LIBRARY', args)

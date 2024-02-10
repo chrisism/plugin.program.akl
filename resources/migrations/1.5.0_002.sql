@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS libraries(
     id TEXT PRIMARY KEY,
     name TEXT,
     platform TEXT,
+    box_size TEXT,
     assets_path TEXT,
     last_scan_timestamp TIMESTAMP,
     akl_addon_id TEXT,
@@ -58,8 +59,8 @@ CREATE TABLE IF NOT EXISTS library_launchers(
 -- --------------------------------------
 -- MIGRATE EXISTING DATA INTO NEW TABLES
 -- --------------------------------------
-INSERT INTO libraries (id, name, platform, assets_path, akl_addon_id, settings)
-    SELECT rcs.id, rc.name || ' (' || rcs.id || ')', rc.platform, m.assets_path, rcs.akl_addon_id, rcs.settings
+INSERT INTO libraries (id, name, platform, box_size, assets_path, akl_addon_id, settings)
+    SELECT rcs.id, rc.name || ' (' || rcs.id || ')', rc.platform, rc.box_size, m.assets_path, rcs.akl_addon_id, rcs.settings
     FROM romcollection_scanners as rcs
         LEFT JOIN romcollections as rc ON rc.id = rcs.romcollection_id
         INNER JOIN metadata as m ON m.id = rc.metadata_id
@@ -189,6 +190,7 @@ CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT
     l.id AS id, 
     l.name AS name,
     l.platform AS platform,
+    l.box_size AS box_size,
     l.assets_path AS assets_path,
     l.last_scan_timestamp AS last_scan_timestamp,
     l.settings AS settings,

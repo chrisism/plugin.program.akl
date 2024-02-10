@@ -454,6 +454,7 @@ def _render_library_view(library: Library, roms_repository: ROMsRepository) -> d
         'id': library.get_id(),
         'name': library.get_name(),
         'properties': {
+            'boxsize': library.get_box_sizing()
         },
         'obj_type': library.get_type(),
         'items': []
@@ -546,7 +547,7 @@ def _render_romcollection_listitem(romcollection_obj: ROMCollection) -> dict:
             'overlay': ICON_OVERLAY
         },
         'art': assets,
-        'properties': { 
+        'properties': {
             constants.AKL_CONTENT_LABEL: constants.AKL_CONTENT_VALUE_ROMCOLLECTION,
             'platform': romcollection_obj.get_platform(),
             'boxsize': romcollection_obj.get_box_sizing(),

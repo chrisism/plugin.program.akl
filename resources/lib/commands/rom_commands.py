@@ -564,6 +564,7 @@ def cmd_rom_metadata_clear_tags(args):
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})        
     AppMediator.sync_cmd('ROM_EDIT_METADATA_TAGS', args)
 
+
 @AppMediator.register('ROM_EDIT_METADATA_BOXSIZE')
 def cmd_rom_metadata_boxsize(args):
     rom_id = args['rom_id'] if 'rom_id' in args else None  
@@ -578,6 +579,7 @@ def cmd_rom_metadata_boxsize(args):
             uow.commit()
             AppMediator.async_cmd('RENDER_ROM_VIEWS', {'rom_id': rom.get_id()})        
     AppMediator.sync_cmd('ROM_EDIT_METADATA', args)
+
 
 @AppMediator.register('ROM_LOAD_PLOT')
 def cmd_rom_load_plot(args):    

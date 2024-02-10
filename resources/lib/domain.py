@@ -544,6 +544,12 @@ class Library(ROMAddon):
     def set_platform(self, platform):
         self.entity_data['platform'] = platform
 
+    def get_box_sizing(self):
+        return self.entity_data['box_size'] if 'box_size' in self.entity_data else constants.BOX_SIZE_POSTER
+    
+    def set_box_sizing(self, box_size):
+        self.entity_data['box_size'] = box_size
+
     def num_roms(self) -> int:
         return self.entity_data['num_roms'] if 'num_roms' in self.entity_data else 0
 

@@ -317,10 +317,10 @@ SELECT_LIBRARIES_BY_ROMCOLLECTION = """
 SELECT_LIBRARY_ASSET_PATHS = "SELECT * FROM vw_library_asset_paths WHERE library_id = ?"
 
 INSERT_LIBRARY = """
-                INSERT INTO libraries (id,name,platform,assets_path,last_scan_timestamp,settings,akl_addon_id)
-                VALUES (?,?,?,?,?,?,?)
+                INSERT INTO libraries (id,name,platform,box_size,assets_path,last_scan_timestamp,settings,akl_addon_id)
+                VALUES (?,?,?,?,?,?,?,?)
                 """
-UPDATE_LIBRARY = "UPDATE libraries SET name=?, platform=?, assets_path=?, last_scan_timestamp=?, settings=? WHERE id =?"
+UPDATE_LIBRARY = "UPDATE libraries SET name=?, platform=?, box_size=?, assets_path=?, last_scan_timestamp=?, settings=? WHERE id =?"
 DELETE_LIBRARY = "DELETE FROM libraries WHERE id = ?"
 
 INSERT_LIBRARY_ASSET_PATH = "INSERT INTO library_assetpaths (library_id, assetpaths_id) VALUES (?, ?)"
