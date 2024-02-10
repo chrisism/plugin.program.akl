@@ -756,7 +756,6 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
     container_type = container_data['obj_type'] if 'obj_type' in container_data else constants.OBJ_NONE
     
     container_is_category: bool = container_type == constants.OBJ_CATEGORY
-    container_is_root = container_data['id'] == ''
     
     is_category: bool = item_type == constants.OBJ_CATEGORY
     is_library: bool = item_type == constants.OBJ_LIBRARY
@@ -773,8 +772,6 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
         commands.append((kodi.translate(40885), _context_menu_url_for('/execute/command/add_rom_to_favourites', {'rom_id': item_id})))
         
     if is_category:
-        if container_is_root:
-            container_id = constants.VCATEGORY_ADDONROOT_ID
         commands.append((kodi.translate(40886), _context_menu_url_for(f'/categories/view/{item_id}')))
         commands.append((kodi.translate(40887), _context_menu_url_for(f'/categories/edit/{item_id}')))
         commands.append((kodi.translate(40888), _context_menu_url_for(f'/categories/add/{item_id}/in/{container_id}')))
@@ -799,8 +796,6 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
             commands.append((kodi.translate(40919), _context_menu_url_for(f'/launcher/delete/{item_id}')))
         
     if not is_category and container_is_category:
-        if container_is_root:
-            container_id = constants.VCATEGORY_ADDONROOT_ID
         commands.append((kodi.translate(40888), _context_menu_url_for(f'/categories/add/{container_id}')))
         commands.append((kodi.translate(40889), _context_menu_url_for(f'/romcollection/add/{container_id}')))
         commands.append((kodi.translate(40890), _context_menu_url_for(f'/categories/addrom/{container_id}')))

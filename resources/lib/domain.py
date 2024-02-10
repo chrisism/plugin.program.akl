@@ -522,6 +522,7 @@ class Library(ROMAddon):
                 'id': text.misc_generate_random_SID(),
                 'name': '',
                 'platform': '',
+                'box_size': '',
                 'assets_path': '',
                 'num_roms': 0,
                 'last_scan_timestamp': None,
@@ -810,21 +811,6 @@ class RuleSet(object):
 # Abstract base class for business objects which support the generic
 # metadata fields and assets.
 #
-# --- Class hierarchy ---
-#  
-# |-MetaDataItemABC(object) (abstract class)
-# |
-# |----- Category
-# |      |
-# |      |----- VirtualCategory
-# |
-# |----- ROMCollection (Collection)
-# |      |
-# |      |----- VirtualCollection
-# |
-# |----- ROM
-# |
-#
 class MetaDataItemABC(EntityABC):
     __metaclass__ = abc.ABCMeta
 
@@ -971,10 +957,10 @@ class MetaDataItemABC(EntityABC):
 
         return available_assets
                 
-    # 
+    #
     # Gets the asset path (str) of the given assetinfo type.
     #
-    def get_asset_str(self, asset_info=None, asset_id=None, fallback = '') -> str:
+    def get_asset_str(self, asset_info=None, asset_id=None, fallback='') -> str:
         if asset_info is None and asset_id is None:
             return None
         if asset_info is not None:
@@ -983,7 +969,8 @@ class MetaDataItemABC(EntityABC):
         asset = self.get_asset(asset_id)
         if asset is not None:
             path = asset.get_path()
-            if path != '': return path
+            if path != '':
+                return path
             
         return fallback
             

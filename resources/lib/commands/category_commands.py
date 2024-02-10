@@ -30,6 +30,7 @@ from resources.lib.domain import Category, g_assetFactory
 
 logger = logging.getLogger(__name__)
 
+
 @AppMediator.register('ADD_CATEGORY')
 def cmd_add_category(args):
     logger.debug('cmd_add_category() BEGIN')
@@ -38,13 +39,16 @@ def cmd_add_category(args):
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository            = CategoryRepository(uow)
-        parent_category       = repository.find_category(parent_id) if parent_id is not None else None
+        repository = CategoryRepository(uow)
+        parent_category = repository.find_category(parent_id) if parent_id is not None else None
         grand_parent_category = repository.find_category(grand_parent_id) if grand_parent_id is not None else None
         
         if grand_parent_category is not None:
             options_dialog = kodi.ListDialog()
-            selected_option = options_dialog.select(kodi.translate(41084),[parent_category.get_name(), grand_parent_category.get_name()])
+            selected_option = options_dialog.select(kodi.translate(41084), [
+                parent_category.get_name(),
+                grand_parent_category.get_name()
+            ])
             if selected_option > 0:
                 parent_category = grand_parent_category
     
@@ -64,10 +68,11 @@ def cmd_add_category(args):
         AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': parent_category.get_id()})
         AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
 
+
 @AppMediator.register('EDIT_CATEGORY')
 def cmd_edit_category(args):    
     logger.debug('EDIT_CATEGORY: BEGIN')
-    category_id:str = args['category_id'] if 'category_id' in args else None
+    category_id: str = args['category_id'] if 'category_id' in args else None
     
     if category_id is None:
         logger.warning('cmd_add_category(): No category id supplied.')
@@ -84,12 +89,12 @@ def cmd_edit_category(args):
         options['CATEGORY_EDIT_METADATA'] = kodi.translate(40853)
         options['CATEGORY_EDIT_ASSETS'] = kodi.translate(40854)
         options['CATEGORY_EDIT_DEFAULT_ASSETS'] = kodi.translate(40859)
-        options['CATEGORY_STATUS'] = f'{kodi.translate(40859)} {category.get_finished_str_code()}'
+        options['CATEGORY_STATUS'] = f'{kodi.translate(40860)} {category.get_finished_str_code()}'
         options['EXPORT_CATEGORY_XML'] = kodi.translate(40861)
         options['DELETE_CATEGORY'] = kodi.translate(40862)
         
-        s = f'{kodi.translate(40950)} "{category.get_name}"'
-        selected_option = kodi.OrdDictionaryDialog().select(s, options)    
+        s = f'{kodi.translate(40950)} "{category.get_name()}"'
+        selected_option = kodi.OrdDictionaryDialog().select(s, options)
     
     if selected_option is None:
         # >> Exits context menu
@@ -99,10 +104,11 @@ def cmd_edit_category(args):
     # >> Execute subcommand. May be atomic, maybe a submenu.
     logger.debug(f'EDIT_CATEGORY: Selected {selected_option}')
     AppMediator.sync_cmd(selected_option, args)
-    
-# --- Submenu command ---    
+
+
+# --- Submenu command ---
 @AppMediator.register('CATEGORY_EDIT_METADATA')
-def cmd_edit_metadata_category(args):    
+def cmd_edit_metadata_category(args):
     logger.debug('CATEGORY_EDIT_METADATA: cmd_edit_metadata_category() BEGIN')
     category_id = args['category_id'] if 'category_id' in args else None
     selected_option = None
@@ -112,9 +118,9 @@ def cmd_edit_metadata_category(args):
         repository = CategoryRepository(uow)
         category = repository.find_category(category_id)
         
-        NFO_FileName  = category.get_NFO_name()
+        NFO_FileName = category.get_NFO_name()
         NFO_found_str = kodi.translate(42019) if NFO_FileName.exists() else kodi.translate(42020)
-        plot_str      = text.limit_string(category.get_plot(), constants.PLOT_STR_MAXSIZE)
+        plot_str = text.limit_string(category.get_plot(), constants.PLOT_STR_MAXSIZE)
 
         options = collections.OrderedDict()
         options['CATEGORY_EDIT_METADATA_TITLE'] = kodi.translate(40863).format(category.get_name())
@@ -140,6 +146,7 @@ def cmd_edit_metadata_category(args):
     logger.debug('CATEGORY_EDIT_METADATA: cmd_edit_metadata_category() Selected {0}'.format(selected_option))
     AppMediator.sync_cmd(selected_option, args)
 
+
 @AppMediator.register('CATEGORY_EDIT_ASSETS')
 def cmd_category_edit_assets(args):
     category_id = args['category_id'] if 'category_id' in args else None
@@ -156,7 +163,7 @@ def cmd_category_edit_assets(args):
             return
         
         asset = g_assetFactory.get_asset_info(selected_asset_to_edit)
-        #if selected_asset_to_edit == editors.SCRAPE_CMD:
+        #  if selected_asset_to_edit == editors.SCRAPE_CMD:
         #    AppMediator.async_cmd('EDIT_CATEGORY_MENU', args)
         #    globals.run_command(scrape_cmd, rom=obj_instance)
         #    edit_object_assets(obj_instance, selected_option)
@@ -169,9 +176,10 @@ def cmd_category_edit_assets(args):
             repository.update_category(category)
             uow.commit()
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
-            AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})   
+            AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
         
-    AppMediator.sync_cmd('CATEGORY_EDIT_ASSETS', {'category_id': category_id, 'selected_asset': asset.id})         
+    AppMediator.sync_cmd('CATEGORY_EDIT_ASSETS', {'category_id': category_id, 'selected_asset': asset.id})
+
 
 @AppMediator.register('CATEGORY_EDIT_DEFAULT_ASSETS')
 def cmd_category_edit_default_assets(args):
@@ -192,9 +200,10 @@ def cmd_category_edit_default_assets(args):
             repository.update_category(category)
             uow.commit()   
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
-            AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})     
+            AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
     
     AppMediator.sync_cmd('CATEGORY_EDIT_DEFAULT_ASSETS', {'category_id': category_id, 'selected_asset': selected_asset_to_edit.id})
+
 
 @AppMediator.register('CATEGORY_STATUS')
 def cmd_category_status(args):
@@ -209,9 +218,10 @@ def cmd_category_status(args):
         uow.commit()
         
     AppMediator.async_cmd('RENDER_CATEGORY_VIEW', args) 
-    AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})           
+    AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
     AppMediator.sync_cmd('EDIT_CATEGORY', args)
-    
+
+   
 #
 # Remove category. Also removes launchers in that category
 #
@@ -224,7 +234,6 @@ def cmd_category_delete(args):
         category = repository.find_category(category_id)
         category_name = category.get_name()
         
-        del_q = kodi.translate(41066).format(category_name)
         if category.has_items():
             question = kodi.translate(41067).format(category_name, category.num_categories(), category.num_romcollections()) \
                 + kodi.translate(41066).format(category_name)
@@ -232,14 +241,15 @@ def cmd_category_delete(args):
             question = kodi.translate(41068).format(category_name) + kodi.translate(41066).format(category_name)
     
         ret = kodi.dialog_yesno(question)
-        if not ret: return
+        if not ret:
+            return
             
         logger.info(f'Deleting category "{category_name}" ID {category.get_id()}')
         repository.delete_category(category_id)
         uow.commit()
         
     kodi.notify(kodi.translate(41037).format(category_name))
-    AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})            
+    AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
     AppMediator.async_cmd('CLEANUP_VIEWS')
     AppMediator.sync_cmd('EDIT_CATEGORY', args)
 
@@ -309,9 +319,10 @@ def cmd_category_metadata_developer(args):
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
     AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
 
+
 @AppMediator.register('CATEGORY_EDIT_METADATA_RATING')
 def cmd_category_metadata_rating(args):
-    category_id = args['category_id'] if 'category_id' in args else None    
+    category_id = args['category_id'] if 'category_id' in args else None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         repository = CategoryRepository(uow)
@@ -324,9 +335,10 @@ def cmd_category_metadata_rating(args):
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
     AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
 
+
 @AppMediator.register('CATEGORY_EDIT_METADATA_PLOT')
 def cmd_category_metadata_plot(args):
-    category_id = args['category_id'] if 'category_id' in args else None    
+    category_id = args['category_id'] if 'category_id' in args else None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         repository = CategoryRepository(uow)
@@ -338,10 +350,11 @@ def cmd_category_metadata_plot(args):
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_id()})
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
     AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
-    
+
+
 @AppMediator.register('CATEGORY_IMPORT_NFO_FILE_DEFAULT')
 def cmd_category_import_nfo_file(args):
-    category_id = args['category_id'] if 'category_id' in args else None    
+    category_id = args['category_id'] if 'category_id' in args else None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         repository = CategoryRepository(uow)
@@ -357,8 +370,9 @@ def cmd_category_import_nfo_file(args):
     
     AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
 
+
 @AppMediator.register('CATEGORY_IMPORT_NFO_FILE_BROWSE')
-def cmd_category_browse_import_nfo_file(args):    
+def cmd_category_browse_import_nfo_file(args):
     category_id = args['category_id'] if 'category_id' in args else None
     
     NFO_file = kodi.browse(text=kodi.translate(41143), mask='.nfo')
@@ -382,6 +396,7 @@ def cmd_category_browse_import_nfo_file(args):
             AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': category.get_parent_id()})
     
     AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
+
 
 @AppMediator.register('CATEGORY_SAVE_NFO_FILE')
 def cmd_category_save_nfo_file(args):
