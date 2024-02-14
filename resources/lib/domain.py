@@ -608,8 +608,9 @@ class Library(ROMAddon):
             for j, asset_j in enumerate(constants.ROM_ASSET_ID_LIST[i + 1:]):
                 A_j = g_assetFactory.get_asset_info(asset_j)
                 # >> Exclude unconfigured assets (empty strings).
-                if A_i.path_key not in self.entity_data or A_j.path_key not in self.entity_data  \
-                    or not self.entity_data[A_i.path_key] or not self.entity_data[A_j.path_key]: continue
+                if A_i.path_key not in self.entity_data or A_j.path_key not in self.entity_data \
+                   or not self.entity_data[A_i.path_key] or not self.entity_data[A_j.path_key]:
+                    continue
                 
                 # logger.debug('asset_get_duplicated_asset_list() Checking {0:<9} vs {1:<9}'.format(A_i.name, A_j.name))
                 if self.entity_data[A_i.path_key] == self.entity_data[A_j.path_key]:
@@ -1121,7 +1122,7 @@ class Category(MetaDataItemABC):
         return constants.KIND_ASSET_CATEGORY
     
     def get_type(self):
-        return constants.OBJ_CATEGORY # 42501
+        return constants.OBJ_CATEGORY  # 42501
     
     # parent category / romcollection this item belongs to.
     def get_parent_id(self) -> str:
@@ -1146,7 +1147,7 @@ class Category(MetaDataItemABC):
         return 'DefaultFolder.png' 
     
     def get_NFO_name(self) -> io.FileName:
-        nfo_dir = io.FileName(settings.getSetting('categories_asset_dir'), isdir = True)
+        nfo_dir = io.FileName(settings.getSetting('categories_asset_dir'), isdir=True)
         nfo_file_path = nfo_dir.pjoin(self.get_name() + '.nfo')
         logger.debug("Category.get_NFO_name() nfo_file_path = '{0}'".format(nfo_file_path.getPath()))
         return nfo_file_path
@@ -1182,19 +1183,24 @@ class Category(MetaDataItemABC):
             logger.error("Category.import_NFO_file() NFO file not found '{0}'".format(nfo_FileName.getPath()))
             return False
 
-        item_year      = re.findall('<year>(.*?)</year>',           item_nfo)
-        item_genre     = re.findall('<genre>(.*?)</genre>',         item_nfo)
+        item_year = re.findall('<year>(.*?)</year>', item_nfo)
+        item_genre = re.findall('<genre>(.*?)</genre>', item_nfo)
         item_developer = re.findall('<developer>(.*?)</developer>', item_nfo)
-        item_rating    = re.findall('<rating>(.*?)</rating>',       item_nfo)
-        item_plot      = re.findall('<plot>(.*?)</plot>',           item_nfo)
+        item_rating = re.findall('<rating>(.*?)</rating>', item_nfo)
+        item_plot = re.findall('<plot>(.*?)</plot>', item_nfo)
 
         # >> Careful about object mutability! This should modify the dictionary
         # >> passed as argument outside this function.
-        if len(item_year) > 0:      self.set_releaseyear(text.unescape_XML(item_year[0]))
-        if len(item_genre) > 0:     self.set_genre(text.unescape_XML(item_genre[0]))
-        if len(item_developer) > 0: self.set_developer(text.unescape_XML(item_developer[0]))
-        if len(item_rating) > 0:    self.set_rating(text.unescape_XML(item_rating[0]))
-        if len(item_plot) > 0:      self.set_plot(text.unescape_XML(item_plot[0]))
+        if len(item_year) > 0:
+            self.set_releaseyear(text.unescape_XML(item_year[0]))
+        if len(item_genre) > 0:
+            self.set_genre(text.unescape_XML(item_genre[0]))
+        if len(item_developer) > 0:
+            self.set_developer(text.unescape_XML(item_developer[0]))
+        if len(item_rating) > 0:
+            self.set_rating(text.unescape_XML(item_rating[0]))
+        if len(item_plot) > 0:
+            self.set_plot(text.unescape_XML(item_plot[0]))
 
         logger.debug("Category.import_NFO_file() Imported '{0}'".format(nfo_FileName.getPath()))
 
@@ -1209,11 +1215,11 @@ class Category(MetaDataItemABC):
         nfo_content.append('<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n')
         nfo_content.append('<!-- Exported by AKL on {0} -->\n'.format(time.strftime("%Y-%m-%d %H:%M:%S")))
         nfo_content.append('<category>\n')
-        nfo_content.append(text.XML_line('year',      self.get_releaseyear()))
-        nfo_content.append(text.XML_line('genre',     self.get_genre())) 
+        nfo_content.append(text.XML_line('year', self.get_releaseyear()))
+        nfo_content.append(text.XML_line('genre', self.get_genre()))
         nfo_content.append(text.XML_line('developer', self.get_developer()))
-        nfo_content.append(text.XML_line('rating',    self.get_rating()))
-        nfo_content.append(text.XML_line('plot',      self.get_plot()))
+        nfo_content.append(text.XML_line('rating', self.get_rating()))
+        nfo_content.append(text.XML_line('plot', self.get_plot()))
         
         nfo_content.append('</category>\n')
         full_string = ''.join(nfo_content)
@@ -1672,10 +1678,10 @@ class ROM(MetaDataItemABC):
         return self.entity_data['scanned_by_id'] if 'scanned_by_id' in self.entity_data else None
 
     def add_disk(self, disk):
-        if not 'disks' in self.entity_data or self.entity_data['disks'] is None:
+        if 'disks' not in self.entity_data or self.entity_data['disks'] is None:
             self.entity_data['disks'] = []
             
-        disks:list = self.entity_data['disks']
+        disks: list = self.entity_data['disks']
         disks.append(disk)
         self.entity_data['disks'] = disks
 
@@ -1694,17 +1700,17 @@ class ROM(MetaDataItemABC):
     def set_platform(self, platform): 
         self.entity_data['platform'] = platform
     
-    def add_tag(self, tag:str):
+    def add_tag(self, tag: str):
         if self.tags is None:
             self.tags = {}
         if tag in self.tags:
             return
         self.tags[tag] = ''
 
-    def remove_tag(self, tag:str):
+    def remove_tag(self, tag: str):
         if self.tags is None:
             return
-        if not tag in self.tags:
+        if tag not in self.tags:
             return
         del self.tags[tag]
 

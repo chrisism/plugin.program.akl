@@ -99,7 +99,7 @@ BEGIN TRANSACTION;
 ALTER TABLE roms RENAME TO _roms_old;
 ALTER TABLE romcollection_launchers RENAME TO _romcollection_launchers_old;
 ALTER TABLE rom_launchers RENAME TO _rom_launchers_old;
-ALTER TABLE metadata TO _metadata_old;
+ALTER TABLE metadata RENAME TO _metadata_old;
 
 CREATE TABLE IF NOT EXISTS metadata(
     id TEXT PRIMARY KEY, 
