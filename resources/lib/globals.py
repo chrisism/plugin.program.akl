@@ -33,34 +33,35 @@ addon_profile = addon.getAddonInfo('profile')
 addon_type = addon.getAddonInfo('type')
 addon_path = addon.getAddonInfo('path')
 
+
 # --- Addon paths and constant definition ---
 # _PATH is a filename | _DIR is a directory.
 class AKL_Paths(object):
     def __init__(self, addon_id):
         # --- Base paths ---
-        self.HOME_DIR         = io.FileName('special://home')
-        self.PROFILE_DIR      = io.FileName('special://profile')
-        self.ADDONS_DATA_DIR  = io.FileName('special://profile/addon_data')
-        #self.DATABASE_DIR     = io.FileName('special://database')
+        self.HOME_DIR = io.FileName('special://home')
+        self.PROFILE_DIR = io.FileName('special://profile')
+        self.ADDONS_DATA_DIR = io.FileName('special://profile/addon_data')
+        #  self.DATABASE_DIR     = io.FileName('special://database')
         
-        self.ADDON_DATA_DIR             = self.ADDONS_DATA_DIR.pjoin(addon_id)
-        self.ADDONS_CODE_DIR            = self.HOME_DIR.pjoin('addons', True)
-        self.ADDON_CODE_DIR             = self.ADDONS_CODE_DIR.pjoin(addon_id)
-        self.ICON_FILE_PATH             = self.ADDON_CODE_DIR.pjoin('media/icon.png')
-        self.FANART_FILE_PATH           = self.ADDON_CODE_DIR.pjoin('media/fanart.jpg')
-        self.DATABASE_SCHEMA_PATH       = self.ADDON_CODE_DIR.pjoin('resources/schema.sql')
-        self.DATABASE_MIGRATIONS_PATH   = self.ADDON_CODE_DIR.pjoin('resources/migrations', True)
+        self.ADDON_DATA_DIR = self.ADDONS_DATA_DIR.pjoin(addon_id)
+        self.ADDONS_CODE_DIR = self.HOME_DIR.pjoin('addons', True)
+        self.ADDON_CODE_DIR = self.ADDONS_CODE_DIR.pjoin(addon_id)
+        self.ICON_FILE_PATH = self.ADDON_CODE_DIR.pjoin('media/icon.png')
+        self.FANART_FILE_PATH = self.ADDON_CODE_DIR.pjoin('media/fanart.jpg')
+        self.DATABASE_SCHEMA_PATH = self.ADDON_CODE_DIR.pjoin('resources/schema.sql')
+        self.DATABASE_MIGRATIONS_PATH = self.ADDON_CODE_DIR.pjoin('resources/migrations', True)
 
         # -- Root data file
-        self.ROOT_PATH              = self.ADDON_DATA_DIR.pjoin('root.json')
+        self.ROOT_PATH = self.ADDON_DATA_DIR.pjoin('root.json')
         # --- Databases and reports ---
-        self.DATABASE_FILE_PATH     = self.ADDON_DATA_DIR.pjoin('akl.db')
+        self.DATABASE_FILE_PATH = self.ADDON_DATA_DIR.pjoin('akl.db')
         # --- datetime peek file for automatic scanning ---
-        self.SCAN_INDICATOR_FILE    = self.ADDON_DATA_DIR.pjoin('auto_scan.txt')
+        self.SCAN_INDICATOR_FILE = self.ADDON_DATA_DIR.pjoin('auto_scan.txt')
 
         # --- Offline scraper databases ---
-        self.GAMEDB_INFO_DIR           = self.ADDON_CODE_DIR.pjoin('data-AOS')
-        self.GAMEDB_JSON_BASE_NOEXT    = 'AOS_GameDB_info'
+        self.GAMEDB_INFO_DIR = self.ADDON_CODE_DIR.pjoin('data-AOS')
+        self.GAMEDB_JSON_BASE_NOEXT = 'AOS_GameDB_info'
         # self.LAUNCHBOX_INFO_DIR        = self.ADDON_CODE_DIR.pjoin('LaunchBox')
         # self.LAUNCHBOX_JSON_BASE_NOEXT = 'LaunchBox_info'
 
@@ -68,10 +69,10 @@ class AKL_Paths(object):
         self.SCRAPER_CACHE_DIR = self.ADDON_DATA_DIR.pjoin('ScraperCache')
 
         # --- Artwork and NFO for Categories and Launchers ---
-        self.DEFAULT_CAT_ASSET_DIR     = self.ADDON_DATA_DIR.pjoin('asset-categories')
-        self.DEFAULT_COL_ASSET_DIR     = self.ADDON_DATA_DIR.pjoin('asset-collections')
-        self.DEFAULT_LAUN_ASSET_DIR    = self.ADDON_DATA_DIR.pjoin('asset-launchers')
-        self.DEFAULT_FAV_ASSET_DIR     = self.ADDON_DATA_DIR.pjoin('asset-favourites')
+        self.DEFAULT_CAT_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-categories')
+        self.DEFAULT_COL_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-collections')
+        self.DEFAULT_ROM_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-roms')
+        self.DEFAULT_FAV_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-favourites')
         
         # --- Rendered views (normal and virtuals/generated) ---
         self.GENERATED_VIEWS_DIR = self.ADDON_DATA_DIR.pjoin('db_generated_views')
@@ -98,8 +99,8 @@ class AKL_Paths(object):
             self.DEFAULT_CAT_ASSET_DIR.makedirs()
         if not self.DEFAULT_COL_ASSET_DIR.exists():
             self.DEFAULT_COL_ASSET_DIR.makedirs()
-        if not self.DEFAULT_LAUN_ASSET_DIR.exists():
-            self.DEFAULT_LAUN_ASSET_DIR.makedirs()
+        if not self.DEFAULT_ROM_ASSET_DIR.exists():
+            self.DEFAULT_ROM_ASSET_DIR.makedirs()
         if not self.DEFAULT_FAV_ASSET_DIR.exists():
             self.DEFAULT_FAV_ASSET_DIR.makedirs()
         
@@ -109,16 +110,18 @@ class AKL_Paths(object):
             self.VIEWS_DIR.makedirs()
 
         return self
-  
+
+
 router: routing.Plugin = routing.Plugin()
 g_PATHS: AKL_Paths
 
 WEBSERVER_HOST = '127.0.0.1'
 WEBSERVER_PORT = 57300
+
+
 #
 # Bootstrap factory object instances.
 #
 def g_bootstrap_instances():
     global g_PATHS    
     g_PATHS = AKL_Paths(addon_id).build()
-      

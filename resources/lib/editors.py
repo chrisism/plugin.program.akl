@@ -4,7 +4,7 @@
 #
 
 # Copyright (c) Chrisism <crizizz@gmail.com>
-# Portions (c) Wintermute0110 <wintermute0110@gmail.com> 
+# Portions (c) Wintermute0110 <wintermute0110@gmail.com>
 # Portions (c) 2010-2015 Angelscry
 #
 # This program is free software; you can redistribute it and/or modify
@@ -28,6 +28,7 @@ import xbmcgui
 from akl.utils import kodi, io, text
 from akl import constants, settings
 
+from resources.lib import globals
 from resources.lib.domain import EntityABC, MetaDataItemABC, AssetInfo, g_assetFactory
 
 logger = logging.getLogger(__name__)
@@ -154,7 +155,7 @@ def edit_rating(obj_instance: MetaDataItemABC, get_method, set_method):
 
 
 #
-# Reads a text file with category/launcher plot. 
+# Reads a text file with category/launcher plot.
 # Checks file size to avoid importing binary files!
 #
 def import_TXT_file(text_file: io.FileName):
@@ -241,25 +242,34 @@ def edit_object_assets(obj_instance: MetaDataItemABC, preselected_asset=None) ->
 #   None      No changes were made. No necessary to refresh container
 #
 def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo, assets_directory: io.FileName = None) -> str:
-    if not assets_directory or not assets_directory.exists():
-        if obj_instance.get_assets_kind() == constants.KIND_ASSET_CATEGORY:
-            assets_directory = io.FileName(settings.getSetting('categories_asset_dir'), isdir=True)
-        elif obj_instance.get_assets_kind() == constants.KIND_ASSET_COLLECTION:
-            assets_directory = io.FileName(settings.getSetting('collections_asset_dir'), isdir=True)
-        elif obj_instance.get_assets_kind() == constants.KIND_ASSET_ROM:
-            assets_directory = io.FileName(settings.getSetting('launchers_asset_dir'), isdir=True)
-        else:
-            kodi.dialog_OK(kodi.translate(41140).format(obj_instance.get_assets_kind()))
-            return None
+    addon_assets_directory = None
+    if obj_instance.get_assets_kind() == constants.KIND_ASSET_CATEGORY:
+        addon_assets_directory = settings.getSettingAsFilePath('categories_asset_dir', isdir=True,
+                                                               fallback=globals.g_PATHS.DEFAULT_CAT_ASSET_DIR)
+    elif obj_instance.get_assets_kind() == constants.KIND_ASSET_COLLECTION:
+        addon_assets_directory = settings.getSettingAsFilePath('collections_asset_dir', isdir=True,
+                                                               fallback=globals.g_PATHS.DEFAULT_COL_ASSET_DIR)
+    elif obj_instance.get_assets_kind() == constants.KIND_ASSET_ROM:
+        addon_assets_directory = settings.getSettingAsFilePath('launchers_asset_dir', isdir=True,
+                                                               fallback=globals.g_PATHS.DEFAULT_ROM_ASSET_DIR)
+    else:
+        kodi.dialog_OK(kodi.translate(41140).format(obj_instance.get_assets_kind()))
+        return None
     
-    asset_type_directory = obj_instance.get_asset_path(asset_info, False)
+    if not assets_directory or not assets_directory.exists():
+        if not addon_assets_directory.exists():
+            addon_assets_directory.makedirs()
+        assets_directory = addon_assets_directory
+    
+    asset_type_directory = obj_instance.get_asset_path(asset_info)
     if not asset_type_directory:
         asset_type_directory = assets_directory.pjoin(asset_info.plural.lower(), isdir=True)
 
     logger.info(f'edit_asset() Editing {obj_instance.get_object_name()} {asset_info.name}')
     logger.info(f'edit_asset() Object ID {obj_instance.get_id()}')
-    logger.debug(f'edit_asset() assets_directory "{assets_directory.getPath()}"')
+    logger.debug(f'edit_asset() assets_directory "{assets_directory.getPath() if asset_type_directory else "None"}"')
     logger.debug(f'edit_asset() asset_type_directory "{asset_type_directory.getPath() if asset_type_directory else "None"}"')
+    logger.debug(f'edit_asset() addon_assets_directory "{addon_assets_directory.getPath()}"')
     
     dialog_title = kodi.translate(41074).format(obj_instance.get_name(), asset_info.name)
     
@@ -428,7 +438,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo, assets_dire
 
 
 #
-# Generic function to edit the Object default assets for 
+# Generic function to edit the Object default assets for
 # icon/fanart/banner/poster/clearlogo context submenu.
 # Argument obj is an object instance of class Category, CollectionLauncher, etc.
 #

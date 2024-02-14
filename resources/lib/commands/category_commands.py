@@ -89,7 +89,7 @@ def cmd_edit_category(args):
         options['CATEGORY_EDIT_METADATA'] = kodi.translate(40853)
         options['CATEGORY_EDIT_ASSETS'] = kodi.translate(40854)
         options['CATEGORY_EDIT_DEFAULT_ASSETS'] = kodi.translate(40859)
-        options['CATEGORY_STATUS'] = f'{kodi.translate(40860)} {category.get_finished_str_code()}'
+        options['CATEGORY_STATUS'] = f'{kodi.translate(40860)} {kodi.translate(category.get_finished_str_code())}'
         options['EXPORT_CATEGORY_XML'] = kodi.translate(40861)
         options['DELETE_CATEGORY'] = kodi.translate(40862)
         
