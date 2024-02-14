@@ -205,7 +205,7 @@ def vw_route_render_utilities():
     container_context_items = viewqueries.qry_container_context_menu_items(container)
 
     _render_list_items(container, container_context_items)
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
 
     
 @router.route('/globalreports')
@@ -214,7 +214,7 @@ def vw_route_render_globalreports():
     container_context_items = viewqueries.qry_container_context_menu_items(container)
 
     _render_list_items(container, container_context_items)
-    xbmcplugin.endOfDirectory(handle = router.handle, succeeded = True, cacheToDisc = False)    
+    xbmcplugin.endOfDirectory(handle=router.handle, succeeded=True, cacheToDisc=False)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -243,7 +243,7 @@ def vw_edit_category(category_id: str):
 @router.route('/categories/addrom/<category_id>/in')
 @router.route('/categories/addrom/<category_id>/in/<parent_category_id>')
 def vw_add_rom_to_category(category_id: str = None, parent_category_id: str = None):
-    AppMediator.async_cmd('ADD_STANDALONE_ROM', {'category_id': category_id,  'parent_category_id': parent_category_id})
+    AppMediator.async_cmd('ADD_STANDALONE_ROM', {'category_id': category_id, 'parent_category_id': parent_category_id})
 
 
 @router.route('/romcollection/add')
@@ -256,7 +256,6 @@ def vw_add_romcollection(category_id: str = None, parent_category_id: str = None
 
 @router.route('/romcollection/view/<romcollection_id>')
 def vw_view_romcollection(romcollection_id: str):
-    #todo
     pass
 
 
@@ -287,10 +286,10 @@ def vw_edit_rom(rom_id: str):
 
 # -------------------------------------------------------------------------------------------------
 # ROM execution / view
-# -------------------------------------------------------------------------------------------------    
+# -------------------------------------------------------------------------------------------------
 @router.route('/execute/rom/<rom_id>')
 def vw_route_execute_rom(rom_id):
-    AppMediator.async_cmd("EXECUTE_ROM", {'rom_id': rom_id} )
+    AppMediator.async_cmd("EXECUTE_ROM", {'rom_id': rom_id})
 
 
 @router.route('/rom/view/<rom_id>')
@@ -411,7 +410,7 @@ class ViewRomGUI(xbmcgui.WindowXML):
             uri_args = None
             if args:
                 args_lst = args.split("=")
-                uri_args = { args_lst[0]: args_lst[1]}
+                uri_args = {args_lst[0]: args_lst[1]}
             self.close()
             kodi.update_uri(uri, uri_args)
 
@@ -447,11 +446,11 @@ def vw_misc_set_all_sorting_methods():
     # >> This must be called only if router.handle > 0, otherwise Kodi will complain in the log.
     if router.handle < 0:
         return
-    xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_LABEL_IGNORE_FOLDERS)
-    xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_VIDEO_YEAR)
-    xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_STUDIO)
-    xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_UNSORTED)
-    xbmcplugin.addSortMethod(handle = router.handle, sortMethod = xbmcplugin.SORT_METHOD_GENRE)
+    xbmcplugin.addSortMethod(handle=router.handle, sortMethod=xbmcplugin.SORT_METHOD_LABEL_IGNORE_FOLDERS)
+    xbmcplugin.addSortMethod(handle=router.handle, sortMethod=xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+    xbmcplugin.addSortMethod(handle=router.handle, sortMethod=xbmcplugin.SORT_METHOD_STUDIO)
+    xbmcplugin.addSortMethod(handle=router.handle, sortMethod=xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.addSortMethod(handle=router.handle, sortMethod=xbmcplugin.SORT_METHOD_GENRE)
 
 
 #
@@ -462,20 +461,20 @@ def vw_misc_set_all_sorting_methods():
 def vw_misc_set_AEL_Content(AEL_Content_Value):
     if AEL_Content_Value == constants.AKL_CONTENT_VALUE_LAUNCHERS:
         logger.debug('vw_misc_set_AEL_Content() Setting Window({0}) '.format(constants.AKL_CONTENT_WINDOW_ID) +
-                  'property "{0}" = "{1}"'.format(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_LAUNCHERS))
+                     'property "{0}" = "{1}"'.format(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_LAUNCHERS))
         xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_LAUNCHERS)
         
     elif AEL_Content_Value == constants.AKL_CONTENT_VALUE_CATEGORY:
         logger.debug('vw_misc_set_AEL_Content() Setting Window({0}) '.format(constants.AKL_CONTENT_WINDOW_ID) +
-                  'property "{0}" = "{1}"'.format(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_CATEGORY))
+                     'property "{0}" = "{1}"'.format(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_CATEGORY))
         xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_CATEGORY)        
     elif AEL_Content_Value == constants.AKL_CONTENT_VALUE_ROMS:
         logger.debug('vw_misc_set_AEL_Content() Setting Window({0}) '.format(constants.AKL_CONTENT_WINDOW_ID) +
-                  'property "{0}" = "{1}"'.format(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_ROMS))
+                      'property "{0}" = "{1}"'.format(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_ROMS))
         xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_ROMS)
     elif AEL_Content_Value == constants.AKL_CONTENT_VALUE_NONE:
         logger.debug('vw_misc_set_AEL_Content() Setting Window({0}) '.format(constants.AKL_CONTENT_WINDOW_ID) +
-                  'property "{0}" = "{1}"'.format(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_NONE))
+                    'property "{0}" = "{1}"'.format(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_NONE))
         xbmcgui.Window(constants.AKL_CONTENT_WINDOW_ID).setProperty(constants.AKL_CONTENT_LABEL, constants.AKL_CONTENT_VALUE_NONE)
     else:
         logger.error('vw_misc_set_AEL_Content() Invalid AEL_Content_Value "{0}"'.format(AEL_Content_Value))
@@ -496,7 +495,7 @@ def vw_create_filter(filter_on_type: str, filter_on_value: str) -> ListFilter:
         filter_on_value = ''
     
     if filter_on_type == constants.META_TITLE_ID:
-        return OnTitleFilter(filter_on_value)    
+        return OnTitleFilter(filter_on_value)
     if filter_on_type == constants.META_DEVELOPER_ID:
         return OnDeveloperFilter(filter_on_value)
     if filter_on_type == constants.META_GENRE_ID:
@@ -504,7 +503,7 @@ def vw_create_filter(filter_on_type: str, filter_on_value: str) -> ListFilter:
     if filter_on_type == constants.META_YEAR_ID:
         return OnReleaseYearFilter(filter_on_value)
     if filter_on_type == constants.META_RATING_ID:
-        return OnRatingFilter(filter_on_value)    
+        return OnRatingFilter(filter_on_value)
     if filter_on_type == constants.META_ESRB_ID:
         return OnESRBFilter(filter_on_value)
     if filter_on_type == constants.META_PEGI_ID:
@@ -537,11 +536,11 @@ def vw_get_object_type_by_url(url: str):
 class ListFilter(object):
     __metaclass__ = abc.ABCMeta
     
-    def __init__(self, filter_value:str):
+    def __init__(self, filter_value: str):
         self.filter_value = filter_value
 
-    @abc.abstractmethod        
-    def is_valid(self, subject:dict) -> bool:
+    @abc.abstractmethod
+    def is_valid(self, subject: dict) -> bool:
         return True
     
 
@@ -552,37 +551,37 @@ class OnTitleFilter(ListFilter):
 
 class OnDeveloperFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
-        return 'info' in subject and 'studio' in subject['info'] and subject['info']['studio'] == self.filter_value  
+        return 'info' in subject and 'studio' in subject['info'] and subject['info']['studio'] == self.filter_value
 
 
 class OnGenreFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
-        return 'info' in subject and 'genre' in subject['info'] and subject['info']['genre'] == self.filter_value  
+        return 'info' in subject and 'genre' in subject['info'] and subject['info']['genre'] == self.filter_value
 
 
 class OnReleaseYearFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
-        return 'info' in subject and 'year' in subject['info'] and subject['info']['year'] == self.filter_on_value    
+        return 'info' in subject and 'year' in subject['info'] and subject['info']['year'] == self.filter_on_value
 
 
 class OnRatingFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
-        return 'info' in subject and 'rating' in subject['info'] and subject['info']['rating'] == self.filter_on_value    
+        return 'info' in subject and 'rating' in subject['info'] and subject['info']['rating'] == self.filter_on_value
     
 
 class OnESRBFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
-        return 'properties' in subject and 'esrb' in subject['properties'] and subject['properties']['esrb'] == self.filter_on_value   
+        return 'properties' in subject and 'esrb' in subject['properties'] and subject['properties']['esrb'] == self.filter_on_value
     
 
 class OnPEGIFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
-        return 'properties' in subject and 'pegi' in subject['properties'] and subject['properties']['pegi'] == self.filter_on_value   
+        return 'properties' in subject and 'pegi' in subject['properties'] and subject['properties']['pegi'] == self.filter_on_value
     
 
 class OnNumberOfPlayersFilter(ListFilter):
     def is_valid(self, subject: dict) -> bool:
-        return 'properties' in subject and 'nplayers' in subject['properties'] and subject['properties']['nplayers'] == self.filter_on_value  
+        return 'properties' in subject and 'nplayers' in subject['properties'] and subject['properties']['nplayers'] == self.filter_on_value
     
 
 class OnPlatformFilter(ListFilter):

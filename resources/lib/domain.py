@@ -487,7 +487,7 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
             'akl_addon_id': self.get_id(),
             'addon_id': self.addon.get_addon_id(),
             'settings': {}
-        }        
+        }
         is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST, globals.WEBSERVER_PORT, post_data)
         if not is_stored:
             kodi.notify_error(kodi.translate(40958))
@@ -498,7 +498,7 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
             'akl_addon_id': self.get_id(),
             'addon_id': self.addon.get_addon_id(),
             'settings': {}
-        }        
+        }
         is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST, globals.WEBSERVER_PORT, post_data)
         if not is_stored:
             kodi.notify_error(kodi.translate(40958))
@@ -1033,13 +1033,13 @@ class MetaDataItemABC(EntityABC):
     
     @abc.abstractmethod
     def get_default_icon(self) -> str:
-        pass 
+        pass
     
     def is_mappable_asset(self, asset_info) -> bool:
         return asset_info.id in self.get_mappable_asset_ids_list()
     
     # returns the complete set of assets as they are mapped for the view
-    def get_view_assets(self) -> typing.Dict[str,str]:
+    def get_view_assets(self) -> typing.Dict[str, str]:
         asset_ids = self.get_asset_ids_list()
         mappable_asset_ids = self.get_mappable_asset_ids_list()
         view_asset_ids = asset_ids + list(set(mappable_asset_ids) - set(asset_ids))
@@ -1070,7 +1070,7 @@ class MetaDataItemABC(EntityABC):
     # Get a list of the assets that can be mapped to a defaultable asset.
     # They must be images, no videos, no documents.
     #
-    def get_mappable_asset_list(self) -> typing.List[AssetInfo]: 
+    def get_mappable_asset_list(self) -> typing.List[AssetInfo]:
         return g_assetFactory.get_asset_list_by_IDs(self.get_mappable_asset_ids_list(), 'image')
 
     #
@@ -1084,7 +1084,7 @@ class MetaDataItemABC(EntityABC):
         if not mapped_asset or not mapped_asset.to_asset_info:
             return asset_info
         return mapped_asset.to_asset_info
-	
+
     def set_mapped_asset(self, asset_info: AssetInfo, mapped_to_info: AssetInfo):
         mapped_asset = next((m for m in self.asset_mappings if m.asset_info.id == asset_info.id), None)
         if not mapped_asset:
@@ -1174,7 +1174,7 @@ class Category(MetaDataItemABC):
             try:
                 item_nfo = nfo_FileName.loadFileToStr()
                 item_nfo = item_nfo.replace('\r', '').replace('\n', '')
-            except:
+            except Exception:
                 kodi.notify_warn(kodi.translate(41044).format(nfo_FileName.getPath()))
                 logger.error("Category.import_NFO_file() Exception reading NFO file '{0}'".format(nfo_FileName.getPath()))
                 return False
@@ -1384,7 +1384,7 @@ class ROMCollection(MetaDataItemABC):
         return self.launchers_data
 
     def get_launcher(self, id: str) -> ROMLauncherAddon:
-        return next((l for l in self.launchers_data if l.get_id() == id), None)
+        return next((ld for ld in self.launchers_data if ld.get_id() == id), None)
 
     def get_default_launcher(self) -> ROMLauncherAddon:
         if len(self.launchers_data) == 0:
@@ -1726,13 +1726,13 @@ class ROM(MetaDataItemABC):
     def set_clone(self, clone):
         self.entity_data['cloneof'] = clone
 
-    def scanned_with(self, scanner_id: str): 
+    def scanned_with(self, scanner_id: str):
         self.entity_data['scanned_by_id'] = scanner_id
         
     def get_scanned_data(self):
         return self.scanned_data
 
-    def get_scanned_data_element(self, key:str):
+    def get_scanned_data_element(self, key: str):
         return self.scanned_data[key] if key in self.scanned_data else None
     
     def get_scanned_data_element_as_file(self, key: str) -> io.FileName:
@@ -1781,7 +1781,7 @@ class ROM(MetaDataItemABC):
     def get_default_launcher(self) -> ROMLauncherAddon:
         if len(self.launchers_data) == 0:
             return None
-        default_launcher = next((l for l in self.launchers_data if l.is_default()), None)
+        default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
         if default_launcher is None:
             return self.launchers_data[0]
         
@@ -1791,11 +1791,11 @@ class ROM(MetaDataItemABC):
         if len(self.launchers_data) == 0:
             return
         
-        current_default_launcher = next((l for l in self.launchers_data if l.is_default()), None)
+        current_default_launcher = next((ld for ld in self.launchers_data if ld.is_default()), None)
         if current_default_launcher:
             current_default_launcher.set_default(False)
         
-        launcher_to_be_default = next((l for l in self.launchers_data if l.get_id() == launcher_id), None)
+        launcher_to_be_default = next((ld for ld in self.launchers_data if ld.get_id() == launcher_id), None)
         if launcher_to_be_default:
             launcher_to_be_default.set_default(True)
             
@@ -1924,16 +1924,16 @@ class ROM(MetaDataItemABC):
         nfo_content.append('<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n')
         nfo_content.append('<!-- Exported by AKL on {0} -->\n'.format(time.strftime("%Y-%m-%d %H:%M:%S")))
         nfo_content.append('<ROM>\n')
-        nfo_content.append(text.XML_line('title',     self.get_name()))
-        nfo_content.append(text.XML_line('year',      self.get_releaseyear()))
-        nfo_content.append(text.XML_line('genre',     self.get_genre())) 
+        nfo_content.append(text.XML_line('title', self.get_name()))
+        nfo_content.append(text.XML_line('year', self.get_releaseyear()))
+        nfo_content.append(text.XML_line('genre', self.get_genre())) 
         nfo_content.append(text.XML_line('developer', self.get_developer()))
-        nfo_content.append(text.XML_line('nplayers',  self.get_number_of_players()))
-        nfo_content.append(text.XML_line('esrb',      self.get_esrb_rating()))
-        nfo_content.append(text.XML_line('pegi',      self.get_pegi_rating()))
-        nfo_content.append(text.XML_line('rating',    self.get_rating()))
-        nfo_content.append(text.XML_line('plot',      self.get_plot()))
-        nfo_content.append(text.XML_line('trailer',   self.get_trailer()))
+        nfo_content.append(text.XML_line('nplayers', self.get_number_of_players()))
+        nfo_content.append(text.XML_line('esrb', self.get_esrb_rating()))
+        nfo_content.append(text.XML_line('pegi', self.get_pegi_rating()))
+        nfo_content.append(text.XML_line('rating', self.get_rating()))
+        nfo_content.append(text.XML_line('plot', self.get_plot()))
+        nfo_content.append(text.XML_line('trailer', self.get_trailer()))
         
         nfo_content.append('</ROM>\n')
         full_string = ''.join(nfo_content)
@@ -1944,12 +1944,12 @@ class ROM(MetaDataItemABC):
     # Flags indicate which elements are allowed to be updated/altered with the incoming data.
     #
     def update_with(self, 
-        api_rom_obj: api.ROMObj, 
-        metadata_to_update=[], 
-        assets_to_update=[], 
-        overwrite_existing_metadata=False,
-        overwrite_existing_assets=False,
-        update_scanned_data=False):
+                    api_rom_obj: api.ROMObj,
+                    metadata_to_update=[],
+                    assets_to_update=[],
+                    overwrite_existing_metadata=False,
+                    overwrite_existing_assets=False,
+                    update_scanned_data=False):
 
         logger.debug(f"Overwriting existing metadata in domain: {overwrite_existing_metadata}")
         logger.debug(f"Overwriting existing assets in domain: {overwrite_existing_assets}")
@@ -1957,61 +1957,61 @@ class ROM(MetaDataItemABC):
         if constants.META_TITLE_ID in metadata_to_update \
             and api_rom_obj.get_name() \
             and (overwrite_existing_metadata or \
-                _is_empty_or_default(self.get_name(), constants.DEFAULT_META_TITLE)): 
+                 _is_empty_or_default(self.get_name(), constants.DEFAULT_META_TITLE)):
             self.set_name(api_rom_obj.get_name())
 
         if constants.META_PLOT_ID in metadata_to_update \
             and api_rom_obj.get_plot() \
             and (overwrite_existing_metadata or \
-                _is_empty_or_default(self.get_plot(), constants.DEFAULT_META_PLOT)):              
+                 _is_empty_or_default(self.get_plot(), constants.DEFAULT_META_PLOT)):
             self.set_plot(api_rom_obj.get_plot())
     
         if constants.META_YEAR_ID in metadata_to_update \
             and api_rom_obj.get_releaseyear() \
             and (overwrite_existing_metadata or \
-                _is_empty_or_default(self.get_releaseyear(), constants.DEFAULT_META_YEAR)):       
+                 _is_empty_or_default(self.get_releaseyear(), constants.DEFAULT_META_YEAR)):
             self.set_releaseyear(api_rom_obj.get_releaseyear())
         
         if constants.META_GENRE_ID in metadata_to_update \
             and api_rom_obj.get_genre() \
             and (overwrite_existing_metadata or \
-                _is_empty_or_default(self.get_genre(), constants.DEFAULT_META_GENRE)):
+                 _is_empty_or_default(self.get_genre(), constants.DEFAULT_META_GENRE)):
             self.set_genre(api_rom_obj.get_genre())
         
         if constants.META_DEVELOPER_ID in metadata_to_update \
             and api_rom_obj.get_developer() \
             and (overwrite_existing_metadata or \
-                _is_empty_or_default(self.get_developer(), constants.DEFAULT_META_DEVELOPER)):         
+                 _is_empty_or_default(self.get_developer(), constants.DEFAULT_META_DEVELOPER)):         
             self.set_developer(api_rom_obj.get_developer())
         
         if constants.META_NPLAYERS_ID in metadata_to_update \
             and api_rom_obj.get_number_of_players() \
             and (overwrite_existing_metadata or \
-                _is_empty_or_default(self.get_number_of_players(), constants.DEFAULT_META_NPLAYERS)):
+                 _is_empty_or_default(self.get_number_of_players(), constants.DEFAULT_META_NPLAYERS)):
             self.set_number_of_players(api_rom_obj.get_number_of_players())
         
         if constants.META_NPLAYERS_ONLINE_ID in metadata_to_update \
             and api_rom_obj.get_number_of_players_online() \
             and (overwrite_existing_metadata or \
-                _is_empty_or_default(self.get_number_of_players_online(), constants.DEFAULT_META_NPLAYERS)):
+                 _is_empty_or_default(self.get_number_of_players_online(), constants.DEFAULT_META_NPLAYERS)):
             self.set_number_of_players_online(api_rom_obj.get_number_of_players_online())
         
         if constants.META_ESRB_ID in metadata_to_update\
                 and api_rom_obj.get_esrb_rating() \
                 and (overwrite_existing_metadata or \
-                    _is_empty_or_default(self.get_esrb_rating(), constants.DEFAULT_META_ESRB)):
+                     _is_empty_or_default(self.get_esrb_rating(), constants.DEFAULT_META_ESRB)):
             self.set_esrb_rating(api_rom_obj.get_esrb_rating())
         
         if constants.META_PEGI_ID in metadata_to_update\
                 and api_rom_obj.get_pegi_rating() \
                 and (overwrite_existing_metadata or \
-                    _is_empty_or_default(self.get_pegi_rating(), constants.DEFAULT_META_PEGI)):       
+                     _is_empty_or_default(self.get_pegi_rating(), constants.DEFAULT_META_PEGI)):       
             self.set_pegi_rating(api_rom_obj.get_pegi_rating())
         
         if constants.META_RATING_ID in metadata_to_update \
                 and api_rom_obj.get_rating() \
                 and (overwrite_existing_metadata or \
-                    _is_empty_or_default(self.get_rating(), constants.DEFAULT_META_RATING)):            
+                     _is_empty_or_default(self.get_rating(), constants.DEFAULT_META_RATING)):            
             self.set_rating(api_rom_obj.get_rating())
         
         if constants.META_TAGS_ID in metadata_to_update and api_rom_obj.get_tags() is not None:
@@ -2028,7 +2028,7 @@ class ROM(MetaDataItemABC):
                 existing_asset = self.get_asset(asset_id)
                 new_asset = api_rom_obj.get_asset(asset_id)
                 if new_asset is not None and \
-                    (overwrite_existing_assets or existing_asset is None or not existing_asset.is_assigned()):
+                   (overwrite_existing_assets or existing_asset is None or not existing_asset.is_assigned()):
                     if asset_id == constants.ASSET_TRAILER_ID:
                         self.set_trailer(new_asset)
                     else:
@@ -2078,7 +2078,7 @@ class AssetInfoFactory(object):
         
     def __init__(self):        
         # default collections
-        self.ASSET_INFO_ID_DICT:typing.Dict[str,AssetInfo] = {} # ID -> object        
+        self.ASSET_INFO_ID_DICT: typing.Dict[str, AssetInfo] = {}  # ID -> object
         self._load_asset_data()
         
     # -------------------------------------------------------------------------------------------------
@@ -2128,14 +2128,15 @@ class AssetInfoFactory(object):
     # IDs is a list (or an iterable that returns an asset ID
     # Returns a list of AssetInfo objects.
     # If the asset kind is given, it will filter out assets not corresponding to that kind.
-    def get_asset_list_by_IDs(self, IDs, kind = None) -> typing.List[AssetInfo]:
+    def get_asset_list_by_IDs(self, IDs, kind=None) -> typing.List[AssetInfo]:
         asset_info_list = []
         for asset_ID in IDs:
             asset_info = self.ASSET_INFO_ID_DICT.get(asset_ID, None)
             if asset_info is None:
                 logger.error('get_asset_list_by_IDs() Wrong asset_ID = {0}'.format(asset_ID))
                 continue
-            if kind is None or asset_info.kind_str == kind: asset_info_list.append(asset_info)
+            if kind is None or asset_info.kind_str == kind:
+                asset_info_list.append(asset_info)
 
         return asset_info_list
   
@@ -2178,24 +2179,39 @@ class AssetInfoFactory(object):
     #
     # Returns a FileName object
     #
-    def assets_get_path_noext_SUFIX(self, asset_ID, AssetPath, asset_base_noext, objectID = '000'):
+    def assets_get_path_noext_SUFIX(self, asset_ID, AssetPath, asset_base_noext, objectID='000'):
         objectID_str = '_' + objectID[0:3]
 
-        if   asset_ID == constants.ASSET_ICON_ID:       asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_icon')
-        elif asset_ID == constants.ASSET_FANART_ID:     asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_fanart')
-        elif asset_ID == constants.ASSET_BANNER_ID:     asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_banner')
-        elif asset_ID == constants.ASSET_POSTER_ID:     asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_poster')
-        elif asset_ID == constants.ASSET_CLEARLOGO_ID:  asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_clearlogo')
-        elif asset_ID == constants.ASSET_CONTROLLER_ID: asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_controller')
-        elif asset_ID == constants.ASSET_TRAILER_ID:    asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_trailer')
-        elif asset_ID == constants.ASSET_TITLE_ID:      asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_title')
-        elif asset_ID == constants.ASSET_SNAP_ID:       asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_snap')
-        elif asset_ID == constants.ASSET_BOXFRONT_ID:   asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_boxfront')
-        elif asset_ID == constants.ASSET_BOXBACK_ID:    asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_boxback')
-        elif asset_ID == constants.ASSET_CARTRIDGE_ID:  asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_cartridge')
-        elif asset_ID == constants.ASSET_FLYER_ID:      asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_flyer')
-        elif asset_ID == constants.ASSET_MAP_ID:        asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_map')
-        elif asset_ID == constants.ASSET_MANUAL_ID:     asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_manual')
+        if asset_ID == constants.ASSET_ICON_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_icon')
+        elif asset_ID == constants.ASSET_FANART_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_fanart')
+        elif asset_ID == constants.ASSET_BANNER_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_banner')
+        elif asset_ID == constants.ASSET_POSTER_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_poster')
+        elif asset_ID == constants.ASSET_CLEARLOGO_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_clearlogo')
+        elif asset_ID == constants.ASSET_CONTROLLER_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_controller')
+        elif asset_ID == constants.ASSET_TRAILER_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_trailer')
+        elif asset_ID == constants.ASSET_TITLE_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_title')
+        elif asset_ID == constants.ASSET_SNAP_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_snap')
+        elif asset_ID == constants.ASSET_BOXFRONT_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_boxfront')
+        elif asset_ID == constants.ASSET_BOXBACK_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_boxback')
+        elif asset_ID == constants.ASSET_CARTRIDGE_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_cartridge')
+        elif asset_ID == constants.ASSET_FLYER_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_flyer')
+        elif asset_ID == constants.ASSET_MAP_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_map')
+        elif asset_ID == constants.ASSET_MANUAL_ID:
+            asset_path_noext_FN = AssetPath.pjoin(asset_base_noext + objectID_str + '_manual')
         else:
             asset_path_noext_FN = io.FileName('')
             logger.error('assets_get_path_noext_SUFIX() Wrong asset_ID = {0}'.format(asset_ID))
@@ -2654,15 +2670,17 @@ class VirtualCategoryFactory(object):
             ])     
                 
         return None
+
   
 class ROMLauncherAddonFactory(object):
 
     @staticmethod
-    def create(addon: AelAddon, data:dict) -> ROMLauncherAddon:
+    def create(addon: AelAddon, data: dict) -> ROMLauncherAddon:
         if addon.get_addon_id() == constants.RETROPLAYER_LAUNCHER_APP_NAME:
             return RetroplayerLauncherAddon(data, addon)
                     
         return ROMLauncherAddon(data, addon)
+
     
 # -------------------------------------------------------------------------------------------------
 # Data model used in the plugin

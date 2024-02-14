@@ -11,7 +11,11 @@ UPDATE_METADATA = "UPDATE metadata SET year=?, genre=?, developer=?, rating=?, p
 UPDATE_ASSET = "UPDATE assets SET filepath = ?, asset_type = ? WHERE id = ?"
 UPDATE_ASSET_PATH = "UPDATE assetpaths SET path = ?, asset_type = ? WHERE id = ?"
 
-SELECT_ITEM_ASSET_MAPPINGS = "SELECT am.* FROM assetmappings AS am INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id WHERE mm.metadata_id = ?"
+SELECT_ITEM_ASSET_MAPPINGS = """
+    SELECT am.* FROM assetmappings AS am
+    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id
+    WHERE mm.metadata_id = ?
+"""
 INSERT_ASSET_MAPPING = "INSERT INTO assetmappings (id, mapped_asset_type, to_asset_type) VALUES (?,?,?)"
 UPDATE_ASSET_MAPPING = "UPDATE assetmappings SET mapped_asset_type = ?, to_asset_type = ? WHERE id = ?"
 INSERT_MAPPING_WITH_METADATA = "INSERT INTO metadata_assetmappings (metadata_id, assetmapping_id) VALUES (?,?)"
@@ -23,10 +27,10 @@ SELECT_CATEGORY_ASSETS = "SELECT * FROM vw_category_assets WHERE category_id = ?
 SELECT_CATEGORIES = "SELECT * FROM vw_categories ORDER BY m_name"
 SELECT_ALL_CATEGORY_ASSETS = "SELECT * FROM vw_category_assets"
 SELECT_ALL_CATEGORY_ASSET_MAPPINGS = """
-                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
-                                    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
-                                    INNER JOIN categories AS c ON mm.metadata_id = c.metadata_id
-                                    """
+    SELECT am.*, mm.metadata_id FROM assetmappings AS am
+    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id
+    INNER JOIN categories AS c ON mm.metadata_id = c.metadata_id
+"""
 SELECT_ROOT_CATEGORIES = "SELECT * FROM vw_categories WHERE parent_id IS NULL ORDER BY m_name"
 SELECT_ROOT_CATEGORY_ASSETS = "SELECT * FROM vw_category_assets WHERE parent_id IS NULL"
 SELECT_ROOT_CATEGORY_ASSET_MAPPINGS = """

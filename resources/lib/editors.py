@@ -165,7 +165,8 @@ def import_TXT_file(text_file: io.FileName):
     logger.debug('import_TXT_file() File size is {0}'.format(file_size))
     if file_size > 16384:
         ret = kodi.dialog_yesno(kodi.translate(41070).format(text_file.getPath(), file_size))
-        if not ret: return ''
+        if not ret:
+            return ''
 
     # Import file
     logger.debug('import_TXT_file() Importing description from "{0}"'.format(text_file.getPath()))
@@ -425,12 +426,13 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo, assets_dire
     
     return selected_option
 
+
 #
 # Generic function to edit the Object default assets for 
 # icon/fanart/banner/poster/clearlogo context submenu.
 # Argument obj is an object instance of class Category, CollectionLauncher, etc.
 #
-def edit_object_default_assets(obj_instance: MetaDataItemABC, preselected_asset_id = None) -> AssetInfo:
+def edit_object_default_assets(obj_instance: MetaDataItemABC, preselected_asset_id=None) -> AssetInfo:
     logger.debug('edit_object_default_assets() obj {0}'.format(obj_instance.__class__.__name__))
     logger.debug('edit_object_default_assets() preselected_asset_id {0}'.format(preselected_asset_id))
     
@@ -450,10 +452,10 @@ def edit_object_default_assets(obj_instance: MetaDataItemABC, preselected_asset_
         mapped_asset_info = obj_instance.get_asset_mapping(default_asset_info)
         mapped_asset_str = obj_instance.get_asset_str(mapped_asset_info)
         label1_str = kodi.translate(42055).format(
-            kodi.translate(default_asset_info.name_id), 
+            kodi.translate(default_asset_info.name_id),
             kodi.translate(mapped_asset_info.name_id))
         label2_str = mapped_asset_str
-        list_item = xbmcgui.ListItem(label = label1_str, label2 = label2_str)
+        list_item = xbmcgui.ListItem(label=label1_str, label2=label2_str)
         if mapped_asset_str:
             item_path = io.FileName(mapped_asset_str)
             if item_path.isVideoFile():
@@ -464,7 +466,7 @@ def edit_object_default_assets(obj_instance: MetaDataItemABC, preselected_asset_
                 item_img = mapped_asset_str
         else:
             item_img = 'DefaultAddonNone.png'
-        list_item.setArt({'icon' : item_img})
+        list_item.setArt({'icon': item_img})
         # --- Append to list of ListItems ---
         list_items.append(list_item)
         asset_info_list.append(default_asset_info)
@@ -473,8 +475,8 @@ def edit_object_default_assets(obj_instance: MetaDataItemABC, preselected_asset_
             pre_select_idx = counter
         counter += 1
 
-    selected_option = xbmcgui.Dialog().select(
-            dialog_title_str, list = list_items, useDetails = True, preselect = pre_select_idx)
+    selected_option = xbmcgui.Dialog().select(dialog_title_str, list=list_items, useDetails=True,
+                                              preselect=pre_select_idx)
     logger.debug(f'edit_object_default_assets() Main select() returned {selected_option}')
     if selected_option < 0:
         # >> Return to parent menu.
@@ -484,9 +486,10 @@ def edit_object_default_assets(obj_instance: MetaDataItemABC, preselected_asset_
     # >> Execute edit default asset submenu. Then, execute recursively this submenu again.
     # >> The menu dialog is instantiated again so it reflects the changes just edited.
     logger.debug('edit_object_default_assets() Executing mappable asset select() dialog.')
-    selected_asset_info:AssetInfo = asset_info_list[selected_option]
+    selected_asset_info: AssetInfo = asset_info_list[selected_option]
     logger.debug(f'edit_object_default_assets() Main selected {selected_asset_info.name}.')
-    return selected_asset_info            
+    return selected_asset_info
+
 
 def edit_default_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> bool:
     selectable_asset_ids = obj_instance.get_asset_ids_list()
@@ -503,7 +506,7 @@ def edit_default_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> 
         mapped_asset_str = obj_instance.get_asset_str(mappable_asset_info)
         label1_str = mappable_asset_info.name
         label2_str = mapped_asset_str if mapped_asset_str else kodi.translate(42001)
-        list_item = xbmcgui.ListItem(label = label1_str, label2 = label2_str)
+        list_item = xbmcgui.ListItem(label=label1_str, label2=label2_str)
         if mapped_asset_str:
             item_path = io.FileName(mapped_asset_str)
             if item_path.isVideoFile():
@@ -514,7 +517,7 @@ def edit_default_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> 
                 item_img = mapped_asset_str
         else:
             item_img = 'DefaultAddonNone.png'
-        list_item.setArt({'icon' : item_img})
+        list_item.setArt({'icon': item_img})
         # --- Append to list of ListItems ---
         list_items.append(list_item)
         asset_info_list.append(mappable_asset_info)
@@ -523,8 +526,8 @@ def edit_default_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo) -> 
         counter += 1
     
     dialog_title_str = kodi.translate(41078).format(obj_instance.get_object_name(), asset_info.name)
-    secondary_selected_option = xbmcgui.Dialog().select(
-            dialog_title_str, list = list_items, useDetails = True, preselect = secondary_pre_select_idx)
+    secondary_selected_option = xbmcgui.Dialog().select(dialog_title_str, list=list_items, useDetails=True,
+                                                        preselect=secondary_pre_select_idx)
     logger.debug('edit_default_asset() Mapable select() returned {0}'.format(secondary_selected_option))
     if secondary_selected_option < 0:
         # >> Return to parent menu.
