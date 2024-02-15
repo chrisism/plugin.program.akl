@@ -837,10 +837,7 @@ class MetaDataItemABC(EntityABC):
     # --------------------------------------------------------------------------------------------
     # Core functions
     # --------------------------------------------------------------------------------------------
-    @abc.abstractmethod
-    def get_assets_kind(self) -> int:
-        pass
-
+    
     # --- Metadata --------------------------------------------------------------------------------
     def get_metadata_id(self):
         return self.entity_data['metadata_id']
@@ -1113,9 +1110,6 @@ class Category(MetaDataItemABC):
     def get_object_name(self):
         return "Category"
 
-    def get_assets_kind(self):
-        return constants.KIND_ASSET_CATEGORY
-    
     def get_type(self):
         return constants.OBJ_CATEGORY  # 42501
     
@@ -1257,9 +1251,6 @@ class VirtualCategory(Category):
     def get_object_name(self):
         return "Virtual Category"
     
-    def get_assets_kind(self):
-        return constants.KIND_ASSET_CATEGORY
-    
     def get_type(self):
         return constants.OBJ_CATEGORY_VIRTUAL  # 42502
  
@@ -1300,9 +1291,6 @@ class ROMCollection(MetaDataItemABC):
     def get_object_name(self):
         return "ROM Collection"
 
-    def get_assets_kind(self):
-        return constants.KIND_ASSET_LAUNCHER
-    
     def get_type(self):
         return constants.OBJ_ROMCOLLECTION
     
@@ -1529,9 +1517,6 @@ class VirtualCollection(ROMCollection):
     def get_object_name(self):
         return "Virtual Collection"
     
-    def get_assets_kind(self):
-        return constants.KIND_ASSET_COLLECTION
-    
     def get_type(self):
         return constants.OBJ_COLLECTION_VIRTUAL
         
@@ -1582,9 +1567,6 @@ class ROM(MetaDataItemABC):
         
     def get_object_name(self):
         return 'ROM'
-
-    def get_assets_kind(self):
-        return constants.KIND_ASSET_ROM
 
     def get_type(self):
         return constants.OBJ_ROM
@@ -2102,23 +2084,21 @@ class AssetInfoFactory(object):
 
         return asset_info
     
-    def get_assets_for_type(self, asset_kind) -> typing.List[AssetInfo]:
-        if asset_kind == constants.KIND_ASSET_CATEGORY:
+    def get_assets_for_type(self, obj_type) -> typing.List[AssetInfo]:
+        if obj_type == constants.OBJ_CATEGORY:
             return self.get_asset_list_by_IDs(constants.CATEGORY_ASSET_ID_LIST)
-        if asset_kind == constants.KIND_ASSET_COLLECTION:
+        if obj_type == constants.OBJ_ROMCOLLECTION:
             return self.get_asset_list_by_IDs(constants.COLLECTION_ASSET_ID_LIST)
-        if asset_kind == constants.KIND_ASSET_LAUNCHER:
-            return self.get_asset_list_by_IDs(constants.LAUNCHER_ASSET_ID_LIST)
-        if asset_kind == constants.KIND_ASSET_ROM:
+        if obj_type == constants.OBJ_ROM:
             return self.get_asset_list_by_IDs(constants.ROM_ASSET_ID_LIST)
         return []
 
-    def get_asset_kinds_for_roms(self) -> typing.List[AssetInfo]:
-        rom_asset_kinds = []
+    def get_asset_for_roms(self) -> typing.List[AssetInfo]:
+        rom_assets = []
         for rom_asset_id in constants.ROM_ASSET_ID_LIST:
-            rom_asset_kinds.append(self.ASSET_INFO_ID_DICT[rom_asset_id])
+            rom_assets.append(self.ASSET_INFO_ID_DICT[rom_asset_id])
 
-        return rom_asset_kinds
+        return rom_assets
 
     # IDs is a list (or an iterable that returns an asset ID
     # Returns a list of AssetInfo objects.

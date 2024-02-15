@@ -59,9 +59,7 @@ def cmd_manage_roms(args):
     options['SET_ROMS_DEFAULT_ARTWORK'] = kodi.translate(42044)
     options['IMPORT_ROMS'] = kodi.translate(42050)
     if has_roms:
-        options['EXPORT_ROMS'] = kodi.translate(42051)
         options['SCRAPE_ROMS'] = kodi.translate(42052)
-        options['DELETE_ROMS_NFO'] = kodi.translate(42053)
         options['CLEAR_ROMS'] = kodi.translate(42054)
 
     s = kodi.translate(41128).format(romcollection.get_name())

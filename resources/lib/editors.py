@@ -243,17 +243,17 @@ def edit_object_assets(obj_instance: MetaDataItemABC, preselected_asset=None) ->
 #
 def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo, assets_directory: io.FileName = None) -> str:
     addon_assets_directory = None
-    if obj_instance.get_assets_kind() == constants.KIND_ASSET_CATEGORY:
+    if obj_instance.get_type() == constants.OBJ_CATEGORY:
         addon_assets_directory = settings.getSettingAsFilePath('categories_asset_dir', isdir=True,
                                                                fallback=globals.g_PATHS.DEFAULT_CAT_ASSET_DIR)
-    elif obj_instance.get_assets_kind() == constants.KIND_ASSET_COLLECTION:
+    elif obj_instance.get_type() == constants.OBJ_ROMCOLLECTION:
         addon_assets_directory = settings.getSettingAsFilePath('collections_asset_dir', isdir=True,
                                                                fallback=globals.g_PATHS.DEFAULT_COL_ASSET_DIR)
-    elif obj_instance.get_assets_kind() == constants.KIND_ASSET_ROM:
+    elif obj_instance.get_type() == constants.OBJ_ROM:
         addon_assets_directory = settings.getSettingAsFilePath('launchers_asset_dir', isdir=True,
                                                                fallback=globals.g_PATHS.DEFAULT_ROM_ASSET_DIR)
     else:
-        kodi.dialog_OK(kodi.translate(41140).format(obj_instance.get_assets_kind()))
+        kodi.dialog_OK(kodi.translate(41140).format(obj_instance.get_type()))
         return None
     
     if not assets_directory or not assets_directory.exists():
@@ -278,7 +278,7 @@ def edit_asset(obj_instance: MetaDataItemABC, asset_info: AssetInfo, assets_dire
     options['LINK_LOCAL'] = kodi.translate(42004).format(asset_info.name)
     options['IMPORT_LOCAL'] = kodi.translate(42005).format(asset_info.name)
     options['UNSET'] = kodi.translate(42006)
-    if obj_instance.get_assets_kind() == constants.KIND_ASSET_ROM:
+    if obj_instance.get_type() == constants.OBJ_ROM:
         options['SCRAPE_ASSET'] = kodi.translate(42007).format(asset_info.name)
         
     selected_option = kodi.OrdDictionaryDialog().select(dialog_title, options)

@@ -47,7 +47,7 @@ def report_print_ROM(slist: list, rom: ROM):
     slist.append("[COLOR skyblue]i_extra_ROM[/COLOR]: {0}\n".format(rom.get_extra_ROM()))
 
     # >> Assets/artwork
-    asset_infos = g_assetFactory.get_asset_kinds_for_roms()
+    asset_infos = g_assetFactory.get_asset_for_roms()
     for asset_info in asset_infos:
         slist.append("[COLOR violet]{0}[/COLOR]: '{1}'".format(asset_info.id, rom.get_asset(asset_info)))
 

@@ -299,7 +299,7 @@ def cmd_set_rom_asset_dirs(args):
     library_id: str = args['library_id'] if 'library_id' in args else None
     
     list_items = collections.OrderedDict()
-    assets = g_assetFactory.get_assets_for_type(constants.KIND_ASSET_ROM)
+    assets = g_assetFactory.get_assets_for_type(constants.OBJ_ROM)
 
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
@@ -432,3 +432,30 @@ def cmd_execute_rom_scanner(args):
 def _get_name_from_platform(input, item_key, entity_data):
     title = entity_data['platform']
     return title
+
+
+@AppMediator.register('IMPORT_LIBRARY_ROMS')
+def cmd_library_import_roms(args):
+    romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
+        
+    selected_option = None
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        repository = ROMCollectionRepository(uow)
+        romcollection = repository.find_romcollection(romcollection_id)
+
+    options = collections.OrderedDict()
+    options['IMPORT_ROMS_NFO'] = kodi.translate(42056)
+    options['IMPORT_ROMS_JSON'] = kodi.translate(42057)
+
+    s = kodi.translate(41130).format(romcollection.get_name())
+    selected_option = kodi.OrdDictionaryDialog().select(s, options)
+    if selected_option is None:
+        # >> Exits context menu
+        logger.debug('IMPORT_ROMS: cmd_import_roms() Selected None. Closing context menu')
+        AppMediator.async_cmd('ROMCOLLECTION_MANAGE_ROMS', args)
+        return
+    
+    # >> Execute subcommand. May be atomic, maybe a submenu.
+    logger.debug('IMPORT_ROMS: cmd_import_roms() Selected {}'.format(selected_option))
+    AppMediator.async_cmd(selected_option, args)
