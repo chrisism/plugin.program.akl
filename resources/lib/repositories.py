@@ -14,7 +14,7 @@ from akl import constants
 
 from resources.lib import globals
 from resources.lib import queries as qry
-from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, VirtualCollection
+from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, VirtualCollection, RuleSet
 from resources.lib.domain import Asset, AssetPath, AssetMapping, RomAssetMapping
 from resources.lib.domain import VirtualCategoryFactory, VirtualCollectionFactory, ROMLauncherAddonFactory, g_assetFactory
 from resources.lib.domain import Library, ROMLauncherAddon, AelAddon
@@ -233,10 +233,11 @@ class XmlConfigurationRepository(object):
 # -------------------------------------------------------------------------------------------------
 class ROMsJsonFileRepository(object):
 
-    def __init__(self, file_path: io.FileName, debug = False):
+    def __init__(self, file_path: io.FileName, debug=False):
         self.file_path = file_path
         self.debug = debug
         self.logger = logging.getLogger(__name__)
+        
     #
     # Loads ROM databases from disk
     #
@@ -265,7 +266,7 @@ class ROMsJsonFileRepository(object):
         if roms_data and isinstance(roms_data, list) and 'control' in roms_data[0]:
             control_str = roms_data[0]['control']
             version_int = roms_data[0]['version']
-            roms_data   = roms_data[1]
+            roms_data = roms_data[1]
 
         roms = []
         if isinstance(roms_data, list):
@@ -430,7 +431,7 @@ class UnitOfWork(object):
         try:
             self.execute(qry.AKL_SELECT_MIGRATIONS)
             migrations_data_set = self.result_set()
-        except:
+        except Exception:
             self.logger.error("Failure getting executed migrations")
         finally:
             self.close_session()
@@ -440,14 +441,14 @@ class UnitOfWork(object):
         if not globals.g_PATHS.DATABASE_MIGRATIONS_PATH.exists():
             globals.g_PATHS.DATABASE_MIGRATIONS_PATH.makedirs()
             
-        migrations_files_available  = globals.g_PATHS.DATABASE_MIGRATIONS_PATH.scanFilesInPath("*.sql")
+        migrations_files_available = globals.g_PATHS.DATABASE_MIGRATIONS_PATH.scanFilesInPath("*.sql")
         migrations_files_to_execute = []
         for migration_file in migrations_files_available:
             file_version = self.get_version_from_migration_file(migration_file)
             if file_version > db_version:
                 migrations_files_to_execute.append(migration_file)
 
-        migrations_files_to_execute.sort(key = lambda f: f.getBaseNoExt())
+        migrations_files_to_execute.sort(key=lambda f: f.getBaseNoExt())
         return migrations_files_to_execute
 
     def get_version_from_migration_file(self, file: io.FileName):
@@ -650,20 +651,20 @@ class CategoryRepository(object):
         parent_category_id = parent_obj.get_id() if parent_obj is not None and parent_obj.get_id() != constants.VCATEGORY_ADDONROOT_ID else None
         
         self._uow.execute(qry.INSERT_METADATA,
-            metadata_id,
-            category_obj.get_releaseyear(),
-            category_obj.get_genre(),
-            category_obj.get_developer(),
-            category_obj.get_rating(),
-            category_obj.get_plot(),
-            json.dumps(category_obj.get_extras()),
-            category_obj.is_finished())
+                          metadata_id,
+                          category_obj.get_releaseyear(),
+                          category_obj.get_genre(),
+                          category_obj.get_developer(),
+                          category_obj.get_rating(),
+                          category_obj.get_plot(),
+                          json.dumps(category_obj.get_extras()),
+                          category_obj.is_finished())
 
         self._uow.execute(qry.INSERT_CATEGORY,
-            category_obj.get_id(),
-            category_obj.get_name(),
-            parent_category_id,
-            metadata_id)
+                          category_obj.get_id(),
+                          category_obj.get_name(),
+                          parent_category_id,
+                          metadata_id)
 
         category_assets = category_obj.get_assets()
         for asset in category_assets: 
@@ -676,18 +677,18 @@ class CategoryRepository(object):
         self.logger.info(f" Updating category '{category_obj.get_name()}'")
         
         self._uow.execute(qry.UPDATE_METADATA,
-            category_obj.get_releaseyear(),
-            category_obj.get_genre(),
-            category_obj.get_developer(),
-            category_obj.get_rating(),
-            category_obj.get_plot(),
-            json.dumps(category_obj.get_extras()),
-            category_obj.is_finished(),
-            category_obj.get_custom_attribute('metadata_id'))
+                          category_obj.get_releaseyear(),
+                          category_obj.get_genre(),
+                          category_obj.get_developer(),
+                          category_obj.get_rating(),
+                          category_obj.get_plot(),
+                          json.dumps(category_obj.get_extras()),
+                          category_obj.is_finished(),
+                          category_obj.get_custom_attribute('metadata_id'))
 
         self._uow.execute(qry.UPDATE_CATEGORY,
-            category_obj.get_name(),
-            category_obj.get_id())
+                          category_obj.get_name(),
+                          category_obj.get_id())
         
         for asset in category_obj.get_assets():
             if asset.get_id() == '':
@@ -931,7 +932,23 @@ class ROMCollectionRepository(object):
                 launcher = ROMLauncherAddonFactory.create(addon, launcher_data)
                 launchers.append(launcher)
                 
-            yield ROMCollection(romcollection_data, assets, asset_mappings, rom_asset_mappings, launchers)                       
+            yield ROMCollection(romcollection_data, assets, asset_mappings, rom_asset_mappings, launchers)
+    
+    def find_import_rules_by_collection(self, romcollection: ROMCollection) -> typing.Iterator[RuleSet]:
+        self._uow.execute(qry.SELECT_IMPORT_RULES_BY_COLLECTION, romcollection.get_id())
+        result_set = self._uow.result_set()
+        rulesets = {}
+        for rule_data in result_set:
+            rulesets.setdefault(rule_data["ruleset_id"], []).append(rule_data)
+        
+        for ruleset_id, ruleset_data in rulesets.items():
+            yield RuleSet({
+                'ruleset_id': ruleset_id,
+                'library_id': ruleset_data[0]['library_id'],
+                'collection_id': ruleset_data[0]['collection_id'],
+                'set_operator': ruleset_data[0]['set_operator'],
+                'rules': ruleset_data
+            })
     
     def insert_romcollection(self, romcollection_obj: ROMCollection, parent_obj: Category = None):
         self.logger.info(f"ROMCollectionRepository: Inserting new romcollection '{romcollection_obj.get_name()}'")
@@ -1057,6 +1074,13 @@ class ROMCollectionRepository(object):
     def remove_launcher(self, romcollection_id: str, launcher_id: str):
         self._uow.execute(qry.DELETE_ROMCOLLECTION_LAUNCHER, romcollection_id, launcher_id)
 
+    def add_ruleset_to_romcollection(self, romcollection_id: str, ruleset: RuleSet):
+        self._uow.execute(qry.INSERT_RULESET_FOR_ROMCOLLECTION,
+                          ruleset.get_ruleset_id(),
+                          ruleset.get_library_id(),
+                          romcollection_id,
+                          ruleset.get_set_operator())
+
     def _insert_asset(self, asset: Asset, romcollection_obj: ROMCollection):
         asset_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET, asset_db_id, asset.get_path(), asset.get_asset_info_id())
@@ -1065,43 +1089,46 @@ class ROMCollectionRepository(object):
     def _update_asset(self, asset: Asset, romcollection_obj: ROMCollection):
         self._uow.execute(qry.UPDATE_ASSET, asset.get_path(), asset.get_asset_info_id(), asset.get_id())
         if asset.get_custom_attribute('romcollection_id') is None:
-            self._uow.execute(qry.INSERT_ROMCOLLECTION_ASSET, romcollection_obj.get_id(), asset.get_id())     
+            self._uow.execute(qry.INSERT_ROMCOLLECTION_ASSET, romcollection_obj.get_id(), asset.get_id())
     
     def _insert_asset_path(self, asset_path: AssetPath, romcollection_obj: ROMCollection):
         asset_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET_PATH, asset_db_id, asset_path.get_path(), asset_path.get_asset_info_id())
-        self._uow.execute(qry.INSERT_ROMCOLLECTION_ASSET_PATH, romcollection_obj.get_id(), asset_db_id)    
+        self._uow.execute(qry.INSERT_ROMCOLLECTION_ASSET_PATH, romcollection_obj.get_id(), asset_db_id)
         
     def _update_asset_path(self, asset_path: AssetPath, romcollection_obj: ROMCollection):
         self._uow.execute(qry.UPDATE_ASSET_PATH, asset_path.get_path(), asset_path.get_asset_info_id(), asset_path.get_id())
         if asset_path.get_custom_attribute('romcollection_id') is None:
-            self._uow.execute(qry.INSERT_ROMCOLLECTION_ASSET_PATH, romcollection_obj.get_id(), asset_path.get_id())     
+            self._uow.execute(qry.INSERT_ROMCOLLECTION_ASSET_PATH, romcollection_obj.get_id(), asset_path.get_id())
 
     def _insert_asset_mapping(self, mapping: AssetMapping, obj: MetaDataItemABC):
         if not mapping.is_mapped():
             return
         mapping_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET_MAPPING, mapping_db_id, mapping.get_asset_info().id, mapping.get_mapped_to_asset_info().id)
-        self._uow.execute(qry.INSERT_MAPPING_WITH_METADATA, obj.get_metadata_id(), mapping_db_id)   
+        self._uow.execute(qry.INSERT_MAPPING_WITH_METADATA, obj.get_metadata_id(), mapping_db_id)
  
     def _update_asset_mapping(self, mapping: AssetMapping, obj: MetaDataItemABC):
         if mapping.is_mapped():
             self._uow.execute(qry.UPDATE_ASSET_MAPPING, mapping.get_asset_info().id, mapping.get_mapped_to_asset_info().id, mapping.get_id())
             return
-        self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())   
+        self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())
 
     def _insert_rom_asset_mapping(self, mapping: RomAssetMapping, obj: ROMCollection):
         if not mapping.is_mapped():
             return
         mapping_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET_MAPPING, mapping_db_id, mapping.get_asset_info().id, mapping.get_mapped_to_asset_info().id)
-        self._uow.execute(qry.INSERT_ROMCOLLECTION_ROM_ASSET_MAPPING, obj.get_id(), mapping_db_id)   
+        self._uow.execute(qry.INSERT_ROMCOLLECTION_ROM_ASSET_MAPPING, obj.get_id(), mapping_db_id)
  
     def _update_rom_asset_mapping(self, mapping: RomAssetMapping, obj: MetaDataItemABC):
         if mapping.is_mapped():
-            self._uow.execute(qry.UPDATE_ASSET_MAPPING, mapping.get_asset_info().id, mapping.get_mapped_to_asset_info().id, mapping.get_id())
+            self._uow.execute(qry.UPDATE_ASSET_MAPPING,
+                              mapping.get_asset_info().id,
+                              mapping.get_mapped_to_asset_info().id,
+                              mapping.get_id())
             return
-        self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())   
+        self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())
                  
     def _get_collections_query_by_vcategory_id(self, vcategory_id: str) -> str:
         if vcategory_id == constants.VCATEGORY_TITLE_ID:
@@ -1165,7 +1192,7 @@ class ROMsRepository(object):
                 
             scanned_data = {
                 entry['data_key']: entry['data_value'] 
-                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set) 
+                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set)
             }
             yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
  
@@ -1196,7 +1223,7 @@ class ROMsRepository(object):
             asset_mappings = []
             tags = {}
             for asset_data in filter(lambda a: a['rom_id'] == rom_data['id'], assets_result_set):
-                assets.append(Asset(asset_data))    
+                assets.append(Asset(asset_data))
             for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
                 asset_paths.append(AssetPath(asset_paths_data))
             for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
@@ -1206,7 +1233,7 @@ class ROMsRepository(object):
                 
             scanned_data = {
                 entry['data_key']: entry['data_value'] 
-                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set) 
+                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set)
             }
             yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
 
@@ -1215,25 +1242,25 @@ class ROMsRepository(object):
         romcollection_id = romcollection.get_id()
         
         if is_virtual:
-            vcollection:VirtualCollection = romcollection
+            vcollection: VirtualCollection = romcollection
             query_param = vcollection.get_collection_value()
             roms_query, rom_assets_query = self._get_queries_by_vcollection_type(romcollection)
             
             if query_param is not None:
-                self._uow.execute(roms_query, query_param) 
-                result_set = self._uow.result_set()            
+                self._uow.execute(roms_query, query_param)
+                result_set = self._uow.result_set()
                 self._uow.execute(rom_assets_query, query_param)
-                assets_result_set = self._uow.result_set() 
+                assets_result_set = self._uow.result_set()
             else: 
-                self._uow.execute(roms_query) 
-                result_set = self._uow.result_set()            
+                self._uow.execute(roms_query)
+                result_set = self._uow.result_set()
                 self._uow.execute(rom_assets_query)
-                assets_result_set = self._uow.result_set() 
+                assets_result_set = self._uow.result_set()
                     
-            asset_paths_result_set  = []
+            asset_paths_result_set = []
             asset_mappings_result_set = []
             scanned_data_result_set = []
-            tags_data_set = {}      
+            tags_data_set = {}
         else:
             self._uow.execute(qry.SELECT_ROMS_BY_SET, romcollection_id)
             result_set = self._uow.result_set()
@@ -1310,7 +1337,7 @@ class ROMsRepository(object):
                 
             scanned_data = {
                 entry['data_key']: entry['data_value'] 
-                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set) 
+                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set)
             }
             yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
   
@@ -1338,7 +1365,7 @@ class ROMsRepository(object):
 
         self._uow.execute(qry.SELECT_ROM_SCANNED_DATA, rom_id)
         scanned_data_result_set = self._uow.result_set()
-        scanned_data = { entry['data_key']: entry['data_value'] for entry in scanned_data_result_set }    
+        scanned_data = {entry['data_key']: entry['data_value'] for entry in scanned_data_result_set}
         
         self._uow.execute(qry.SELECT_ROM_LAUNCHERS, rom_id)
         launchers_data = self._uow.result_set()
@@ -1369,29 +1396,29 @@ class ROMsRepository(object):
         metadata_id = text.misc_generate_random_SID()
         
         self._uow.execute(qry.INSERT_METADATA,
-            metadata_id,
-            rom_obj.get_releaseyear(),
-            rom_obj.get_genre(),
-            rom_obj.get_developer(),
-            rom_obj.get_rating(),
-            rom_obj.get_plot(),
-            json.dumps(rom_obj.get_extras()),
-            rom_obj.is_finished())
-
+                          metadata_id,
+                          rom_obj.get_releaseyear(),
+                          rom_obj.get_genre(),
+                          rom_obj.get_developer(),
+                          rom_obj.get_rating(),
+                          rom_obj.get_plot(),
+                          json.dumps(rom_obj.get_extras()),
+                          rom_obj.is_finished())
+  
         self._uow.execute(qry.INSERT_ROM,
-            rom_obj.get_id(),
-            metadata_id,
-            rom_obj.get_name(),
-            rom_obj.get_number_of_players(),
-            rom_obj.get_number_of_players_online(),
-            rom_obj.get_esrb_rating(),
-            rom_obj.get_pegi_rating(),
-            rom_obj.get_platform(),
-            rom_obj.get_box_sizing(), 
-            rom_obj.get_nointro_status(),
-            rom_obj.get_clone(),
-            rom_obj.get_rom_status(),
-            rom_obj.get_scanned_with())
+                          rom_obj.get_id(),
+                          metadata_id,
+                          rom_obj.get_name(),
+                          rom_obj.get_number_of_players(),
+                          rom_obj.get_number_of_players_online(),
+                          rom_obj.get_esrb_rating(),
+                          rom_obj.get_pegi_rating(),
+                          rom_obj.get_platform(),
+                          rom_obj.get_box_sizing(), 
+                          rom_obj.get_nointro_status(),
+                          rom_obj.get_clone(),
+                          rom_obj.get_rom_status(),
+                          rom_obj.get_scanned_by())
         
         rom_assets = rom_obj.get_assets()
         for asset in rom_assets:
@@ -1439,7 +1466,7 @@ class ROMsRepository(object):
                           rom_obj.get_launch_count(),
                           rom_obj.get_last_launch_date(),
                           rom_obj.is_favourite(),
-                          rom_obj.get_scanned_with(),
+                          rom_obj.get_scanned_by(),
                           rom_obj.get_id())
         
         for asset in rom_obj.get_assets():
@@ -1487,35 +1514,38 @@ class ROMsRepository(object):
     def _insert_asset(self, asset: Asset, rom_obj: ROM):
         asset_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET, asset_db_id, asset.get_path(), asset.get_asset_info_id())
-        self._uow.execute(qry.INSERT_ROM_ASSET, rom_obj.get_id(), asset_db_id)   
+        self._uow.execute(qry.INSERT_ROM_ASSET, rom_obj.get_id(), asset_db_id)
     
     def _update_asset(self, asset: Asset, rom_obj: ROM):
         self._uow.execute(qry.UPDATE_ASSET, asset.get_path(), asset.get_asset_info_id(), asset.get_id())
         if asset.get_custom_attribute('rom_id') is None:
-            self._uow.execute(qry.INSERT_ROM_ASSET, rom_obj.get_id(), asset.get_id())   
+            self._uow.execute(qry.INSERT_ROM_ASSET, rom_obj.get_id(), asset.get_id())
 
     def _insert_asset_path(self, asset_path: AssetPath, rom_obj: ROM):
         asset_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET_PATH, asset_db_id, asset_path.get_path(), asset_path.get_asset_info_id())
-        self._uow.execute(qry.INSERT_ROM_ASSET_PATH, rom_obj.get_id(), asset_db_id)    
+        self._uow.execute(qry.INSERT_ROM_ASSET_PATH, rom_obj.get_id(), asset_db_id)
         
     def _update_asset_path(self, asset_path: AssetPath, rom_obj: ROM):
         self._uow.execute(qry.UPDATE_ASSET_PATH, asset_path.get_path(), asset_path.get_asset_info_id(), asset_path.get_id())
         if asset_path.get_custom_attribute('rom_id') is None:
-            self._uow.execute(qry.INSERT_ROM_ASSET_PATH, rom_obj.get_id(), asset_path.get_id())     
+            self._uow.execute(qry.INSERT_ROM_ASSET_PATH, rom_obj.get_id(), asset_path.get_id())
 
     def _insert_asset_mapping(self, mapping: AssetMapping, obj: MetaDataItemABC):
         if not mapping.is_mapped():
             return
         mapping_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET_MAPPING, mapping_db_id, mapping.get_asset_info().id, mapping.get_mapped_to_asset_info().id)
-        self._uow.execute(qry.INSERT_MAPPING_WITH_METADATA, obj.get_metadata_id(), mapping_db_id)   
+        self._uow.execute(qry.INSERT_MAPPING_WITH_METADATA, obj.get_metadata_id(), mapping_db_id)
  
     def _update_asset_mapping(self, mapping: AssetMapping, obj: MetaDataItemABC):
         if mapping.is_mapped():
-            self._uow.execute(qry.UPDATE_ASSET_MAPPING, mapping.get_asset_info().id, mapping.get_mapped_to_asset_info().id, mapping.get_id())
+            self._uow.execute(qry.UPDATE_ASSET_MAPPING,
+                              mapping.get_asset_info().id,
+                              mapping.get_mapped_to_asset_info().id,
+                              mapping.get_id())
             return
-        self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())          
+        self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())
 
     def _update_launchers(self, rom_id: str, rom_launchers: typing.List[ROMLauncherAddon]):
         for rom_launcher in rom_launchers:
@@ -1540,7 +1570,7 @@ class ROMsRepository(object):
         existing_tags = self.find_all_tags()
         for tag_name, tag_id in tag_data.items():
             if tag_id == '':
-                if not tag_name in existing_tags.keys():
+                if tag_name not in existing_tags.keys():
                     tag_id = self.insert_tag(tag_name)
                 else:
                     tag_id = existing_tags[tag_name]
@@ -1548,31 +1578,31 @@ class ROMsRepository(object):
 
     def _get_queries_by_vcollection_type(self, vcollection: VirtualCollection) -> typing.Tuple[str, str]:
         
-        vcollection_id  = vcollection.get_id()
-        vcategory_id    = vcollection.get_parent_id()
+        vcollection_id = vcollection.get_id()
+        vcategory_id = vcollection.get_parent_id()
         
-        if vcategory_id is not None:            
+        if vcategory_id is not None:
             if vcategory_id == constants.VCATEGORY_TITLE_ID:
-                return qry.SELECT_BY_TITLE, qry.SELECT_BY_TITLE_ASSETS            
+                return qry.SELECT_BY_TITLE, qry.SELECT_BY_TITLE_ASSETS
             if vcategory_id == constants.VCATEGORY_GENRE_ID:
-                return qry.SELECT_BY_GENRE, qry.SELECT_BY_GENRE_ASSETS            
+                return qry.SELECT_BY_GENRE, qry.SELECT_BY_GENRE_ASSETS
             if vcategory_id == constants.VCATEGORY_DEVELOPER_ID:
-                return qry.SELECT_BY_DEVELOPER, qry.SELECT_BY_DEVELOPER_ASSETS            
+                return qry.SELECT_BY_DEVELOPER, qry.SELECT_BY_DEVELOPER_ASSETS
             if vcategory_id == constants.VCATEGORY_ESRB_ID:
                 return qry.SELECT_BY_ESRB, qry.SELECT_BY_ESRB_ASSETS
             if vcategory_id == constants.VCATEGORY_PEGI_ID:
-                return qry.SELECT_BY_PEGI, qry.SELECT_BY_PEGI_ASSETS       
+                return qry.SELECT_BY_PEGI, qry.SELECT_BY_PEGI_ASSETS
             if vcategory_id == constants.VCATEGORY_YEARS_ID:
-                return qry.SELECT_BY_YEAR, qry.SELECT_BY_YEAR_ASSETS            
+                return qry.SELECT_BY_YEAR, qry.SELECT_BY_YEAR_ASSETS
             if vcategory_id == constants.VCATEGORY_NPLAYERS_ID:
-                return qry.SELECT_BY_NPLAYERS, qry.SELECT_BY_NPLAYERS_ASSETS            
+                return qry.SELECT_BY_NPLAYERS, qry.SELECT_BY_NPLAYERS_ASSETS
             if vcategory_id == constants.VCATEGORY_RATING_ID:
                 return qry.SELECT_BY_RATING, qry.SELECT_BY_RATING_ASSETS
         else:
             if vcollection_id == constants.VCOLLECTION_FAVOURITES_ID:
                 return qry.SELECT_MY_FAVOURITES, qry.SELECT_FAVOURITES_ROM_ASSETS
             if vcollection_id == constants.VCOLLECTION_RECENT_ID:
-                return qry.SELECT_RECENTLY_PLAYED_ROMS,qry.SELECT_RECENTLY_PLAYED_ROM_ASSETS
+                return qry.SELECT_RECENTLY_PLAYED_ROMS, qry.SELECT_RECENTLY_PLAYED_ROM_ASSETS
             if vcollection_id == constants.VCOLLECTION_MOST_PLAYED_ID:
                 return qry.SELECT_MOST_PLAYED_ROMS, qry.SELECT_MOST_PLAYED_ROM_ASSETS
             

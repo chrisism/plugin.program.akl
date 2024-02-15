@@ -440,6 +440,18 @@ msgctxt "#42507"
 msgid "No Type"
 msgstr "domain"
 
+msgctxt "#42508"
+msgid "All"
+msgstr "domain"
+
+msgctxt "#42509"
+msgid "Ruleset"
+msgstr "domain"
+
+msgctxt "#42510"
+msgid "Rules"
+msgstr "domain"
+
 ############################
 # Advanced Enum values
 ############################
@@ -463,6 +475,14 @@ msgstr "LOG ENUM"
 msgctxt "#30915"
 msgid "DEBUG"
 msgstr "LOG ENUM"
+
+msgctxt "#30916"
+msgid "AND"
+msgstr "RuleSetOperator"
+
+msgctxt "#30917"
+msgid "OR"
+msgstr "RuleSetOperator"
 
 ################################################################################################################
 
@@ -752,6 +772,10 @@ msgstr ""
 
 msgctxt "#40920"
 msgid "Launchers"
+msgstr ""
+
+msgctxt "#40921"
+msgid "Add new ruleset"
 msgstr ""
 
 ############################
@@ -1483,7 +1507,7 @@ msgid "ROM Asset directories"
 msgstr ""
 
 msgctxt "#41130"
-msgid "Import ROMs in ROMCollection '{}'"
+msgid "Import rules for ROMs in ROMCollection '{}'"
 msgstr ""
 
 msgctxt "#41131"
@@ -1648,6 +1672,10 @@ msgstr ""
 
 msgctxt "#41171"
 msgid "Set launcher '{0}' as default?"
+msgstr ""
+
+msgctxt "#41172"
+msgid "Select library"
 msgstr ""
 
 ############################

@@ -789,14 +789,63 @@ class Rule(object):
 
 class RuleSet(object):
     
-    def __init__(self, data: dict):
-        self.set_operator = data['set_operator']
+    def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
+        
+        if entity_data is None:
+            entity_data = {
+                'ruleset_id': text.misc_generate_random_SID(),
+                'library_id': '',
+                'library_name': '',
+                'collection_id': '',
+                'set_operator': None,
+                'rules': []
+            }
+            
+        self.entity_data = entity_data
         self.rules = []
+        
+        if 'rules' in self.entity_data:
+            for rule_data in self.entity_data['rules']:
+                self.rules.append(Rule(rule_data))
+         
+    def get_ruleset_id(self):
+        return self.entity_data['ruleset_id'] if 'ruleset_id' in self.entity_data else None
+         
+    def get_library_id(self):
+        return self.entity_data['library_id'] if 'library_id' in self.entity_data else None
+    
+    def get_library_name(self):
+        return self.entity_data['library_name'] if 'library_name' in self.entity_data else "Unknown"
+    
+    def get_rules_description(self):
+        if len(self.rules) == 0:
+            return kodi.translate(42508)  # All
+                
+        return f"{len(self.rules)} {kodi.translate(42510)} [{self.get_set_operator_str()}]"
+            
+    def get_set_operator(self):
+        return self.entity_data['set_operator'] if 'set_operator' in self.entity_data else None
+           
+    def get_set_operator_str(self):
+        set_operator = self.get_set_operator()
+        if not set_operator:
+            set_operator = RuleSetOperator.OR
+        
+        return kodi.translate(30916) if set_operator == RuleSetOperator.AND else kodi.translate(30917)
+    
+    def apply_library_and_collection(self, library: Library, collection: ROMCollection):
+        self.entity_data['library_id'] = library.get_id()
+        self.entity_data['library_name'] = library.get_name()
+        self.entity_data['collection_id'] = collection.get_id()
     
     def applies_to(self, rom: ROM):
         # no rules, then all applied
         if len(self.rules) == 0:
             return True
+        
+        set_operator = self.get_set_operator()
+        if not set_operator:
+            set_operator = RuleSetOperator.OR
         
         for rule in self.rules:
             if rule.applies_to(rom):
@@ -1651,7 +1700,7 @@ class ROM(MetaDataItemABC):
     def get_last_launch_date(self):
         return self.entity_data['last_launch_timestamp'] if 'last_launch_timestamp' in self.entity_data else None
 
-    def get_scanned_with(self) -> str:
+    def get_scanned_by(self) -> str:
         return self.entity_data['scanned_by_id'] if 'scanned_by_id' in self.entity_data else None
 
     def add_disk(self, disk):
@@ -1703,7 +1752,7 @@ class ROM(MetaDataItemABC):
     def set_clone(self, clone):
         self.entity_data['cloneof'] = clone
 
-    def scanned_with(self, scanner_id: str):
+    def scanned_by(self, scanner_id: str):
         self.entity_data['scanned_by_id'] = scanner_id
         
     def get_scanned_data(self):

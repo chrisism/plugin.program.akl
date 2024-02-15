@@ -125,6 +125,21 @@ CREATE TABLE IF NOT EXISTS scanned_roms_data(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
+CREATE TABLE IF NOT EXISTS collection_library_ruleset(
+    ruleset_id TEXT PRIMARY KEY,
+    library_id TEXT,
+    collection_id TEXT,
+    set_operator INTEGER DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS import_rule(
+    rule_id TEXT PRIMARY KEY,
+    ruleset_id TEXT,
+    property TEXT,
+    value TEXT,
+    operator INTEGER DEFAULT 1 NOT NULL
+);
+
 -------------------------------------------------
 -- ENTITY JOIN TABLES
 -------------------------------------------------
@@ -153,21 +168,6 @@ CREATE TABLE IF NOT EXISTS roms_in_category(
         ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY (category_id) REFERENCES categories (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
-CREATE TABLE IF NOT EXISTS collection_library_ruleset(
-    ruleset_id TEXT PRIMARY KEY,
-    library_id TEXT,
-    collection_id TEXT,
-    set_operator INTEGER DEFAULT NULL
-);
-
-CREATE TABLE IF NOT EXISTS import_rule(
-    rule_id TEXT PRIMARY KEY,
-    ruleset_id TEXT,
-    property TEXT,
-    value TEXT,
-    operator INTEGER DEFAULT 1 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS romcollection_launchers(
@@ -199,6 +199,7 @@ CREATE TABLE IF NOT EXISTS rom_launchers(
     FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
+
 -------------------------------------------------
 -- ASSETS JOIN TABLES
 -------------------------------------------------
