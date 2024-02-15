@@ -171,6 +171,15 @@ SELECT_IMPORT_RULES_BY_COLLECTION = """
             ON rs.library_id = l.id
     WHERE rs.collection_id = ?
     """
+SELECT_IMPORT_RULE_BY_COLLECTION = """
+    SELECT r.*, rs.*, l.name as library_name
+    FROM import_rule AS r
+        RIGHT JOIN collection_library_ruleset AS rs
+            ON r.ruleset_id = rs.ruleset_id
+        INNER JOIN libraries AS l
+            ON rs.library_id = l.id
+    WHERE rs.collection_id = ? AND r.ruleset_id = ?
+    """
 INSERT_RULESET_FOR_ROMCOLLECTION = """
     INSERT INTO collection_library_ruleset (ruleset_id, library_id, collection_id, set_operator) VALUES (?,?,?,?)"
     """

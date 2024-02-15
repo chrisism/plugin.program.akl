@@ -229,11 +229,14 @@ def cmd_edit_import_ruleset(args):
     with uow:
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
-
-        lib_repository = LibrariesRepository(uow)
-        libraries = lib_repository.find_all()
+        ruleset = repository.find_ruleset(romcollection_id, ruleset_id)
         
-        
+        options = collections.OrderedDict()
+        options["SET_RULESET_LIBRARY"] = kodi.get_listitem(kodi.translate(42506), ruleset.get_library_name())
+        options["CHANGE_RULESET_OPERATOR"] = kodi.get_listitem(kodi.translate(41060), ruleset.get_set_operator_str())
+        options["CHANGE_RULESET_BY_RULES"] = kodi.get_listitem(kodi.translate(41173), ruleset.get_rules_shortdescription())
+        for rule in ruleset.get_rules():
+            options[rule.get_id()]
 
 # --- Empty Launcher ROMs ---
 @AppMediator.register('CLEAR_ROMS')

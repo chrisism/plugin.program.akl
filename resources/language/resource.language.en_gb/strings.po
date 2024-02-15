@@ -1221,10 +1221,9 @@ msgctxt "#41059"
 msgid "Are you sure to unassociate launcher '{}'?"
 msgstr ""
 
-# TODO: obsolete
-# msgctxt "#41060"
-# msgid "Are you sure to delete ROM scanner '{}'?"
-# msgstr ""
+msgctxt "#41060"
+msgid "Change set operator"
+msgstr ""
 
 msgctxt "#41061"
 msgid "Overwrite existing assets?"
@@ -1494,10 +1493,6 @@ msgctxt "#41127"
 msgid "Edit Launcher '{0}' metadata"
 msgstr ""
 
-# msgctxt "#41128"
-# msgid "Move to category"
-# msgstr ""
-
 msgctxt "#41128"
 msgid "Manage ROM Collection '{}' ROMs"
 msgstr ""
@@ -1676,6 +1671,10 @@ msgstr ""
 
 msgctxt "#41172"
 msgid "Select library"
+msgstr ""
+
+msgctxt "#41173"
+msgid "Import by rules / All"
 msgstr ""
 
 ############################

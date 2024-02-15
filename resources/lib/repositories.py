@@ -950,6 +950,18 @@ class ROMCollectionRepository(object):
                 'rules': ruleset_data
             })
     
+    def find_ruleset(self, romcollection_id, ruleset_id):
+        self._uow.execute(qry.SELECT_IMPORT_RULE_BY_COLLECTION, romcollection_id, ruleset_id)
+        result_set = self._uow.result_set()
+
+        return RuleSet({
+            'ruleset_id': result_set[0]['resultset_id'],
+            'library_id': result_set[0]['library_id'],
+            'collection_id': result_set[0]['collection_id'],
+            'set_operator': result_set[0]['set_operator'],
+            'rules': result_set
+        })
+    
     def insert_romcollection(self, romcollection_obj: ROMCollection, parent_obj: Category = None):
         self.logger.info(f"ROMCollectionRepository: Inserting new romcollection '{romcollection_obj.get_name()}'")
         metadata_id = text.misc_generate_random_SID()

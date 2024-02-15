@@ -765,10 +765,12 @@ class RuleOperator(Enum):
 
 class Rule(object):
     
-    def __init__(self, data: dict):
+    def __init__(self, entity_data: dict):
         self.property = data['property']
         self.value = data['value']
         self.operator = RuleOperator(data['operator'])
+    
+    
     
     def applies_to(self, rom: ROM):
         actual = rom.get_custom_attribute(self.property)
@@ -822,7 +824,12 @@ class RuleSet(object):
             return kodi.translate(42508)  # All
                 
         return f"{len(self.rules)} {kodi.translate(42510)} [{self.get_set_operator_str()}]"
-            
+        
+    def get_rules_shortdescription(self):
+        if len(self.rules) == 0:
+            return kodi.translate(42508)  # All
+        return kodi.translate(42510)  # Rules
+        
     def get_set_operator(self):
         return self.entity_data['set_operator'] if 'set_operator' in self.entity_data else None
            
@@ -832,6 +839,9 @@ class RuleSet(object):
             set_operator = RuleSetOperator.OR
         
         return kodi.translate(30916) if set_operator == RuleSetOperator.AND else kodi.translate(30917)
+    
+    def get_rules(self) -> typing.List[Rule]:
+        return self.rules
     
     def apply_library_and_collection(self, library: Library, collection: ROMCollection):
         self.entity_data['library_id'] = library.get_id()
