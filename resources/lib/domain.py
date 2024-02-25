@@ -26,7 +26,7 @@ import re
 import time
 import datetime
 import json
-from enum import Enum
+from enum import IntEnum
 
 # --- AKL packages ---
 from resources.lib import globals
@@ -749,12 +749,12 @@ class ScraperAddon(ROMAddon):
         }
  
 
-class RuleSetOperator(Enum):
+class RuleSetOperator(IntEnum):
     AND = 1
     OR = 2
 
 
-class RuleOperator(Enum):
+class RuleOperator(IntEnum):
     Equals = 1
     NotEquals = 2
     Contains = 3
@@ -763,29 +763,76 @@ class RuleOperator(Enum):
     LessThan = 6
     
 
-class Rule(object):
+class Rule(EntityABC):
     
-    def __init__(self, entity_data: dict):
-        self.property = data['property']
-        self.value = data['value']
-        self.operator = RuleOperator(data['operator'])
+    def __init__(self, entity_data: typing.Dict[str, typing.Any] = None):
+        
+        if entity_data is None:
+            entity_data = {
+                'rule_id': '',
+                'ruleset_id': '',
+                'property': '',
+                'value': '',
+                'operator': 1
+            }
+
+        super(Rule, self).__init__(entity_data)
+            
+    def get_id(self):
+        return self.entity_data['rule_id'] if 'rule_id' in self.entity_data else None
+
+    def set_id(self, id: str):
+        self.entity_data['rule_id'] = id
+
+    def get_operator(self):
+        return RuleOperator(self.entity_data['operator']) if 'operator' in self.entity_data else RuleOperator.Equals
     
+    def get_operator_str(self):
+        opr = self.get_operator()
+        if opr == RuleOperator.Equals:
+            return kodi.translate(30918)
+        if opr == RuleOperator.NotEquals:
+            return kodi.translate(30919)
+        if opr == RuleOperator.Contains:
+            return kodi.translate(30920)
+        if opr == RuleOperator.DoesNotContain:
+            return kodi.translate(30921)
+        if opr == RuleOperator.MoreThan:
+            return kodi.translate(30922)
+        if opr == RuleOperator.LessThan:
+            return kodi.translate(30923)
+        return kodi.translate(30918)
     
+    def get_property(self):
+        return self.entity_data['property'] if 'property' in self.entity_data else ''
+    
+    def get_value(self):
+        return self.entity_data['value'] if 'value' in self.entity_data else ''
+    
+    def get_description(self):
+        return f"{self.get_property()} {self.get_operator_str()} {self.get_value()}"
+    
+    def set_ruleset(self, ruleset_id):
+        self.entity_data['ruleset_id'] = ruleset_id
     
     def applies_to(self, rom: ROM):
-        actual = rom.get_custom_attribute(self.property)
-        if self.operator == RuleOperator.Equals:
-            return actual == self.value
-        if self.operator == RuleOperator.NotEquals:
-            return actual != self.value
-        if self.operator == RuleOperator.Contains:
-            return self.value in actual
-        if self.operator == RuleOperator.DoesNotContain:
-            return self.value not in actual
-        if self.operator == RuleOperator.MoreThan:
-            return self.value > actual
-        if self.operator == RuleOperator.LessThan:
-            return self.value < actual
+        operator = self.get_operator()
+        entity_property = self.get_property()
+        property_value = self.get_value()
+        
+        actual = rom.get_custom_attribute(entity_property)
+        if operator == RuleOperator.Equals:
+            return actual == property_value
+        if operator == RuleOperator.NotEquals:
+            return actual != property_value
+        if operator == RuleOperator.Contains:
+            return property_value in actual
+        if operator == RuleOperator.DoesNotContain:
+            return property_value not in actual
+        if operator == RuleOperator.MoreThan:
+            return property_value > actual
+        if operator == RuleOperator.LessThan:
+            return property_value < actual
         return False
 
 
@@ -808,7 +855,8 @@ class RuleSet(object):
         
         if 'rules' in self.entity_data:
             for rule_data in self.entity_data['rules']:
-                self.rules.append(Rule(rule_data))
+                if rule_data['rule_id']:
+                    self.rules.append(Rule(rule_data))
          
     def get_ruleset_id(self):
         return self.entity_data['ruleset_id'] if 'ruleset_id' in self.entity_data else None
@@ -831,23 +879,38 @@ class RuleSet(object):
         return kodi.translate(42510)  # Rules
         
     def get_set_operator(self):
-        return self.entity_data['set_operator'] if 'set_operator' in self.entity_data else None
+        return self.entity_data['set_operator'] if 'set_operator' in self.entity_data else RuleSetOperator.OR
            
     def get_set_operator_str(self):
         set_operator = self.get_set_operator()
-        if not set_operator:
-            set_operator = RuleSetOperator.OR
-        
         return kodi.translate(30916) if set_operator == RuleSetOperator.AND else kodi.translate(30917)
     
     def get_rules(self) -> typing.List[Rule]:
         return self.rules
     
-    def apply_library_and_collection(self, library: Library, collection: ROMCollection):
+    def get_rule(self, rule_id: str) -> Rule:
+        return next((rule for rule in self.rules if rule.get_id() == rule_id), None)
+    
+    def add_rule(self, rule: Rule):
+        self.rules.append(rule)
+    
+    def apply_library(self, library: Library):
         self.entity_data['library_id'] = library.get_id()
         self.entity_data['library_name'] = library.get_name()
-        self.entity_data['collection_id'] = collection.get_id()
     
+    def change_operator(self):
+        current = self.get_set_operator()
+        if current == RuleSetOperator.OR:
+            self.entity_data['set_operator'] = RuleSetOperator.AND
+        else:
+            self.entity_data['set_operator'] = RuleSetOperator.OR
+    
+    def clear_rules(self):
+        self.rules.clear()
+        
+    def has_rules(self):
+        return len(self.rules) > 0
+        
     def applies_to(self, rom: ROM):
         # no rules, then all applied
         if len(self.rules) == 0:
@@ -1603,9 +1666,32 @@ class ROM(MetaDataItemABC):
                  scanned_data: dict = {},
                  launchers_data: typing.List[ROMLauncherAddon] = []):
         if rom_data is None:
-            rom_data = _get_default_ROM_data_model()
-            rom_data['id'] = text.misc_generate_random_SID()
-        
+            rom_data = {
+                'id': text.misc_generate_random_SID(),
+                'm_name': '',
+                'nplayers': 0,
+                'nplayers_online': 0,
+                'esrb': constants.ESRB_PENDING,
+                'pegi': constants.DEFAULT_META_PEGI,
+                'nointro_status': constants.AUDIT_STATUS_NONE,
+                'pclone_status': constants.PCLONE_STATUS_NONE,
+                'cloneof': '',
+                'platform': '',
+                'scanned_by_id': '',
+                'box_size': '',
+                'm_year': '',
+                'm_genre': '',
+                'm_developer': '',
+                'm_rating': '',
+                'm_plot': '',
+                'extra': '',
+                'finished': False,
+                'rom_status': '',
+                'is_favourite': False,
+                'launch_count': 0,
+                'last_launch_timestamp': None
+            }
+    
         self.tags = tag_data
         self.scanned_data = scanned_data
         self.launchers_data = launchers_data
@@ -1677,16 +1763,16 @@ class ROM(MetaDataItemABC):
         return None
 
     def get_number_of_players(self):
-        return self.entity_data['m_nplayers']
+        return self.entity_data['nplayers']
 
     def get_number_of_players_online(self):
-        return self.entity_data['m_nplayers_online']
+        return self.entity_data['nplayers_online']
 
     def get_esrb_rating(self):
-        return self.entity_data['m_esrb']
+        return self.entity_data['esrb']
 
     def get_pegi_rating(self):
-        return self.entity_data['m_pegi']
+        return self.entity_data['pegi']
     
     def get_rom_status(self):
         return self.entity_data['rom_status'] if 'rom_status' in self.entity_data else None
@@ -1722,16 +1808,16 @@ class ROM(MetaDataItemABC):
         self.entity_data['disks'] = disks
 
     def set_number_of_players(self, amount):
-        self.entity_data['m_nplayers'] = amount
+        self.entity_data['nplayers'] = amount
 
     def set_number_of_players_online(self, amount):
-        self.entity_data['m_nplayers_online'] = amount
+        self.entity_data['nplayers_online'] = amount
 
     def set_esrb_rating(self, esrb):
-        self.entity_data['m_esrb'] = esrb
+        self.entity_data['esrb'] = esrb
 
     def set_pegi_rating(self, pegi):
-        self.entity_data['m_pegi'] = pegi
+        self.entity_data['pegi'] = pegi
         
     def set_platform(self, platform): 
         self.entity_data['platform'] = platform
@@ -2097,6 +2183,26 @@ class ROM(MetaDataItemABC):
         for mappable_asset in mappable_assets:
             mapped_asset = romcollection.get_ROM_asset_mapping(mappable_asset)
             self.set_mapped_asset(mappable_asset, mapped_asset)
+        
+    def get_fields_with_translations(self):
+        return {
+            'm_name': 40815,
+            'nplayers': 40808,
+            'nplayers_online': 40809,
+            'esrb': 40804,
+            'pegi': 40805,
+            'platform': 40807,
+            'box_size': 40816,
+            'm_year': 40803,
+            'm_genre': 40801,
+            'm_developer': 40802,
+            'm_rating': 40806,
+            'm_plot': 40811,
+            'finished': 42014,
+            'is_favourite': 40818,
+            'launch_count': 40819,
+            'tags': 40810
+        }
         
     def __str__(self):
         """Overrides the default implementation"""
@@ -2794,28 +2900,6 @@ def _get_default_ROMCollection_data_model():
         'path_trailer' : ''        
     }
 
-def _get_default_ROM_data_model():
-    return {
-        'id' : '',
-        'type': constants.OBJ_ROM,
-        'm_name' : '',
-        'm_year' : '',
-        'm_genre' : '',
-        'm_developer' : '',
-        'm_nplayers' : '',
-        'm_nplayers_online' : '',
-        'm_esrb' : constants.ESRB_PENDING,
-        'm_pegi' : constants.DEFAULT_META_PEGI,
-        'm_rating' : '',
-        'm_plot' : '',
-        'platform': '',
-        'box_size': '',
-        'disks' : [],
-        'finished' : False,
-        'nointro_status' : constants.AUDIT_STATUS_NONE,
-        'pclone_status' : constants.PCLONE_STATUS_NONE,
-        'cloneof' : ''
-    }
     
 def _get_default_asset_data_model():
     return {

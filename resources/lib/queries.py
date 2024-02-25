@@ -163,7 +163,7 @@ SELECT_ROMCOLLECTION_LAUNCHERS_BY_ROM = "SELECT rl.* FROM vw_romcollection_launc
 SELECT_ROMCOLLECTION_SCANNERS_BY_ROM = "SELECT rs.* FROM vw_romcollection_scanners AS rs INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rs.romcollection_id WHERE rr.rom_id = ?"
 
 SELECT_IMPORT_RULES_BY_COLLECTION = """
-    SELECT r.*, rs.*, l.name as library_name
+    SELECT r.*, rs.*, l.name AS library_name
     FROM import_rule AS r
         RIGHT JOIN collection_library_ruleset AS rs
             ON r.ruleset_id = rs.ruleset_id
@@ -172,17 +172,24 @@ SELECT_IMPORT_RULES_BY_COLLECTION = """
     WHERE rs.collection_id = ?
     """
 SELECT_IMPORT_RULE_BY_COLLECTION = """
-    SELECT r.*, rs.*, l.name as library_name
+    SELECT r.*, rs.*, l.name AS library_name
     FROM import_rule AS r
         RIGHT JOIN collection_library_ruleset AS rs
             ON r.ruleset_id = rs.ruleset_id
         INNER JOIN libraries AS l
             ON rs.library_id = l.id
-    WHERE rs.collection_id = ? AND r.ruleset_id = ?
+    WHERE rs.collection_id = ? AND rs.ruleset_id = ?
     """
 INSERT_RULESET_FOR_ROMCOLLECTION = """
     INSERT INTO collection_library_ruleset (ruleset_id, library_id, collection_id, set_operator) VALUES (?,?,?,?)"
     """
+UPDATE_RULESET_FOR_ROMCOLLECTION = """
+    UPDATE collection_library_ruleset SET library_id=?, collection_id=?, set_operator=? WHERE ruleset_id=?
+    """
+INSERT_RULE = "INSERT INTO import_rule (rule_id,ruleset_id,property,value,operator) VALUES (?,?,?,?,?)"
+UPDATE_RULE = "UPDATE import_rule SET property=?, value=?, operator=? WHERE rule_id=?"
+DELETE_RULE_FROM_RULESET = "DELETE FROM rules WHERE rule_id = ? AND ruleset_id = ?"
+
 #
 # ROMsRepository -> ROMs from SQLite DB
 #

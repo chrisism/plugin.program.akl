@@ -14,7 +14,7 @@ from akl import constants
 
 from resources.lib import globals
 from resources.lib import queries as qry
-from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, VirtualCollection, RuleSet
+from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, VirtualCollection, RuleSet, Rule
 from resources.lib.domain import Asset, AssetPath, AssetMapping, RomAssetMapping
 from resources.lib.domain import VirtualCategoryFactory, VirtualCollectionFactory, ROMLauncherAddonFactory, g_assetFactory
 from resources.lib.domain import Library, ROMLauncherAddon, AelAddon
@@ -941,26 +941,19 @@ class ROMCollectionRepository(object):
         for rule_data in result_set:
             rulesets.setdefault(rule_data["ruleset_id"], []).append(rule_data)
         
-        for ruleset_id, ruleset_data in rulesets.items():
-            yield RuleSet({
-                'ruleset_id': ruleset_id,
-                'library_id': ruleset_data[0]['library_id'],
-                'collection_id': ruleset_data[0]['collection_id'],
-                'set_operator': ruleset_data[0]['set_operator'],
-                'rules': ruleset_data
-            })
+        for ruleset_data in rulesets.values():
+            entity_data = ruleset_data[0]
+            entity_data['rules'] = ruleset_data
+            yield RuleSet(entity_data)
     
     def find_ruleset(self, romcollection_id, ruleset_id):
         self._uow.execute(qry.SELECT_IMPORT_RULE_BY_COLLECTION, romcollection_id, ruleset_id)
         result_set = self._uow.result_set()
 
-        return RuleSet({
-            'ruleset_id': result_set[0]['resultset_id'],
-            'library_id': result_set[0]['library_id'],
-            'collection_id': result_set[0]['collection_id'],
-            'set_operator': result_set[0]['set_operator'],
-            'rules': result_set
-        })
+        entity_data = result_set[0]
+        entity_data['rules'] = result_set
+            
+        return RuleSet(entity_data)
     
     def insert_romcollection(self, romcollection_obj: ROMCollection, parent_obj: Category = None):
         self.logger.info(f"ROMCollectionRepository: Inserting new romcollection '{romcollection_obj.get_name()}'")
@@ -1091,8 +1084,24 @@ class ROMCollectionRepository(object):
                           ruleset.get_ruleset_id(),
                           ruleset.get_library_id(),
                           romcollection_id,
-                          ruleset.get_set_operator())
+                          int(ruleset.get_set_operator()))
 
+    def update_ruleset_in_romcollection(self, romcollection_id: str, ruleset: RuleSet):
+        self._uow.execute(qry.UPDATE_RULESET_FOR_ROMCOLLECTION,
+                          ruleset.get_library_id(),
+                          romcollection_id,
+                          int(ruleset.get_set_operator()),
+                          ruleset.get_ruleset_id())
+        
+        for rule in ruleset.get_rules():
+            if rule.get_id() == '':
+                self._insert_rule(rule, ruleset)
+            else:
+                self._update_rule(rule, ruleset)
+
+    def delete_rule_from_ruleset(self, ruleset: RuleSet, rule: Rule):
+        self._uow.execute(qry.DELETE_RULE_FROM_RULESET, rule.get_id(), ruleset.get_ruleset_id())
+    
     def _insert_asset(self, asset: Asset, romcollection_obj: ROMCollection):
         asset_db_id = text.misc_generate_random_SID()
         self._uow.execute(qry.INSERT_ASSET, asset_db_id, asset.get_path(), asset.get_asset_info_id())
@@ -1141,6 +1150,16 @@ class ROMCollectionRepository(object):
                               mapping.get_id())
             return
         self._uow.execute(qry.DELETE_ASSET_MAPPING, mapping.get_id())
+
+    def _insert_rule(self, rule: Rule, ruleset: RuleSet):
+        rule_id = text.misc_generate_random_SID()
+        rule.set_id(rule_id)
+        self._uow.execute(qry.INSERT_RULE, rule.get_id(), ruleset.get_ruleset_id(), 
+                          rule.get_property(), rule.get_value(), rule.get_operator())
+                 
+    def _update_rule(self, rule: Rule, ruleset: RuleSet):
+        self._uow.execute(qry.UPDATE_RULE, rule.get_property(), rule.get_value(),
+                          rule.get_operator(), rule.get_id())
                  
     def _get_collections_query_by_vcategory_id(self, vcategory_id: str) -> str:
         if vcategory_id == constants.VCATEGORY_TITLE_ID:

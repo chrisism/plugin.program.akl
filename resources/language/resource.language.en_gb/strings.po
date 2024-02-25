@@ -339,6 +339,18 @@ msgctxt "#40816"
 msgid "Default box size"
 msgstr ""
 
+msgctxt "#40817"
+msgid "Is Favourite"
+msgstr ""
+
+msgctxt "#40818"
+msgid "Is Favourite"
+msgstr ""
+
+msgctxt "#40819"
+msgid "Times launched"
+msgstr ""
+
 ############################
 # Constant Enum values
 ############################
@@ -452,6 +464,10 @@ msgctxt "#42510"
 msgid "Rules"
 msgstr "domain"
 
+msgctxt "#42511"
+msgid "Rule"
+msgstr "domain"
+
 ############################
 # Advanced Enum values
 ############################
@@ -476,13 +492,41 @@ msgctxt "#30915"
 msgid "DEBUG"
 msgstr "LOG ENUM"
 
+############################
+# Domain Enum values
+############################
+
 msgctxt "#30916"
-msgid "AND"
+msgid "all of the rules"
 msgstr "RuleSetOperator"
 
 msgctxt "#30917"
-msgid "OR"
+msgid "one or more of the rules"
 msgstr "RuleSetOperator"
+
+msgctxt "#30918"
+msgid "Equals"
+msgstr "RuleOperator"
+
+msgctxt "#30919"
+msgid "Not Equals"
+msgstr "RuleOperator"
+
+msgctxt "#30920"
+msgid "Contains"
+msgstr "RuleOperator"
+
+msgctxt "#30921"
+msgid "Does not contain"
+msgstr "RuleOperator"
+
+msgctxt "#30922"
+msgid "More than"
+msgstr "RuleOperator"
+
+msgctxt "#30923"
+msgid "Less than"
+msgstr "RuleOperator"
 
 ################################################################################################################
 
@@ -1222,7 +1266,7 @@ msgid "Are you sure to unassociate launcher '{}'?"
 msgstr ""
 
 msgctxt "#41060"
-msgid "Change set operator"
+msgid "Items must match"
 msgstr ""
 
 msgctxt "#41061"
@@ -1674,7 +1718,43 @@ msgid "Select library"
 msgstr ""
 
 msgctxt "#41173"
-msgid "Import by rules / All"
+msgid "Import using rules / Import all"
+msgstr ""
+
+msgctxt "#41174"
+msgid "Ruleset for library {0}"
+msgstr ""
+
+msgctxt "#41175"
+msgid "This action will remove all rules applied.\nAre you sure to continue?"
+msgstr ""
+
+msgctxt "#41176"
+msgid "Create a new rule to change how ROMs are imported."
+msgstr ""
+
+msgctxt "#41177"
+msgid "Select field for rule"
+msgstr ""
+
+msgctxt "#41178"
+msgid "Select operator"
+msgstr ""
+
+msgctxt "#41179"
+msgid "Value to use for rule"
+msgstr ""
+
+msgctxt "#41180"
+msgid "Ruleset updated"
+msgstr ""
+
+msgctxt "#41181"
+msgid "Cannot find item"
+msgstr ""
+
+msgctxt "#41182"
+msgid "Choose action for rule"
 msgstr ""
 
 ############################
@@ -1985,10 +2065,9 @@ msgctxt "#42081"
 msgid "Edit scanner"
 msgstr ""
 
-# TODO: oboslete
-# msgctxt "#42082"
-# msgid "Remove scanner"
-# msgstr ""
+msgctxt "#42082"
+msgid "Import ROMs / Rules"
+msgstr ""
 
 msgctxt "#42083"
 msgid "Change root assets path"
@@ -2000,6 +2079,18 @@ msgstr ""
 
 msgctxt "#42085"
 msgid "Delete Library"
+msgstr ""
+
+msgctxt "#42086"
+msgid "Add rule"
+msgstr ""
+
+msgctxt "#42087"
+msgid "Edit rule"
+msgstr ""
+
+msgctxt "#42088"
+msgid "Remove rule"
 msgstr ""
 
 ############################
