@@ -173,7 +173,7 @@ def vw_route_render_virtual_items_view(category_id: str):
 
        
 # -------------------------------------------------------------------------------------------------
-# Source sources
+# Sources
 # -------------------------------------------------------------------------------------------------
 @router.route('/sources')
 def vw_route_render_sources():

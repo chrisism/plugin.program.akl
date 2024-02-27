@@ -776,7 +776,7 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
         commands.append((kodi.translate(40887), _context_menu_url_for(f'/categories/edit/{item_id}')))
         commands.append((kodi.translate(40888), _context_menu_url_for(f'/categories/add/{item_id}/in/{container_id}')))
         commands.append((kodi.translate(40889), _context_menu_url_for(f'/romcollection/add/{item_id}/in/{container_id}')))
-        commands.append((kodi.translate(40890), _context_menu_url_for(f'/categories/addrom/{item_id}/in/{container_id}')))
+        # commands.append((kodi.translate(40890), _context_menu_url_for(f'/categories/addrom/{item_id}/in/{container_id}')))
         
     if is_romcollection:
         commands.append((kodi.translate(40891), _context_menu_url_for(f'/romcollection/view/{item_id}')))
@@ -798,7 +798,7 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
     if not is_category and container_is_category:
         commands.append((kodi.translate(40888), _context_menu_url_for(f'/categories/add/{container_id}')))
         commands.append((kodi.translate(40889), _context_menu_url_for(f'/romcollection/add/{container_id}')))
-        commands.append((kodi.translate(40890), _context_menu_url_for(f'/categories/addrom/{container_id}')))
+        # commands.append((kodi.translate(40890), _context_menu_url_for(f'/categories/addrom/{container_id}')))
         
     if is_virtual_category:
         commands.append((kodi.translate(40893).format(item_name), _context_menu_url_for('execute/command/render_vcategory_view', {

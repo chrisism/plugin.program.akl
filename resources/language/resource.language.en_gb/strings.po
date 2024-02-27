@@ -695,7 +695,7 @@ msgid "Add new ROM Collection"
 msgstr ""
 
 msgctxt "#40890"
-msgid "Add new ROM (Standalone)"
+msgid "Standalone ROM"
 msgstr ""
 
 msgctxt "#40891"
@@ -834,11 +834,11 @@ msgid "Invalid parameters supplied."
 msgstr ""
 
 msgctxt "#40952"
-msgid "Is it a directly launchable file/executable?\nChoose no if you want to assign a separate launcher afterwards."
+msgid "File is directly executable/launchable"
 msgstr ""
 
 msgctxt "#40953"
-msgid "Select file"
+msgid "Select file to execute (Skip if not available)"
 msgstr ""
 
 msgctxt "#40954"

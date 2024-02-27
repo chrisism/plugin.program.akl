@@ -29,7 +29,7 @@ from akl.utils import kodi, io
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals, editors
 from resources.lib.repositories import UnitOfWork, SourcesRepository, ROMsRepository, AelAddonRepository, ROMsJsonFileRepository
-from resources.lib.domain import ROM, Source, AelAddon, AssetInfo, g_assetFactory
+from resources.lib.domain import ROM, Source, AelAddon, AssetInfo, g_assetFactory, ROMLauncherAddonFactory
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +48,7 @@ def cmd_add_source(args):
         addons = addon_repository.find_all_scanner_addons()
         for addon in addons:
             options[addon] = addon.get_name()
+        options['STANDALONE_SOURCE'] = kodi.translate(40890)
     
         s = kodi.translate(41107)
         selected_option: AelAddon = kodi.OrdDictionaryDialog().select(s, options)
@@ -57,9 +58,12 @@ def cmd_add_source(args):
             logger.debug('ADD_SOURCE: cmd_add_source() Selected None. Closing context menu')
             return
         
-        # >> Execute subcommand. May be atomic, maybe a submenu.
-        logger.debug('ADD_SOURCE: cmd_add_source() Selected {}'.format(selected_option.get_id()))
-    
+        if selected_option == "STANDALONE_SOURCE":
+            logger.debug(f'ADD_SOURCE: Selected {selected_option}')
+            AppMediator.sync_cmd(selected_option, args)
+            return
+        
+        logger.debug(f'ADD_SOURCE: Selected {selected_option.get_id()}')
         src_name = kodi.dialog_keyboard(kodi.translate(41166))
         source = Source(None, selected_option)
         source.set_name(src_name)
@@ -250,6 +254,66 @@ def cmd_source_delete(args):
     for collection_id in collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})
     AppMediator.async_cmd('CLEANUP_VIEWS')
+
+
+@AppMediator.register('STANDALONE_SOURCE')
+def cmd_add_standalone_source(args):
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        roms_repository = ROMsRepository(uow)
+        addons_repository = AelAddonRepository(uow)
+        
+        addons = addons_repository.find_all_launcher_addons()
+
+        file_path = kodi.dialog_get_file(kodi.translate(40953))
+        if file_path is not None:
+            path = io.FileName(file_path)
+            rom_name = path.getBaseNoExt()
+            
+        rom_name = kodi.dialog_keyboard(kodi.translate(40815), rom_name)
+        if rom_name is None:
+            return
+        
+        dialog = kodi.ListDialog()
+        selected_idx = dialog.select(kodi.translate(41099), platforms.AKL_platform_list)
+        platform = platforms.AKL_platform_list[selected_idx]
+        
+        rom_obj = ROM()
+        rom_obj.set_name(rom_name)
+        rom_obj.set_platform(platform)
+        if file_path:
+            rom_obj.set_scanned_data_element("file", file_path)
+    
+        options = collections.OrderedDict()
+        options["LAUNCH_DIRECTLY"] = kodi.translate(40952)
+        for addon in addons:
+            options[addon] = addon.get_name()
+    
+        s = kodi.translate(41106)
+        selected_option = kodi.OrdDictionaryDialog().select(s, options)
+        
+        if selected_option == "LAUNCH_DIRECTLY":
+            addon_id = "script.akl.defaults"
+            addon = addons_repository.find_by_addon_id(addon_id, constants.AddonType.LAUNCHER)
+            rom_obj.add_launcher(addon, {
+                "addon_id": addon_id,
+                "application": file_path,
+                "args": "",
+                "secname": path.getBase()
+            })
+            roms_repository.insert_rom(rom_obj)
+            uow.commit()
+        
+        else:
+            roms_repository.insert_rom(rom_obj)
+            uow.commit()
+            
+            selected_launcher = ROMLauncherAddonFactory.create(selected_option, {})
+            selected_launcher.configure()
+        
+    AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': constants.VCATEGORY_TITLE_ID})
+    kodi.notify(kodi.translate(41035).format(rom_name))
+    kodi.refresh_container()
 
 
 # -------------------------------------------------------------------------------------------------
