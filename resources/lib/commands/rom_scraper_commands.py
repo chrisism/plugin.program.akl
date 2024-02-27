@@ -27,8 +27,8 @@ from akl.scrapers import ScraperSettings
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
 from resources.lib.repositories import UnitOfWork, AelAddonRepository, ROMsRepository
-from resources.lib.repositories import ROMCollectionRepository, LibrariesRepository
-from resources.lib.domain import ROMCollection, Library, ScraperAddon, g_assetFactory
+from resources.lib.repositories import ROMCollectionRepository, SourcesRepository
+from resources.lib.domain import ROMCollection, Source, ScraperAddon, g_assetFactory
 
 logger = logging.getLogger(__name__)
 
@@ -66,29 +66,29 @@ def cmd_scrape_romcollection(args):
     AppMediator.sync_cmd('SCRAPE_ROMS_WITH_SETTINGS', args)
 
 
-@AppMediator.register('SCRAPE_LIBRARY_ROMS')
-def cmd_scrape_library(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('SCRAPE_SOURCE_ROMS')
+def cmd_scrape_source(args):
+    source_id: str = args['source_id'] if 'source_id' in args else None
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        library_repository = LibrariesRepository(uow)
-        library = library_repository.find(library_id)
+        source_repository = SourcesRepository(uow)
+        source = source_repository.find(source_id)
     
         scraper_settings: ScraperSettings = ScraperSettings.from_addon_settings()
         
-        dialog_title = kodi.translate(41110).format(library.get_name())
+        dialog_title = kodi.translate(41110).format(source.get_name())
         selected_addon = _select_scraper(uow, dialog_title, scraper_settings)
         if selected_addon is None:
             # >> Exits context menu
-            logger.debug('SCRAPE_LIBRARY_ROMS: cmd_scrape_library() Selected None. Closing context menu')
-            AppMediator.sync_cmd('LIBRARY_MANAGE_ROMS', args)
+            logger.debug('SCRAPE_SOURCE_ROMS: cmd_scrape_source() Selected None. Closing context menu')
+            AppMediator.sync_cmd('SOURCE_MANAGE_ROMS', args)
             return
 
         scraper_settings.asset_IDs_to_scrape = selected_addon.get_supported_assets()
         scraper_settings.metadata_IDs_to_scrape = selected_addon.get_supported_metadata()
 
-        logger.debug(f'cmd_scrape_library() Selected scraper#{selected_addon.get_name()}')
+        logger.debug(f'cmd_scrape_source() Selected scraper#{selected_addon.get_name()}')
         args['scraper_settings'] = scraper_settings
         args['scraper_id'] = selected_addon.addon.get_id()
         args['scraper_supported_metadata'] = selected_addon.get_supported_metadata()
@@ -130,9 +130,9 @@ def cmd_scrape_rom(args):
 
 
 @AppMediator.register('SCRAPE_ROMS_WITH_SETTINGS')
-def cmd_scrape_roms_in_collection_or_library(args):
+def cmd_scrape_roms_in_collection_or_source(args):
     romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
-    library_id: str = args['library_id'] if 'library_id' in args else None
+    source_id: str = args['source_id'] if 'source_id' in args else None
     scraper_id: str = args['scraper_id'] if 'scraper_id' in args else None
     scraper_settings: ScraperSettings = args['scraper_settings'] if 'scraper_settings' in args else ScraperSettings.from_addon_settings()
 
@@ -140,10 +140,10 @@ def cmd_scrape_roms_in_collection_or_library(args):
     with uow:
         addon_repository = AelAddonRepository(uow)
         collection_repository = ROMCollectionRepository(uow)
-        library_repository = LibrariesRepository(uow)
+        source_repository = SourcesRepository(uow)
         
         collection = collection_repository.find_romcollection(romcollection_id)
-        library = library_repository.find(library_id)
+        source = source_repository.find(source_id)
         addon = addon_repository.find(scraper_id)
         selected_addon = ScraperAddon(addon, scraper_settings)
         
@@ -163,14 +163,14 @@ def cmd_scrape_roms_in_collection_or_library(args):
         options['SCRAPER_IGNORE_TITLES_MODE'] = kodi.translate(42034).format(kodi.translate(42035) if scraper_settings.ignore_scrap_title else kodi.translate(42036))
         options['SCRAPE'] = kodi.translate(40881)
         
-        dialog_title = kodi.translate(41000 if library is None else 41111).format(
-            collection.get_name() if collection is not None else library.get_name(),
+        dialog_title = kodi.translate(41000 if source is None else 41111).format(
+            collection.get_name() if collection is not None else source.get_name(),
             selected_addon.get_name())
         selected_option = kodi.OrdDictionaryDialog().select(dialog_title, options, preselect='SCRAPE')
         if selected_option is None:
-            logger.debug('cmd_scrape_roms_in_collection_or_library() Selected None. Closing context menu')
+            logger.debug('cmd_scrape_roms_in_collection_or_source() Selected None. Closing context menu')
             del args['scraper_settings']
-            ret_cmd = 'SCRAPE_ROMS' if collection is not None else 'SCRAPE_LIBRARY_ROMS'
+            ret_cmd = 'SCRAPE_ROMS' if collection is not None else 'SCRAPE_SOURCE_ROMS'
             AppMediator.sync_cmd(ret_cmd, args)
             return
         
@@ -179,16 +179,16 @@ def cmd_scrape_roms_in_collection_or_library(args):
             AppMediator.sync_cmd(selected_option, args)
             return
 
-        if not library:
-            libraries = library_repository.find_libraries_by_collection(romcollection_id)
-            for library in libraries:
-                _check_collection_unset_asset_dirs(library, scraper_settings)
+        if not source:
+            sources = source_repository.find_sources_by_collection(romcollection_id)
+            for source in sources:
+                _check_collection_unset_asset_dirs(source, scraper_settings)
         else:
-            _check_collection_unset_asset_dirs(library, scraper_settings)
+            _check_collection_unset_asset_dirs(source, scraper_settings)
 
     selected_addon.set_scraper_settings(scraper_settings)
     kodi.notify(kodi.translate(40979))
-    entity = collection if collection else library
+    entity = collection if collection else source
     kodi.run_script(
         selected_addon.addon.get_addon_id(),
         selected_addon.get_scrape_command(entity))
@@ -568,14 +568,14 @@ def _select_scraper(uow: UnitOfWork, title: str, scraper_settings: ScraperSettin
     return selected_addon
 
 
-def _check_collection_unset_asset_dirs(library: Library, scraper_settings: ScraperSettings) -> bool:
+def _check_collection_unset_asset_dirs(source: Source, scraper_settings: ScraperSettings) -> bool:
     logger.debug('_check_launcher_unset_asset_dirs() BEGIN ...')
     
     unconfigured_name_list = []
     enabled_asset_list = []
     for asset_id in scraper_settings.asset_IDs_to_scrape:
         rom_asset = g_assetFactory.get_asset_info(asset_id)
-        asset_path = library.get_asset_path(rom_asset, False)
+        asset_path = source.get_asset_path(rom_asset, False)
         
         if asset_path is None:
             logger.debug(f'Directory not set. Asset "{rom_asset}" will be disabled')

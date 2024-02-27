@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Advanced Kodi Launcher: Commands (library roms management)
+# Advanced Kodi Launcher: Commands (source roms management)
 #
 # Copyright (c) Chrisism <crizizz@gmail.com>
 #
@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-# --- Python standard library ---
+# --- Python standard source ---
 from __future__ import unicode_literals
 from __future__ import division
 
@@ -28,22 +28,22 @@ from akl.utils import kodi, io
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals, editors
-from resources.lib.repositories import UnitOfWork, LibrariesRepository, ROMsRepository, AelAddonRepository, ROMsJsonFileRepository
-from resources.lib.domain import ROM, Library, AelAddon, AssetInfo, g_assetFactory
+from resources.lib.repositories import UnitOfWork, SourcesRepository, ROMsRepository, AelAddonRepository, ROMsJsonFileRepository
+from resources.lib.domain import ROM, Source, AelAddon, AssetInfo, g_assetFactory
 
 logger = logging.getLogger(__name__)
 
 
 # --- Main menu commands ---
-@AppMediator.register('ADD_LIBRARY')
-def cmd_add_library(args):
-    logger.debug('cmd_add_library() BEGIN')
+@AppMediator.register('ADD_SOURCE')
+def cmd_add_source(args):
+    logger.debug('cmd_add_source() BEGIN')
     
     options = collections.OrderedDict()
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         addon_repository = AelAddonRepository(uow)
-        library_repository = LibrariesRepository(uow)
+        source_repository = SourcesRepository(uow)
         
         addons = addon_repository.find_all_scanner_addons()
         for addon in addons:
@@ -54,268 +54,268 @@ def cmd_add_library(args):
 
         if selected_option is None:
             # >> Exits context menu
-            logger.debug('ADD_LIBRARY: cmd_add_library() Selected None. Closing context menu')
+            logger.debug('ADD_SOURCE: cmd_add_source() Selected None. Closing context menu')
             return
         
         # >> Execute subcommand. May be atomic, maybe a submenu.
-        logger.debug('ADD_LIBRARY: cmd_add_library() Selected {}'.format(selected_option.get_id()))
+        logger.debug('ADD_SOURCE: cmd_add_source() Selected {}'.format(selected_option.get_id()))
     
-        lib_name = kodi.dialog_keyboard(kodi.translate(41166))
-        library = Library(None, selected_option)
-        library.set_name(lib_name)
+        src_name = kodi.dialog_keyboard(kodi.translate(41166))
+        source = Source(None, selected_option)
+        source.set_name(src_name)
         
         wizard = kodi.WizardDialog_Selection(None, 'platform', kodi.translate(41099), platforms.AKL_platform_list)
         wizard = kodi.WizardDialog_Dummy(wizard, 'name', '', _get_name_from_platform)
         wizard = kodi.WizardDialog_Keyboard(wizard, 'name', kodi.translate(41166))
         wizard = kodi.WizardDialog_FileBrowse(wizard, 'assets_path', kodi.translate(42038), 0, '')
         
-        library = Library(None, selected_option)
-        entity_data = library.get_data_dic()
+        source = Source(None, selected_option)
+        entity_data = source.get_data_dic()
         entity_data = wizard.runWizard(entity_data)
         if entity_data is None:
             return
         
-        library.import_data_dic(entity_data)
+        source.import_data_dic(entity_data)
         
         # --- create assets directory ---
         assets_path = entity_data['assets_path']
         assets_path_FN = io.FileName(assets_path)
-        library.set_assets_root_path(assets_path_FN, constants.ROM_ASSET_ID_LIST, create_default_subdirectories=True)
+        source.set_assets_root_path(assets_path_FN, constants.ROM_ASSET_ID_LIST, create_default_subdirectories=True)
                 
         # --- Determine box size based on platform --
         platform = platforms.get_AKL_platform(entity_data['platform'])
-        library.set_box_sizing(platform.default_box_size)
+        source.set_box_sizing(platform.default_box_size)
         
-        library_repository.insert_library(library)
+        source_repository.insert_source(source)
         uow.commit()
         
         kodi.notify(kodi.translate(40980))
         kodi.run_script(
             selected_option.get_addon_id(),
-            library.get_configure_command())
+            source.get_configure_command())
 
 
-@AppMediator.register('EDIT_LIBRARY')
-def cmd_edit_library(args):
-    logger.debug('EDIT_LIBRARY: cmd_edit_library() BEGIN')
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('EDIT_SOURCE')
+def cmd_edit_source(args):
+    logger.debug('EDIT_SOURCE: cmd_edit_source() BEGIN')
+    source_id: str = args['source_id'] if 'source_id' in args else None
     
-    if library_id is None:
-        logger.warning('cmd_edit_library(): No library_id id supplied.')
+    if source_id is None:
+        logger.warning('cmd_edit_source(): No source_id id supplied.')
         kodi.notify_warn(kodi.translate(40951))
         return
     
     selected_option = None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
 
     options = collections.OrderedDict()
-    options['LIBRARY_EDIT_TITLE'] = kodi.translate(40863).format(library.get_name())
-    options['LIBRARY_EDIT_PLATFORM'] = kodi.translate(40864).format(library.get_platform())
-    options['LIBRARY_EDIT_BOXSIZE'] = kodi.translate(40875).format(library.get_box_sizing())
-    options['LIBRARY_EDIT_SCANNER'] = kodi.translate(42081)
-    if library.has_launchers():
-        options['EDIT_LIBRARY_LAUNCHERS'] = kodi.translate(42016)
+    options['SOURCE_EDIT_TITLE'] = kodi.translate(40863).format(source.get_name())
+    options['SOURCE_EDIT_PLATFORM'] = kodi.translate(40864).format(source.get_platform())
+    options['SOURCE_EDIT_BOXSIZE'] = kodi.translate(40875).format(source.get_box_sizing())
+    options['SOURCE_EDIT_SCANNER'] = kodi.translate(42081)
+    if source.has_launchers():
+        options['EDIT_SOURCE_LAUNCHERS'] = kodi.translate(42016)
     else:
-        options['ADD_LIBRARY_LAUNCHER'] = kodi.translate(42026)
-    options['LIBRARY_MANAGE_ROMS'] = kodi.translate(42039)
-    options['DELETE_LIBRARY'] = kodi.translate(42085)
+        options['ADD_SOURCE_LAUNCHER'] = kodi.translate(42026)
+    options['SOURCE_MANAGE_ROMS'] = kodi.translate(42039)
+    options['DELETE_SOURCE'] = kodi.translate(42085)
 
-    s = kodi.translate(41167).format(library.get_name())
+    s = kodi.translate(41167).format(source.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu
-        logger.debug('EDIT_LIBRARY: cmd_edit_library() Selected None. Closing context menu')
+        logger.debug('EDIT_SOURCE: cmd_edit_source() Selected None. Closing context menu')
         return
     
     # >> Execute subcommand. May be atomic, maybe a submenu.
-    logger.debug(f'EDIT_LIBRARY: cmd_edit_library() Selected {selected_option}')
+    logger.debug(f'EDIT_SOURCE: cmd_edit_source() Selected {selected_option}')
     AppMediator.sync_cmd(selected_option, args)
 
 
-@AppMediator.register('LIBRARY_EDIT_TITLE')
-def cmd_library_title(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('SOURCE_EDIT_TITLE')
+def cmd_source_title(args):
+    source_id: str = args['source_id'] if 'source_id' in args else None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
         
         s = kodi.translate(41137).format(
-            kodi.translate(constants.OBJ_LIBRARY),
-            library.get_name(),
+            kodi.translate(constants.OBJ_SOURCE),
+            source.get_name(),
             kodi.translate(40812))
-        new_value = kodi.dialog_keyboard(s, library.get_name())
-        if new_value is not None and library.get_name() != new_value:
-            library.set_name(new_value)
+        new_value = kodi.dialog_keyboard(s, source.get_name())
+        if new_value is not None and source.get_name() != new_value:
+            source.set_name(new_value)
             kodi.notify(kodi.translate(40986).format(
-                kodi.translate(constants.OBJ_LIBRARY),
+                kodi.translate(constants.OBJ_SOURCE),
                 kodi.translate(40812),
                 new_value))
         
-            repository.update_library(library)
+            repository.update_source(source)
             uow.commit()
-            AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
+            AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
         else:
             kodi.notify(kodi.translate(40987).format(
-                kodi.translate(constants.OBJ_LIBRARY),
+                kodi.translate(constants.OBJ_SOURCE),
                 kodi.translate(40812)))
         
-    AppMediator.sync_cmd('EDIT_LIBRARY', args)
+    AppMediator.sync_cmd('EDIT_SOURCE', args)
 
 
-@AppMediator.register('LIBRARY_EDIT_PLATFORM')
-def cmd_library_metadata_platform(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('SOURCE_EDIT_PLATFORM')
+def cmd_source_metadata_platform(args):
+    source_id: str = args['source_id'] if 'source_id' in args else None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
     
-        if editors.edit_field_by_list(library, kodi.translate(40807), platforms.AKL_platform_list,
-                                      library.get_platform, library.set_platform):
-            repository.update_library(library)
+        if editors.edit_field_by_list(source, kodi.translate(40807), platforms.AKL_platform_list,
+                                      source.get_platform, source.set_platform):
+            repository.update_source(source)
             update_roms_too = kodi.dialog_yesno(kodi.translate(40982))
             
             if update_roms_too:
                 roms_repository = ROMsRepository(uow)
-                roms_to_update = roms_repository.find_roms_by_library(library)
-                platform_to_apply = library.get_platform()
+                roms_to_update = roms_repository.find_roms_by_source(source)
+                platform_to_apply = source.get_platform()
                 for rom in roms_to_update:
                     rom.set_platform(platform_to_apply)
                     roms_repository.update_rom(rom)
 
             uow.commit()
-            AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
-    AppMediator.sync_cmd('EDIT_LIBRARY', args)
+            AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
+    AppMediator.sync_cmd('EDIT_SOURCE', args)
 
 
-@AppMediator.register('LIBRARY_EDIT_BOXSIZE')
-def cmd_library_boxsize(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('SOURCE_EDIT_BOXSIZE')
+def cmd_source_boxsize(args):
+    source_id: str = args['source_id'] if 'source_id' in args else None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
 
-        if editors.edit_field_by_list(library, kodi.translate(40816), constants.BOX_SIZES,
-                                      library.get_box_sizing, library.set_box_sizing):
-            repository.update_library(library)
+        if editors.edit_field_by_list(source, kodi.translate(40816), constants.BOX_SIZES,
+                                      source.get_box_sizing, source.set_box_sizing):
+            repository.update_source(source)
             uow.commit()
-            AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
-    AppMediator.sync_cmd('EDIT_LIBRARY', args)
+            AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
+    AppMediator.sync_cmd('EDIT_SOURCE', args)
 
 
-@AppMediator.register('LIBRARY_EDIT_SCANNER')
-def cmd_edit_library_scanner(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('SOURCE_EDIT_SCANNER')
+def cmd_edit_source_scanner(args):
+    source_id: str = args['source_id'] if 'source_id' in args else None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
      
     kodi.notify(kodi.translate(40980))
     kodi.run_script(
-        library.addon.get_addon_id(),
-        library.get_configure_command())
+        source.addon.get_addon_id(),
+        source.get_configure_command())
        
 
-@AppMediator.register('DELETE_LIBRARY')
-def cmd_library_delete(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('DELETE_SOURCE')
+def cmd_source_delete(args):
+    source_id: str = args['source_id'] if 'source_id' in args else None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
-        library_name = library.get_name()
-        collection_ids = repository.find_romcollection_ids_by_library(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
+        source_name = source.get_name()
+        collection_ids = repository.find_romcollection_ids_by_source(source_id)
         
-        if library.num_roms() > 0:
-            question = kodi.translate(41169).format(library_name, library.num_roms()) + \
-                kodi.translate(41066).format(library_name)
+        if source.num_roms() > 0:
+            question = kodi.translate(41169).format(source_name, source.num_roms()) + \
+                kodi.translate(41066).format(source_name)
         else:
-            question = kodi.translate(41066).format(library_name)
+            question = kodi.translate(41066).format(source_name)
     
         ret = kodi.dialog_yesno(question)
         if not ret:
             return
             
-        logger.info(f'Deleting library "{library_name}" ID {library.get_id()}')
-        repository.delete_library(library.get_id())
+        logger.info(f'Deleting source "{source_name}" ID {source.get_id()}')
+        repository.delete_source(source.get_id())
         uow.commit()
         
-    kodi.notify(kodi.translate(41170).format(library_name))
+    kodi.notify(kodi.translate(41170).format(source_name))
     for collection_id in collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})
     AppMediator.async_cmd('CLEANUP_VIEWS')
 
 
 # -------------------------------------------------------------------------------------------------
-# Library ROM management.
+# Source ROM management.
 # -------------------------------------------------------------------------------------------------
 # --- Submenu menu command ---
-@AppMediator.register('LIBRARY_MANAGE_ROMS')
-def cmd_manage_library_roms(args):
-    logger.debug('LIBRARY_MANAGE_ROMS: cmd_manage_library_roms() SHOW MENU')
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('SOURCE_MANAGE_ROMS')
+def cmd_manage_source_roms(args):
+    logger.debug('SOURCE_MANAGE_ROMS: cmd_manage_source_roms() SHOW MENU')
+    source_id: str = args['source_id'] if 'source_id' in args else None
     
-    if library_id is None:
-        logger.warning('cmd_manage_library_roms(): No library id supplied.')
+    if source_id is None:
+        logger.warning('cmd_manage_source_roms(): No source id supplied.')
         kodi.notify_warn(kodi.translate(40951))
         return
     
     selected_option = None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
 
     options = collections.OrderedDict()
     options['SET_ROMS_ASSET_DIRS'] = kodi.translate(42045)
     options['SCAN_ROMS'] = kodi.translate(42046)
-    options['LIBRARY_IMPORT_ROMS'] = kodi.translate(42050)
+    options['SOURCE_IMPORT_ROMS'] = kodi.translate(42050)
     options['REMOVE_DEAD_ROMS'] = kodi.translate(42047)
     options['EXPORT_ROMS'] = kodi.translate(42051)
-    options['SCRAPE_LIBRARY_ROMS'] = kodi.translate(42052)
+    options['SCRAPE_SOURCE_ROMS'] = kodi.translate(42052)
     options['DELETE_ROMS_NFO'] = kodi.translate(42053)
-    options['CLEAR_LIBRARY_ROMS'] = kodi.translate(42080)
+    options['CLEAR_SOURCE_ROMS'] = kodi.translate(42080)
 
-    s = kodi.translate(41161).format(library.get_name())
+    s = kodi.translate(41161).format(source.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu
-        logger.debug('LIBRARY_MANAGE_ROMS: cmd_manage_library_roms() Selected None. Closing context menu')
+        logger.debug('SOURCE_MANAGE_ROMS: cmd_manage_source_roms() Selected None. Closing context menu')
         if 'scraper_settings' in args:
             del args['scraper_settings']
-        AppMediator.async_cmd('EDIT_LIBRARY', args)
+        AppMediator.async_cmd('EDIT_SOURCE', args)
         return
     
-    logger.debug(f'LIBRARY_MANAGE_ROMS: cmd_manage_library_roms() Selected {selected_option}')
+    logger.debug(f'SOURCE_MANAGE_ROMS: cmd_manage_source_roms() Selected {selected_option}')
     AppMediator.async_cmd(selected_option, args)
 
 
 @AppMediator.register('SET_ROMS_ASSET_DIRS')
 def cmd_set_rom_asset_dirs(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+    source_id: str = args['source_id'] if 'source_id' in args else None
     
     list_items = collections.OrderedDict()
     assets = g_assetFactory.get_assets_for_type(constants.OBJ_ROM)
 
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
         
-        root_path = library.get_assets_root_path()
+        root_path = source.get_assets_root_path()
         root_path_str = root_path.getPath() if root_path else kodi.translate(41158)
         
         gui_listitem = xbmcgui.ListItem(label=kodi.translate(42083), label2=root_path_str)
         gui_listitem.setArt({'icon': 'DefaultFolder.png'})
         list_items[AssetInfo()] = gui_listitem
         for asset_info in assets:
-            path = library.get_asset_path(asset_info)
+            path = source.get_asset_path(asset_info)
             if path:
                 gui_listitem = xbmcgui.ListItem(label=kodi.translate(42084).format(asset_info.plural), label2=path.getPath())
                 gui_listitem.setArt({'icon': 'DefaultFolder.png'})
@@ -325,7 +325,7 @@ def cmd_set_rom_asset_dirs(args):
         selected_asset: AssetInfo = dialog.select(kodi.translate(41129), list_items, use_details=True)
 
         if selected_asset is None:
-            AppMediator.sync_cmd('LIBRARY_MANAGE_ROMS', args)
+            AppMediator.sync_cmd('SOURCE_MANAGE_ROMS', args)
             return
 
         # rootpath?
@@ -337,17 +337,17 @@ def cmd_set_rom_asset_dirs(args):
             
             root_path = io.FileName(dir_path)
             apply_to_all = kodi.dialog_yesno(kodi.translate(41062))
-            library.set_assets_root_path(root_path, constants.ROM_ASSET_ID_LIST, create_default_subdirectories=apply_to_all)
+            source.set_assets_root_path(root_path, constants.ROM_ASSET_ID_LIST, create_default_subdirectories=apply_to_all)
         else:
-            selected_asset_path = library.get_asset_path(selected_asset)
+            selected_asset_path = source.get_asset_path(selected_asset)
             dir_path = kodi.browse(type=0, text=kodi.translate(41160).format(selected_asset.plural),
                                    preselected_path=selected_asset_path.getPath())
             if not dir_path or dir_path == selected_asset_path.getPath():
                 AppMediator.sync_cmd('SET_ROMS_ASSET_DIRS', args)
                 return
-            library.set_asset_path(selected_asset, dir_path)
+            source.set_asset_path(selected_asset, dir_path)
             
-        repository.update_library(library)
+        repository.update_source(source)
         uow.commit()
                 
     # >> Check for duplicate paths and warn user.
@@ -359,42 +359,42 @@ def cmd_set_rom_asset_dirs(args):
 
 @AppMediator.register('REMOVE_DEAD_ROMS')
 def cmd_remove_dead_roms(args):
-    # library_id: str = args['library_id'] if 'library_id' in args else None
+    # source_id: str = args['source_id'] if 'source_id' in args else None
     kodi.notify("Not implemented yet")
 
 
 @AppMediator.register('EXPORT_ROMS')
 def cmd_export_roms(args):
-    # library_id: str = args['library_id'] if 'library_id' in args else None
+    # source_id: str = args['source_id'] if 'source_id' in args else None
     kodi.notify("Not implemented yet")
 
 
 @AppMediator.register('DELETE_ROMS_NFO')
 def cmd_delete_rom_nfos(args):
-    # library_id: str = args['library_id'] if 'library_id' in args else None
+    # source_id: str = args['source_id'] if 'source_id' in args else None
     kodi.notify("Not implemented yet")
 
 
-@AppMediator.register('CLEAR_LIBRARY_ROMS')
-def cmd_clear_library_roms(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('CLEAR_SOURCE_ROMS')
+def cmd_clear_source_roms(args):
+    source_id: str = args['source_id'] if 'source_id' in args else None
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        library_repository = LibrariesRepository(uow)
+        source_repository = SourcesRepository(uow)
         roms_repository = ROMsRepository(uow)
         
-        library = library_repository.find(library_id)
-        roms = roms_repository.find_roms_by_library(library)
+        source = source_repository.find(source_id)
+        roms = roms_repository.find_roms_by_source(source)
         
-        # If library is empty (no ROMs) do nothing
+        # If source is empty (no ROMs) do nothing
         num_roms = len([*roms])
         if num_roms == 0:
             kodi.dialog_OK(kodi.translate(41163))
             return
 
         # Confirm user wants to delete ROMs
-        ret = kodi.dialog_yesno(kodi.translate(41164).format(library.get_name(), num_roms))
+        ret = kodi.dialog_yesno(kodi.translate(41164).format(source.get_name(), num_roms))
         if not ret:
             return
 
@@ -402,33 +402,33 @@ def cmd_clear_library_roms(args):
         # TODO fix
         # romcollection.reset_nointro_xmldata()
         
-        collection_ids = library_repository.find_romcollection_ids_by_library(library_id)
-        library_repository.remove_all_roms_in_library(library_id)
+        collection_ids = source_repository.find_romcollection_ids_by_source(source_id)
+        source_repository.remove_all_roms_in_source(source_id)
         uow.commit()
     
-    AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
+    AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
     for collection_id in collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})
     kodi.notify(kodi.translate(41165))
 
 
 # -------------------------------------------------------------------------------------------------
-# Library Scanner executing
+# Source Scanner executing
 # -------------------------------------------------------------------------------------------------
 @AppMediator.register('SCAN_ROMS')
 def cmd_execute_rom_scanner(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+    source_id: str = args['source_id'] if 'source_id' in args else None
 
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        libraries_repository = LibrariesRepository(uow)
-        library = libraries_repository.find(library_id)
+        sources_repository = SourcesRepository(uow)
+        source = sources_repository.find(source_id)
 
-    logger.info(f'SCAN_ROMS: scanner for library "{library.get_name()}"')
+    logger.info(f'SCAN_ROMS: scanner for source "{source.get_name()}"')
     kodi.notify(kodi.translate(40980))
     kodi.run_script(
-        library.addon.get_addon_id(),
-        library.get_scan_command())
+        source.addon.get_addon_id(),
+        source.get_scan_command())
 
 
 def _get_name_from_platform(input, item_key, entity_data):
@@ -436,46 +436,46 @@ def _get_name_from_platform(input, item_key, entity_data):
     return title
 
 
-@AppMediator.register('LIBRARY_IMPORT_ROMS')
-def cmd_library_import_roms(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+@AppMediator.register('SOURCE_IMPORT_ROMS')
+def cmd_source_import_roms(args):
+    source_id: str = args['source_id'] if 'source_id' in args else None
         
     selected_option = None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
 
     options = collections.OrderedDict()
-    options['LIBRARY_IMPORT_ROMS_NFO'] = kodi.translate(42056)
-    options['LIBRARY_MPORT_ROMS_JSON'] = kodi.translate(42057)
+    options['SOURCE_IMPORT_ROMS_NFO'] = kodi.translate(42056)
+    options['SOURCE_MPORT_ROMS_JSON'] = kodi.translate(42057)
 
-    s = kodi.translate(41130).format(library.get_name())
+    s = kodi.translate(41130).format(source.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu
-        logger.debug('LIBRARY_IMPORT_ROMS: Selected None. Closing context menu')
-        AppMediator.async_cmd('LIBRARY_MANAGE_ROMS', args)
+        logger.debug('SOURCE_IMPORT_ROMS: Selected None. Closing context menu')
+        AppMediator.async_cmd('SOURCE_MANAGE_ROMS', args)
         return
     
     # >> Execute subcommand. May be atomic, maybe a submenu.
-    logger.debug(f'LIBRARY_IMPORT_ROMS: Selected {selected_option}')
+    logger.debug(f'SOURCE_IMPORT_ROMS: Selected {selected_option}')
     AppMediator.async_cmd(selected_option, args)
 
 
 # --- Import ROM metadata from NFO files ---
-@AppMediator.register('LIBRARY_IMPORT_ROMS_NFO')
+@AppMediator.register('SOURCE_IMPORT_ROMS_NFO')
 def cmd_import_roms_nfo(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+    source_id: str = args['source_id'] if 'source_id' in args else None
         
     # >> Load ROMs, iterate and import NFO files
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         repository = ROMsRepository(uow)
-        lib_repository = LibrariesRepository(uow)
+        src_repository = SourcesRepository(uow)
         
-        library = lib_repository.find(library_id)
-        roms = repository.find_roms_by_library(library)
+        source = src_repository.find(source_id)
+        roms = repository.find_roms_by_source(source)
     
         pDialog = kodi.ProgressDialog()
         pDialog.startProgress(kodi.translate(41153), num_steps=len(roms))
@@ -496,25 +496,25 @@ def cmd_import_roms_nfo(args):
         pDialog.close()
         
     kodi.notify(kodi.translate(40985).format(num_read_NFO_files))
-    AppMediator.async_cmd('LIBRARY_IMPORT_ROMS', args)
+    AppMediator.async_cmd('SOURCE_IMPORT_ROMS', args)
 
 
 # --- Import ROM metadata from json config file ---
 @AppMediator.register('IMPORT_ROMS_JSON')
 def cmd_import_roms_json(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+    source_id: str = args['source_id'] if 'source_id' in args else None
     file_list = kodi.browse(text=kodi.translate(41155), mask='.json', multiple=True)
     collection_ids = []
 
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         repository = ROMsRepository(uow)
-        lib_repository = LibrariesRepository(uow)
+        src_repository = SourcesRepository(uow)
         
-        library = lib_repository.find(library_id)
-        collection_ids = lib_repository.find_romcollection_ids_by_library(library_id)
+        source = src_repository.find(source_id)
+        collection_ids = src_repository.find_romcollection_ids_by_source(source_id)
         
-        existing_roms = [*repository.find_roms_by_library(library)]
+        existing_roms = [*repository.find_roms_by_source(source)]
         existing_rom_ids = map(lambda r: r.get_id(), existing_roms)
         existing_rom_names = map(lambda r: r.get_name(), existing_roms)
 
@@ -545,20 +545,20 @@ def cmd_import_roms_json(args):
                         roms_to_update.append(imported_rom)
                 else:
                     logger.debug(f'Add new ROM {imported_rom.get_name()}')
-                    imported_rom.set_platform(library.get_platform())
+                    imported_rom.set_platform(source.get_platform())
                     roms_to_insert.append(imported_rom)
                         
         for rom_to_insert in roms_to_insert:
-            rom_to_insert.scanned_by(library.get_id())
+            rom_to_insert.scanned_by(source.get_id())
             repository.insert_rom(rom_to_insert)
 
         for rom_to_update in roms_to_update:
-            rom_to_update.scanned_by(library.get_id())
+            rom_to_update.scanned_by(source.get_id())
             repository.update_rom(rom_to_update)
             
         uow.commit()
         
-    AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
+    AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
     for collection_id in collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})
     kodi.notify(kodi.translate(40978))

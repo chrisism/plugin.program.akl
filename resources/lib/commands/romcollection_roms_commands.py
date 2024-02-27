@@ -25,7 +25,7 @@ from akl.utils import kodi
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
-from resources.lib.repositories import UnitOfWork, ROMCollectionRepository, ROMsRepository, LibrariesRepository
+from resources.lib.repositories import UnitOfWork, ROMCollectionRepository, ROMsRepository, SourcesRepository
 from resources.lib.domain import g_assetFactory, RuleSet, Rule, ROM, RuleOperator
 
 logger = logging.getLogger(__name__)
@@ -160,11 +160,12 @@ def cmd_import_roms(args):
         options = collections.OrderedDict()
         for import_rule in import_rules:
             options[import_rule.get_ruleset_id()] = kodi.get_listitem(
-                label=kodi.translate(41174).format(import_rule.get_library_name()),
+                label=kodi.translate(41174).format(import_rule.get_source_name()),
                 label2=f"{import_rule.get_rules_description()}",
                 art={'icon': 'DefaultPlaylist.png'})
 
-        options['NEW_IMPORT_RULESET'] = kodi.get_listitem(label=kodi.translate(40921), label2='', art={'icon': 'DefaultAddSource.png'})
+        options['NEW_IMPORT_RULESET'] = kodi.get_listitem(label=kodi.translate(40921), label2='',
+                                                          art={'icon': 'DefaultAddSource.png'})
 
     s = kodi.translate(41130).format(romcollection.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options, use_details=True)
@@ -192,17 +193,17 @@ def cmd_new_import_ruleset(args):
         repository = ROMCollectionRepository(uow)
         romcollection = repository.find_romcollection(romcollection_id)
 
-        selected_library = _select_library_for_rules(uow)
-        if selected_library is None:
+        selected_source = _select_source_for_rules(uow)
+        if selected_source is None:
             # >> Exits context menu
-            logger.debug('NEW_IMPORT_RULESET: No library selected. Closing context menu')
+            logger.debug('NEW_IMPORT_RULESET: No source selected. Closing context menu')
             AppMediator.async_cmd('IMPORT_ROMS', args)
             return
         
-        logger.debug(f'NEW_IMPORT_RULESET: Selected library {selected_library.get_id()}')
+        logger.debug(f'NEW_IMPORT_RULESET: Selected source {selected_source.get_id()}')
         
         ruleset = RuleSet()
-        ruleset.apply_library(selected_library)
+        ruleset.apply_source(selected_source)
         
         repository.add_ruleset_to_romcollection(romcollection.get_id(), ruleset)
         uow.commit()
@@ -223,12 +224,15 @@ def cmd_edit_import_ruleset(args):
         ruleset = repository.find_ruleset(romcollection_id, ruleset_id)
         
         options = collections.OrderedDict()
-        options["SET_RULESET_LIBRARY"] = kodi.get_listitem(kodi.translate(42506), ruleset.get_library_name())
+        options["EXECUTE_RULESET"] = kodi.get_listitem(kodi.translate(42089), "")
+        options["SET_RULESET_SOURCE"] = kodi.get_listitem(kodi.translate(42506), ruleset.get_source_name())
         options["CHANGE_RULESET_OPERATOR"] = kodi.get_listitem(kodi.translate(41060), ruleset.get_set_operator_str())
         options["CHANGE_RULESET_BY_RULES"] = kodi.get_listitem(kodi.translate(41173), ruleset.get_rules_shortdescription())
         for rule in ruleset.get_rules():
-            options[rule.get_id()] = kodi.get_listitem(kodi.translate(42511), rule.get_description())
-        options["ADD_RULE_TO_RULESET"] = kodi.get_listitem(label=kodi.translate(42086), label2='', art={'icon': 'DefaultAddSource.png'})
+            options[rule.get_id()] = kodi.get_listitem(kodi.translate(42511), rule.get_description(),
+                                                       art={'icon': 'DefaultScript.png'})
+        options["ADD_RULE_TO_RULESET"] = kodi.get_listitem(label=kodi.translate(42086), label2='',
+                                                           art={'icon': 'DefaultAddSource.png'})
 
         s = kodi.translate(41172)
         selected_option = kodi.OrdDictionaryDialog().select(s, options, use_details=True)
@@ -239,10 +243,10 @@ def cmd_edit_import_ruleset(args):
             AppMediator.async_cmd('IMPORT_ROMS', args)
             return
         
-        elif selected_option == 'SET_RULESET_LIBRARY':
-            library = _select_library_for_rules(uow)
-            if library:
-                ruleset.apply_library(library) 
+        elif selected_option == 'SET_RULESET_SOURCE':
+            source = _select_source_for_rules(uow)
+            if source:
+                ruleset.apply_source(source)
                 repository.update_ruleset_in_romcollection(romcollection_id, ruleset)
                 uow.commit()
         
@@ -333,8 +337,7 @@ def cmd_edit_rule(args):
     ])
         
     field_options = collections.OrderedDict()
-    rom = ROM()
-    fields = rom.get_fields_with_translations()
+    fields = ROM.get_fields_with_translations()
     for fieldkey, fieldname in fields.items():
         field_options[fieldkey] = kodi.translate(fieldname)
     
@@ -379,17 +382,51 @@ def cmd_edit_rule(args):
     kodi.notify(kodi.translate(41180))
 
 
-def _select_library_for_rules(uow: UnitOfWork):
-    lib_repository = LibrariesRepository(uow)
-    libraries = lib_repository.find_all()
+def _select_source_for_rules(uow: UnitOfWork):
+    src_repository = SourcesRepository(uow)
+    sources = src_repository.find_all()
         
     options = collections.OrderedDict()
-    for library in libraries:
-        options[library] = library.get_name()
+    for source in sources:
+        options[source] = source.get_name()
 
     s = kodi.translate(41172)
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     return selected_option
+
+
+@AppMediator.register('EXECUTE_RULESET')
+def cmd_execute_ruleset(args):
+    romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
+    ruleset_id: str = args['ruleset_id'] if 'ruleset_id' in args else None
+    
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        repository = ROMCollectionRepository(uow)
+        roms_repository = ROMsRepository(uow)
+        src_repository = SourcesRepository(uow)
+    
+        ruleset = repository.find_ruleset(romcollection_id, ruleset_id)
+        collection = repository.find_romcollection(romcollection_id)
+        source = src_repository.find(ruleset.get_source_id())
+            
+        roms_in_collection = roms_repository.find_roms_by_romcollection(collection)
+        collection_rom_ids = [rom.get_id() for rom in roms_in_collection]
+        roms = roms_repository.find_roms_by_source(source)
+        counter = 0
+        for rom in roms:
+            if rom.get_id() in collection_rom_ids:
+                continue
+            
+            if not ruleset.applies_to(rom):
+                continue
+            
+            logger.debug(f"Adding ROM {rom.get_name()} to ROM Collection {collection.get_name()}")
+            repository.add_rom_to_romcollection(romcollection_id, rom.get_id())
+            counter += 1
+        
+        AppMediator.async_cmd('EDIT_IMPORT_RULESET', args)
+        kodi.notify(kodi.translate(41183))
 
 
 # --- Empty Launcher ROMs ---

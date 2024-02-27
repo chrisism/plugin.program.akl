@@ -30,7 +30,7 @@ from akl import constants
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
-from resources.lib.repositories import UnitOfWork, AelAddonRepository, CategoryRepository, ROMCollectionRepository, XmlConfigurationRepository, LibrariesRepository
+from resources.lib.repositories import UnitOfWork, AelAddonRepository, CategoryRepository, ROMCollectionRepository, XmlConfigurationRepository, SourcesRepository
 from resources.lib.domain import Category, ROMCollection, AelAddon
 
 logger = logging.getLogger(__name__)
@@ -274,15 +274,15 @@ def cmd_execute_migrations(args):
 
 @AppMediator.register('CHECK_DUPLICATE_ASSET_DIRS')
 def cmd_check_duplicate_asset_dirs(args):
-    library_id: str = args['library_id'] if 'library_id' in args else None
+    source_id: str = args['source_id'] if 'source_id' in args else None
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        repository = LibrariesRepository(uow)
-        library = repository.find(library_id)
+        repository = SourcesRepository(uow)
+        source = repository.find(source_id)
 
     # >> Check for duplicate paths and warn user.
-    duplicated_name_list = library.get_duplicated_asset_dirs()
+    duplicated_name_list = source.get_duplicated_asset_dirs()
     if duplicated_name_list:
         duplicated_asset_srt = ', '.join(duplicated_name_list)
         kodi.dialog_OK(kodi.translate(41147).format(duplicated_asset_srt))

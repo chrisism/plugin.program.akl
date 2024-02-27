@@ -445,7 +445,7 @@ msgid "ROM"
 msgstr "domain"
 
 msgctxt "#42506"
-msgid "Library"
+msgid "Source"
 msgstr "domain"
 
 msgctxt "#42507"
@@ -791,15 +791,15 @@ msgid "Global ROM Audit statistics (Redump only)"
 msgstr ""
 
 msgctxt "#40914"
-msgid "Libraries"
+msgid "Sources"
 msgstr ""
 
 msgctxt "#40915"
-msgid "Edit Library"
+msgid "Edit Source"
 msgstr ""
 
 msgctxt "#40916"
-msgid "Add Library"
+msgid "Add Source"
 msgstr ""
 
 msgctxt "#40917"
@@ -954,7 +954,7 @@ msgid "Creating new AKL database"
 msgstr ""
 
 msgctxt "#40982"
-msgid "Should new platform be applied to existing ROMs in this library?"
+msgid "Should new platform be applied to existing ROMs in this source?"
 msgstr ""
 
 msgctxt "#40983"
@@ -1054,7 +1054,7 @@ msgid "Configured ROM scanner '{0}'"
 msgstr ""
 
 msgctxt "#41007"
-msgid "Stored scanned ROMS in Library '{0}'"
+msgid "Stored scanned ROMS in source '{0}'"
 msgstr ""
 
 msgctxt "#41008"
@@ -1466,11 +1466,11 @@ msgid "Added launcher '{0}'"
 msgstr ""
 
 msgctxt "#41110"
-msgid "Scrape library '{0}' ROMs"
+msgid "Scrape source '{0}' ROMs"
 msgstr "" 
 
 msgctxt "#41111"
-msgid "Scrape library '{0}' ROMs with '{1}'"
+msgid "Scrape source '{0}' ROMs with '{1}'"
 msgstr "" 
 
 msgctxt "#41112"
@@ -1670,43 +1670,43 @@ msgid "Select {} path"
 msgstr ""
 
 msgctxt "#41161"
-msgid "Rendering library views"
+msgid "Rendering source views"
 msgstr ""
 
 msgctxt "#41162"
-msgid "Manage Library '{}' ROMs"
+msgid "Manage Source '{}' ROMs"
 msgstr ""
 
 msgctxt "#41163"
-msgid "Library has no ROMs. Nothing to do."
+msgid "Source has no ROMs. Nothing to do."
 msgstr ""
 
 msgctxt "#41164"
-msgid "Library '{0}' has {1} ROMs. Are you sure you want to clear them from this library?"
+msgid "Source '{0}' has {1} ROMs. Are you sure you want to clear them from this source?"
 msgstr ""
 
 msgctxt "#41165"
-msgid "Cleared ROMs from library"
+msgid "Cleared ROMs from source"
 msgstr ""
 
 msgctxt "#41166"
-msgid "New Library Name"
+msgid "New Source Name"
 msgstr "" 
 
 msgctxt "#41167"
-msgid "Select action for Library {0}"
+msgid "Select action for Source {0}"
 msgstr ""
 
 msgctxt "#41168"
-msgid "No launchers configured for this library!"
+msgid "No launchers configured for this source!"
 msgstr ""
 
 msgctxt "#41169"
-msgid "Library '{0}' has {1} ROMs. All the references to these ROMs will be deleted also from the database. "
+msgid "Source '{0}' has {1} ROMs. All the references to these ROMs will be deleted also from the database. "
 msgstr "" 
 
 msgctxt "#41170"
-msgid "Deleted library {0}"
+msgid "Deleted source {0}"
 msgstr ""
 
 msgctxt "#41171"
@@ -1714,7 +1714,7 @@ msgid "Set launcher '{0}' as default?"
 msgstr ""
 
 msgctxt "#41172"
-msgid "Select library"
+msgid "Select source"
 msgstr ""
 
 msgctxt "#41173"
@@ -1722,7 +1722,7 @@ msgid "Import using rules / Import all"
 msgstr ""
 
 msgctxt "#41174"
-msgid "Ruleset for library {0}"
+msgid "Ruleset for source {0}"
 msgstr ""
 
 msgctxt "#41175"
@@ -1755,6 +1755,10 @@ msgstr ""
 
 msgctxt "#41182"
 msgid "Choose action for rule"
+msgstr ""
+
+msgctxt "#41183"
+msgid "ROMs imported"
 msgstr ""
 
 ############################
@@ -2058,7 +2062,7 @@ msgid "Browse by Rating"
 msgstr ""
 
 msgctxt "#42080"
-msgid "Clear ROMs from Library"
+msgid "Clear ROMs from source"
 msgstr ""
 
 msgctxt "#42081"
@@ -2066,7 +2070,7 @@ msgid "Edit scanner"
 msgstr ""
 
 msgctxt "#42082"
-msgid "Import ROMs / Rules"
+msgid "Import ROMs"
 msgstr ""
 
 msgctxt "#42083"
@@ -2078,7 +2082,7 @@ msgid "Change {} path"
 msgstr ""
 
 msgctxt "#42085"
-msgid "Delete Library"
+msgid "Delete Source"
 msgstr ""
 
 msgctxt "#42086"
@@ -2091,6 +2095,10 @@ msgstr ""
 
 msgctxt "#42088"
 msgid "Remove rule"
+msgstr ""
+
+msgctxt "#42089"
+msgid "Execute ruleset"
 msgstr ""
 
 ############################

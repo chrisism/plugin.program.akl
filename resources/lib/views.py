@@ -97,7 +97,7 @@ def vw_route_render_root():
 
 @router.route('/category/<view_id>')
 @router.route('/collection/<view_id>')
-@router.route('/library/<view_id>')
+@router.route('/source/<view_id>')
 def vw_route_render_view(view_id: str):
     logger.debug("Executing route: vw_route_render_view")
     obj_type = vw_get_object_type_by_url(router.path)
@@ -173,11 +173,11 @@ def vw_route_render_virtual_items_view(category_id: str):
 
        
 # -------------------------------------------------------------------------------------------------
-# Library sources
+# Source sources
 # -------------------------------------------------------------------------------------------------
-@router.route('/libraries')
-def vw_route_render_libraries():
-    container = viewqueries.qry_get_libraries()
+@router.route('/sources')
+def vw_route_render_sources():
+    container = viewqueries.qry_get_sources()
     container_context_items = viewqueries.qry_container_context_menu_items(container)
 
     _render_list_items(container, container_context_items)
@@ -264,9 +264,9 @@ def vw_edit_romcollection(romcollection_id: str):
     AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id})
 
 
-@router.route('/library/edit/<library_id>')
-def vw_edit_library(library_id: str):
-    AppMediator.async_cmd('EDIT_LIBRARY', {'library_id': library_id})
+@router.route('/source/edit/<source_id>')
+def vw_edit_source(source_id: str):
+    AppMediator.async_cmd('EDIT_SOURCE', {'source_id': source_id})
 
 
 @router.route('/launcher/edit/<launcher_id>')
@@ -528,8 +528,8 @@ def vw_get_object_type_by_url(url: str):
         return constants.OBJ_ROMCOLLECTION
     if 'rom' in url:
         return constants.OBJ_ROM
-    if 'library' in url:
-        return constants.OBJ_LIBRARY
+    if 'source' in url:
+        return constants.OBJ_SOURCE
     return constants.OBJ_NONE
 
 

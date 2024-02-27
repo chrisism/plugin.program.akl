@@ -1,7 +1,7 @@
 -- --------------------------------------
 -- CREATE NEW TABLES
 -- --------------------------------------
-CREATE TABLE IF NOT EXISTS libraries(
+CREATE TABLE IF NOT EXISTS sources(
     id TEXT PRIMARY KEY,
     name TEXT,
     platform TEXT,
@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS libraries(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-CREATE TABLE IF NOT EXISTS collection_library_ruleset(
+CREATE TABLE IF NOT EXISTS collection_source_ruleset(
     ruleset_id TEXT PRIMARY KEY,
-    library_id TEXT,
+    source_id TEXT,
     collection_id TEXT,
     set_operator INTEGER DEFAULT NULL
 );
@@ -29,10 +29,10 @@ CREATE TABLE IF NOT EXISTS import_rule(
     operator INTEGER DEFAULT 1 NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS library_assetpaths(
-    library_id TEXT,
+CREATE TABLE IF NOT EXISTS source_assetpaths(
+    source_id TEXT,
     assetpaths_id TEXT,
-    FOREIGN KEY (library_id) REFERENCES libraries (id) 
+    FOREIGN KEY (source_id) REFERENCES sources (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY (assetpaths_id) REFERENCES assetpaths (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
@@ -47,11 +47,11 @@ CREATE TABLE IF NOT EXISTS launchers(
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
-CREATE TABLE IF NOT EXISTS library_launchers(
-    library_id TEXT,
+CREATE TABLE IF NOT EXISTS source_launchers(
+    source_id TEXT,
     launcher_id TEXT,
     is_default INTEGER DEFAULT 0 NOT NULL,
-    FOREIGN KEY (library_id) REFERENCES libraries (id) 
+    FOREIGN KEY (source_id) REFERENCES sources (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
     FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
@@ -59,19 +59,19 @@ CREATE TABLE IF NOT EXISTS library_launchers(
 -- --------------------------------------
 -- MIGRATE EXISTING DATA INTO NEW TABLES
 -- --------------------------------------
-INSERT INTO libraries (id, name, platform, box_size, assets_path, akl_addon_id, settings)
+INSERT INTO sources (id, name, platform, box_size, assets_path, akl_addon_id, settings)
     SELECT rcs.id, rc.name || ' (' || rcs.id || ')', rc.platform, rc.box_size, m.assets_path, rcs.akl_addon_id, rcs.settings
     FROM romcollection_scanners as rcs
         LEFT JOIN romcollections as rc ON rc.id = rcs.romcollection_id
         INNER JOIN metadata as m ON m.id = rc.metadata_id
         LEFT JOIN akl_addon as aa ON rcs.akl_addon_id = aa.id;
 
-INSERT INTO collection_library_ruleset (ruleset_id, library_id, collection_id)
+INSERT INTO collection_source_ruleset (ruleset_id, source_id, collection_id)
     SELECT rcs.id, rcs.id, rc.id
     FROM romcollection_scanners as rcs
         LEFT JOIN romcollections as rc ON rc.id = rcs.romcollection_id;
 
-INSERT INTO library_assetpaths (library_id, assetpaths_id)
+INSERT INTO source_assetpaths (source_id, assetpaths_id)
     SELECT ra.romcollection_id, ra.assetpaths_id
     FROM romcollection_assetpaths as ra;
 
@@ -85,12 +85,12 @@ INSERT INTO launchers (id, name, akl_addon_id, settings)
     FROM romcollection_launchers AS rcl
         INNER JOIN akl_addon AS a ON rcl.akl_addon_id = a.id;
 
-INSERT INTO library_launchers(library_id, launcher_id, is_default)
+INSERT INTO source_launchers(source_id, launcher_id, is_default)
     SELECT rcl.romcollection_id, rcl.id, rcl.is_default
     FROM romcollection_launchers AS rcl;
 
 -- --------------------------------------
--- ASSOCIATE ROMS WITH LIBRARY INSTEAD OF SCANNER
+-- ASSOCIATE ROMS WITH SOURCE INSTEAD OF SCANNER
 -- AND ALTER LAUNCHER TABLES
 -- --------------------------------------
 PRAGMA foreign_keys=off;
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS roms(
     scanned_by_id TEXT NULL,
     FOREIGN KEY (metadata_id) REFERENCES metadata (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (scanned_by_id) REFERENCES libraries (id) 
+    FOREIGN KEY (scanned_by_id) REFERENCES sources (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -203,32 +203,32 @@ DROP VIEW vw_romcollection_launchers;
 DROP VIEW vw_rom_launchers;
 DROP VIEW vw_categories;
 
-CREATE VIEW IF NOT EXISTS vw_libraries AS SELECT 
-    l.id AS id, 
-    l.name AS name,
-    l.platform AS platform,
-    l.box_size AS box_size,
-    l.assets_path AS assets_path,
-    l.last_scan_timestamp AS last_scan_timestamp,
-    l.settings AS settings,
+CREATE VIEW IF NOT EXISTS vw_sources AS SELECT 
+    s.id AS id, 
+    s.name AS name,
+    s.platform AS platform,
+    s.box_size AS box_size,
+    s.assets_path AS assets_path,
+    s.last_scan_timestamp AS last_scan_timestamp,
+    s.settings AS settings,
     a.id AS associated_addon_id,
     a.name,
     a.addon_id,
     a.version,
     a.addon_type,
     a.extra_settings,
-    (SELECT COUNT(*) FROM roms AS rms WHERE rms.scanned_by_id = l.id) as num_roms
-FROM libraries AS l
-    INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
+    (SELECT COUNT(*) FROM roms AS rms WHERE rms.scanned_by_id = s.id) as num_roms
+FROM sources AS s
+    INNER JOIN akl_addon AS a ON s.akl_addon_id = a.id;
 
-CREATE VIEW IF NOT EXISTS vw_library_asset_paths AS SELECT
+CREATE VIEW IF NOT EXISTS vw_source_asset_paths AS SELECT
     a.id as id,
-    l.id as library_id,
+    s.id as source_id,
     a.path,
     a.asset_type
 FROM assetpaths AS a
- INNER JOIN library_assetpaths AS la ON a.id = la.assetpaths_id 
- INNER JOIN libraries AS l ON la.library_id = l.id;
+ INNER JOIN source_assetpaths AS sa ON a.id = sa.assetpaths_id 
+ INNER JOIN sources AS s ON sa.source_id = s.id;
 
 CREATE VIEW IF NOT EXISTS vw_categories AS SELECT 
     c.id AS id, 
@@ -342,10 +342,10 @@ FROM romcollection_launchers AS rcl
     INNER JOIN launchers AS l ON rcl.launcher_id = l.id
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
     
-CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
+CREATE VIEW IF NOT EXISTS vw_source_launchers AS SELECT
     l.id AS id,
     l.name AS name,
-    ll.library_id,
+    sl.source_id,
     a.id AS associated_addon_id,
     a.name,
     a.addon_id,
@@ -353,9 +353,9 @@ CREATE VIEW IF NOT EXISTS vw_library_launchers AS SELECT
     a.addon_type,
     a.extra_settings,
     l.settings,
-    ll.is_default
-FROM library_launchers AS ll
-    INNER JOIN launchers AS l ON ll.library_id = l.id
+    sl.is_default
+FROM source_launchers AS sl
+    INNER JOIN launchers AS l ON sl.source_id = l.id
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
 
 CREATE VIEW IF NOT EXISTS vw_rom_launchers AS SELECT

@@ -504,7 +504,7 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
             kodi.notify_error(kodi.translate(40958))
      
 
-class Library(ROMAddon):
+class Source(ROMAddon):
     
     def __init__(self,
                  entity_data: dict = None,
@@ -529,7 +529,7 @@ class Library(ROMAddon):
                 'last_scan_timestamp': None,
                 'settings': None
             }
-        super(Library, self).__init__(addon, entity_data)
+        super(Source, self).__init__(addon, entity_data)
     
     def get_name(self):
         return self.entity_data["name"]
@@ -538,7 +538,7 @@ class Library(ROMAddon):
         self.entity_data["name"] = name
     
     def get_type(self):
-        return constants.OBJ_LIBRARY  # 42506
+        return constants.OBJ_SOURCE  # 42506
 
     def get_platform(self):
         return self.entity_data['platform'] if 'platform' in self.entity_data else None
@@ -630,7 +630,7 @@ class Library(ROMAddon):
                 current_default_launcher.set_default(False)
             
         self.launchers_data.append(launcher)
-        logger.debug(f'Adding launcher "{launcher.get_id()}" to Library "{self.get_name()}"')
+        logger.debug(f'Adding launcher "{launcher.get_id()}" to Source "{self.get_name()}"')
         
     def get_launchers(self) -> typing.List[ROMLauncherAddon]:
         return self.launchers_data
@@ -668,7 +668,7 @@ class Library(ROMAddon):
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--library_id': self.get_id()
+            '--source_id': self.get_id()
         }
         
     def get_configure_command(self) -> dict:
@@ -677,7 +677,7 @@ class Library(ROMAddon):
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--library_id': self.get_id()
+            '--source_id': self.get_id()
         }
 
 
@@ -810,7 +810,11 @@ class Rule(EntityABC):
         return self.entity_data['value'] if 'value' in self.entity_data else ''
     
     def get_description(self):
-        return f"{self.get_property()} {self.get_operator_str()} {self.get_value()}"
+        fields = ROM.get_fields_with_translations()
+        property = self.get_property()
+        if property:
+            property = kodi.translate(fields[self.get_property()])
+        return f"{property} {self.get_operator_str()} {self.get_value()}"
     
     def set_ruleset(self, ruleset_id):
         self.entity_data['ruleset_id'] = ruleset_id
@@ -843,8 +847,8 @@ class RuleSet(object):
         if entity_data is None:
             entity_data = {
                 'ruleset_id': text.misc_generate_random_SID(),
-                'library_id': '',
-                'library_name': '',
+                'source_id': '',
+                'source_name': '',
                 'collection_id': '',
                 'set_operator': None,
                 'rules': []
@@ -861,11 +865,11 @@ class RuleSet(object):
     def get_ruleset_id(self):
         return self.entity_data['ruleset_id'] if 'ruleset_id' in self.entity_data else None
          
-    def get_library_id(self):
-        return self.entity_data['library_id'] if 'library_id' in self.entity_data else None
+    def get_source_id(self):
+        return self.entity_data['source_id'] if 'source_id' in self.entity_data else None
     
-    def get_library_name(self):
-        return self.entity_data['library_name'] if 'library_name' in self.entity_data else "Unknown"
+    def get_source_name(self):
+        return self.entity_data['source_name'] if 'source_name' in self.entity_data else "Unknown"
     
     def get_rules_description(self):
         if len(self.rules) == 0:
@@ -894,9 +898,9 @@ class RuleSet(object):
     def add_rule(self, rule: Rule):
         self.rules.append(rule)
     
-    def apply_library(self, library: Library):
-        self.entity_data['library_id'] = library.get_id()
-        self.entity_data['library_name'] = library.get_name()
+    def apply_source(self, source: Source):
+        self.entity_data['source_id'] = source.get_id()
+        self.entity_data['source_name'] = source.get_name()
     
     def change_operator(self):
         current = self.get_set_operator()
@@ -1389,7 +1393,7 @@ class ROMCollection(MetaDataItemABC):
                  asset_mappings: typing.List[AssetMapping] = [],
                  rom_asset_mappings: typing.List[RomAssetMapping] = [],
                  launchers_data: typing.List[ROMLauncherAddon] = [],
-                 library_data: typing.List[Library] = []):
+                 source_data: typing.List[Source] = []):
         # Concrete classes are responsible of creating a default entity_data dictionary
         # with sensible defaults.
         if entity_data is None:
@@ -1397,7 +1401,7 @@ class ROMCollection(MetaDataItemABC):
             entity_data['id'] = text.misc_generate_random_SID()
             
         self.launchers_data = launchers_data
-        self.scanners_data = library_data
+        self.scanners_data = source_data
 
         self.rom_asset_mappings = rom_asset_mappings
         mappable_assets = self.get_ROM_mappable_asset_list()
@@ -2172,10 +2176,10 @@ class ROM(MetaDataItemABC):
             # romcollection.import_data_dic(launcher_settings['romcollection'])
             # metadata_updated = True
      
-    def apply_library_asset_paths(self, library: Library):
-        self.set_assets_root_path(library.get_assets_root_path())
+    def apply_source_asset_paths(self, source: Source):
+        self.set_assets_root_path(source.get_assets_root_path())
         self.asset_paths = {}
-        for assetpath in library.get_asset_paths():
+        for assetpath in source.get_asset_paths():
             self.asset_paths[assetpath.get_asset_info_id()] = assetpath
     
     def apply_romcollection_asset_mapping(self, romcollection: ROMCollection):
@@ -2184,7 +2188,7 @@ class ROM(MetaDataItemABC):
             mapped_asset = romcollection.get_ROM_asset_mapping(mappable_asset)
             self.set_mapped_asset(mappable_asset, mapped_asset)
         
-    def get_fields_with_translations(self):
+    def get_fields_with_translations():
         return {
             'm_name': 40815,
             'nplayers': 40808,

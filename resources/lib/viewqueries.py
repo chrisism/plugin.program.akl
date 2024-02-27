@@ -34,7 +34,7 @@ from akl.utils import kodi
 from resources.lib import globals
 from resources.lib.commands.mediator import AppMediator
 from resources.lib.commands import view_rendering_commands
-from resources.lib.repositories import ViewRepository, UnitOfWork, ROMsRepository, LibrariesRepository, LaunchersRepository, g_assetFactory
+from resources.lib.repositories import ViewRepository, UnitOfWork, ROMsRepository, SourcesRepository, LaunchersRepository, g_assetFactory
 
 
 logger = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ def qry_get_root_items():
     listitem_name = kodi.translate(40914)
     container['items'].append({
         'name': listitem_name,
-        'url': globals.router.url_for_path('libraries'),
+        'url': globals.router.url_for_path('sources'),
         'is_folder': True,
         'type': 'video',
         'info': {
@@ -72,11 +72,11 @@ def qry_get_root_items():
         },
         'art': {
             'fanart': listitem_fanart,
-            'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
-            'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
+            'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_icon.png').getPath(),
+            'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_poster.png').getPath()
         },
         'properties': {
-            'obj_type': constants.OBJ_LIBRARY
+            'obj_type': constants.OBJ_SOURCE
         }
     })
 
@@ -93,8 +93,8 @@ def qry_get_root_items():
         },
         'art': {
             'fanart': listitem_fanart,
-            'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
-            'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
+            'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_icon.png').getPath(),
+            'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_poster.png').getPath()
         },
         'properties': {
             'obj_type': constants.OBJ_LAUNCHER
@@ -320,44 +320,44 @@ def qry_get_view_scanned_data(rom_id: str):
 
 
 #
-# Library items
+# Source items
 #
-def qry_get_libraries():
+def qry_get_sources():
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     container = None
     with uow:
-        libs_repository = LibrariesRepository(uow)
-        libraries = libs_repository.find_all()
+        libs_repository = SourcesRepository(uow)
+        sources = libs_repository.find_all()
         
         container = {
             'id': '',
-            'name': kodi.translate(constants.OBJ_LIBRARY),
-            'obj_type': constants.OBJ_LIBRARY,
+            'name': kodi.translate(constants.OBJ_SOURCE),
+            'obj_type': constants.OBJ_SOURCE,
             'items': []
         }
         
         listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()
 
-        for library in libraries:
-            listitem_name = library.get_name()
+        for source in sources:
+            listitem_name = source.get_name()
             container['items'].append({
-                'id': library.get_id(),
+                'id': source.get_id(),
                 'name': listitem_name,
-                'url': globals.router.url_for_path(f'library/{library.get_id()}'),
+                'url': globals.router.url_for_path(f'source/{source.get_id()}'),
                 'is_folder': True,
                 'type': 'video',
                 'info': {
                     'title': listitem_name,
-                    'plot': f'Library of type {library.addon.get_addon_type()}',
+                    'plot': f'Source of type {source.addon.get_addon_type()}',
                     'overlay': 4
                 },
                 'art': {
                     'fanart': listitem_fanart,
-                    'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
-                    'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
+                    'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_icon.png').getPath(),
+                    'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_poster.png').getPath()
                 },
                 'properties': {
-                    'obj_type': constants.OBJ_LIBRARY
+                    'obj_type': constants.OBJ_SOURCE
                 }
             })
         
@@ -398,8 +398,8 @@ def qry_get_launchers():
                 },
                 'art': {
                     'fanart': listitem_fanart,
-                    'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_icon.png').getPath(),
-                    'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Libraries_poster.png').getPath()
+                    'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_icon.png').getPath(),
+                    'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_poster.png').getPath()
                 },
                 'properties': {
                     'obj_type': constants.OBJ_LAUNCHER
@@ -716,8 +716,8 @@ def qry_container_context_menu_items(container_data) -> typing.List[typing.Tuple
         commands.append((kodi.translate(40893).format(container_name),
                         _context_menu_url_for('execute/command/render_category_view', {'category_id': container_id})))
        
-    if container_type == constants.OBJ_LIBRARY and is_root:
-        commands.append((kodi.translate(40916), _context_menu_url_for('/execute/command/add_library')))
+    if container_type == constants.OBJ_SOURCE and is_root:
+        commands.append((kodi.translate(40916), _context_menu_url_for('/execute/command/add_source')))
         
     if container_type == constants.OBJ_LAUNCHER and is_root:
         commands.append((kodi.translate(40917), _context_menu_url_for('/execute/command/add_launcher')))
@@ -758,7 +758,7 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
     container_is_category: bool = container_type == constants.OBJ_CATEGORY
     
     is_category: bool = item_type == constants.OBJ_CATEGORY
-    is_library: bool = item_type == constants.OBJ_LIBRARY
+    is_source: bool = item_type == constants.OBJ_SOURCE
     is_launcher: bool = item_type == constants.OBJ_LAUNCHER
     is_romcollection: bool = item_type == constants.OBJ_ROMCOLLECTION
     is_virtual_category: bool = item_type == constants.OBJ_CATEGORY_VIRTUAL
@@ -782,11 +782,11 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
         commands.append((kodi.translate(40891), _context_menu_url_for(f'/romcollection/view/{item_id}')))
         commands.append((kodi.translate(40892), _context_menu_url_for(f'/romcollection/edit/{item_id}')))
     
-    if is_library:
+    if is_source:
         if not item_id or len(item_id) == 0:
             commands.append((kodi.translate(40916), _context_menu_url_for('/execute/command/add_library')))
         if item_id and len(item_id) > 0:
-            commands.append((kodi.translate(40915), _context_menu_url_for(f'/library/edit/{item_id}')))
+            commands.append((kodi.translate(40915), _context_menu_url_for(f'/source/edit/{item_id}')))
         
     if is_launcher:
         if not item_id or len(item_id) == 0:

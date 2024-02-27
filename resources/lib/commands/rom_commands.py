@@ -26,7 +26,7 @@ from akl.utils import kodi, text, io
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals, editors
 from resources.lib.repositories import CategoryRepository, ROMsRepository, ROMCollectionRepository, UnitOfWork
-from resources.lib.repositories import AelAddonRepository, LibrariesRepository
+from resources.lib.repositories import AelAddonRepository, SourcesRepository
 
 from resources.lib.domain import g_assetFactory, ROM
 
@@ -137,8 +137,8 @@ def cmd_rom_assets(args):
         repository = ROMsRepository(uow)
         rom = repository.find_rom(rom_id)
         
-        library_repository = LibrariesRepository(uow)
-        library = library_repository.find_library_by_rom(rom.get_id())
+        source_repository = SourcesRepository(uow)
+        source = source_repository.find_source_by_rom(rom.get_id())
         
         romcollection_repository = ROMCollectionRepository(uow)
         rom_romcollections = romcollection_repository.find_romcollections_by_rom(rom_id)
@@ -157,7 +157,7 @@ def cmd_rom_assets(args):
         # >> Execute edit asset menu subcommand. Then, execute recursively this submenu again.
         # >> The menu dialog is instantiated again so it reflects the changes just edited.
         # >> If edit_asset() returns a command other than scrape or None changes were made.
-        cmd = editors.edit_asset(rom, asset, library.get_assets_root_path())
+        cmd = editors.edit_asset(rom, asset, source.get_assets_root_path())
         if cmd is not None:
             if cmd == 'SCRAPE_ASSET':
                 args['selected_asset'] = asset.id

@@ -27,7 +27,7 @@ from akl import constants
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
-from resources.lib.repositories import UnitOfWork, ROMCollectionRepository, ROMsRepository, LibrariesRepository
+from resources.lib.repositories import UnitOfWork, ROMCollectionRepository, ROMsRepository, SourcesRepository
 from resources.lib.repositories import AelAddonRepository, LaunchersRepository
 from resources.lib.domain import ROM, ROMLauncherAddon
 
@@ -66,78 +66,78 @@ def cmd_set_launcher_args(args) -> bool:
 
 
 # -------------------------------------------------------------------------------------------------
-# Library scanner API commands
+# Source scanner API commands
 # -------------------------------------------------------------------------------------------------
 def cmd_set_scanner_settings(args) -> bool:
     # TODO: backwards compatiblity
     romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
-    library_id: str = args['library_id'] if 'library_id' in args else None
-    library_id = romcollection_id if not library_id else library_id
+    source_id: str = args['source_id'] if 'source_id' in args else None
+    source_id = romcollection_id if not source_id else source_id
     
     settings: dict = args['settings'] if 'settings' in args else None
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        lib_repository = LibrariesRepository(uow)
-        library = lib_repository.find(library_id)
+        src_repository = SourcesRepository(uow)
+        source = src_repository.find(source_id)
         
-        library.set_settings(settings)
+        source.set_settings(settings)
             
-        lib_repository.update_library(library)
+        src_repository.update_source(source)
         uow.commit()
     
-    kodi.notify(kodi.translate(41006).format(library.addon.get_name()))
+    kodi.notify(kodi.translate(41006).format(source.addon.get_name()))
     
     if kodi.dialog_yesno(kodi.translate(41051)):
-        AppMediator.async_cmd('SCAN_ROMS', {'library_id': library_id})
+        AppMediator.async_cmd('SCAN_ROMS', {'source_id': source_id})
     else:
-        AppMediator.async_cmd('LIBRARY_MANAGE_ROMS', {'library_id': library_id})
+        AppMediator.async_cmd('SOURCE_MANAGE_ROMS', {'source_id': source_id})
     return True
 
 
 def cmd_store_scanned_roms(args) -> bool:
     # TODO: backwards compatiblity
     romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
-    library_id: str = args['library_id'] if 'library_id' in args else None
-    library_id = romcollection_id if not library_id else library_id
+    source_id: str = args['source_id'] if 'source_id' in args else None
+    source_id = romcollection_id if not source_id else source_id
     
     new_roms: list = args['roms'] if 'roms' in args else None
     
     if new_roms is None:
-        AppMediator.async_cmd('LIBRARY_MANAGE_ROMS', {'library_id': library_id})
+        AppMediator.async_cmd('SOURCE_MANAGE_ROMS', {'source_id': source_id})
         return
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         rom_repository = ROMsRepository(uow)
-        lib_repository = LibrariesRepository(uow)
-        library = lib_repository.find(library_id)
+        src_repository = SourcesRepository(uow)
+        source = src_repository.find(source_id)
 
         for rom_data in new_roms:
             api_rom_obj = ROMObj(rom_data)
             
             rom_obj = ROM()
             rom_obj.update_with(api_rom_obj, overwrite_existing_metadata=True, update_scanned_data=True)
-            rom_obj.set_platform(library.get_platform())
-            rom_obj.scanned_by(library.get_id())
-            rom_obj.apply_library_asset_paths(library)
+            rom_obj.set_platform(source.get_platform())
+            rom_obj.scanned_by(source.get_id())
+            rom_obj.apply_source_asset_paths(source)
                                     
             rom_repository.insert_rom(rom_obj)
         uow.commit()
     
-    kodi.notify(kodi.translate(41007).format(library.get_name()))
+    kodi.notify(kodi.translate(41007).format(source.get_name()))
 
-    AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': library_id})
+    AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
     AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': constants.VCATEGORY_TITLE_ID})
-    AppMediator.async_cmd('LIBRARY_MANAGE_ROMS', {'library_id': library_id})
+    AppMediator.async_cmd('SOURCE_MANAGE_ROMS', {'source_id': source_id})
     return True
 
 
 def cmd_remove_roms(args) -> bool:
     # TODO: backwards compatiblity
     romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
-    library_id: str = args['library_id'] if 'library_id' in args else None
-    library_id = romcollection_id if not library_id else library_id
+    source_id: str = args['source_id'] if 'source_id' in args else None
+    source_id = romcollection_id if not source_id else source_id
     
     rom_ids: list = args['rom_ids'] if 'rom_ids' in args else None
     if rom_ids is None:
@@ -174,15 +174,15 @@ def cmd_store_scraped_roms(args) -> bool:
         
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        library_repository = LibrariesRepository(uow)
+        source_repository = SourcesRepository(uow)
         romcollection_repository = ROMCollectionRepository(uow)
         rom_repository = ROMsRepository(uow)
         
         entity_name = 'UNKNOWN'
-        if entity_type == constants.OBJ_LIBRARY:
-            library = library_repository.find(entity_id)
-            existing_roms = rom_repository.find_roms_by_library(library)
-            entity_name = library.get_name()
+        if entity_type == constants.OBJ_SOURCE:
+            source = source_repository.find(entity_id)
+            existing_roms = rom_repository.find_roms_by_source(source)
+            entity_name = source.get_name()
             
         if entity_type == constants.OBJ_ROMCOLLECTION:
             romcollection = romcollection_repository.find_romcollection(entity_id)
@@ -237,9 +237,9 @@ def cmd_store_scraped_roms(args) -> bool:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': entity_id})
         AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': entity_id})
         
-    if entity_type == constants.OBJ_LIBRARY:
-        AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': entity_id})
-        AppMediator.async_cmd('LIBRARY_MANAGE_ROMS', {'library_id': entity_id})
+    if entity_type == constants.OBJ_SOURCE:
+        AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': entity_id})
+        AppMediator.async_cmd('SOURCE_MANAGE_ROMS', {'source_id': entity_id})
     return True
 
 
@@ -289,7 +289,7 @@ def cmd_store_scraped_single_rom(args) -> bool:
     
     kodi.notify(kodi.translate(41009).format(rom.get_name()))
     
-    AppMediator.async_cmd('RENDER_LIBRARY_VIEW', {'library_id': rom.get_scanned_by()})
+    AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': rom.get_scanned_by()})
     for collection_id in rom_collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})
         

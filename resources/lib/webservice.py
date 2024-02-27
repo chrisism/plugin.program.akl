@@ -222,9 +222,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         elif 'query/romcollection/' in api_path:
             obj = 'ROMCollection'
             response_data = self.handle_romcollection_queries(api_path)
-        elif 'query/library/' in api_path:
-            obj = 'Library'
-            response_data = self.handle_library_queries(api_path)
+        elif 'query/source/' in api_path:
+            obj = 'Source'
+            response_data = self.handle_source_queries(api_path)
         elif 'query/launcher/' in api_path:
             obj = 'Launcher'
             response_data = self.handle_launcher_queries(api_path)
@@ -263,15 +263,15 @@ class RequestHandler(BaseHTTPRequestHandler):
         
         return None
      
-    def handle_library_queries(self, api_path):
+    def handle_source_queries(self, api_path):
         params = self.get_params()
         id = params.get('id')
         
-        if 'library/scanner/settings/' in api_path:
-            return apiqueries.qry_get_library_scanner_settings(id)
-        if 'library/roms/' in api_path:
+        if 'source/scanner/settings/' in api_path:
+            return apiqueries.qry_get_source_scanner_settings(id)
+        if 'source/roms/' in api_path:
             return apiqueries.qry_get_roms(id)
-        if 'library/' in api_path:
+        if 'source/' in api_path:
             return apiqueries.qry_get_rom_collection(id)
         
         return None

@@ -24,7 +24,7 @@ import json
 
 # AKL modules
 from resources.lib import globals
-from resources.lib.repositories import UnitOfWork, ROMsRepository, ROMCollectionRepository, LibrariesRepository, LaunchersRepository
+from resources.lib.repositories import UnitOfWork, ROMsRepository, ROMCollectionRepository, SourcesRepository, LaunchersRepository
 
 logger = logging.getLogger(__name__)
         
@@ -55,14 +55,14 @@ def qry_get_rom_collection(collection_id: str) -> str:
         return json.dumps(data)
 
     
-def qry_get_roms(library_id: str) -> str:
+def qry_get_roms(source_id: str) -> str:
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        library_repository = LibrariesRepository(uow)
+        source_repository = SourcesRepository(uow)
         rom_repository = ROMsRepository(uow)
         
-        library = library_repository.find(library_id)
-        roms = rom_repository.find_roms_by_library(library)
+        source = source_repository.find(source_id)
+        roms = rom_repository.find_roms_by_source(source)
         
         if roms is None:
             return None
@@ -100,13 +100,13 @@ def qry_get_collection_launcher_settings(collection_id: str, launcher_id: str) -
         return launcher.get_settings_str()
 
 
-def qry_get_library_scanner_settings(library_id: str) -> str:
+def qry_get_source_scanner_settings(source_id: str) -> str:
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        library_repository = LibrariesRepository(uow)
-        library = library_repository.find(library_id)
+        source_repository = SourcesRepository(uow)
+        source = source_repository.find(source_id)
         
-        if library is None:
+        if source is None:
             return None
         
-        return library.get_settings_str()
+        return source.get_settings_str()

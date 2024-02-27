@@ -163,28 +163,28 @@ SELECT_ROMCOLLECTION_LAUNCHERS_BY_ROM = "SELECT rl.* FROM vw_romcollection_launc
 SELECT_ROMCOLLECTION_SCANNERS_BY_ROM = "SELECT rs.* FROM vw_romcollection_scanners AS rs INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rs.romcollection_id WHERE rr.rom_id = ?"
 
 SELECT_IMPORT_RULES_BY_COLLECTION = """
-    SELECT r.*, rs.*, l.name AS library_name
+    SELECT r.*, rs.*, s.name AS source_name
     FROM import_rule AS r
-        RIGHT JOIN collection_library_ruleset AS rs
+        RIGHT JOIN collection_source_ruleset AS rs
             ON r.ruleset_id = rs.ruleset_id
-        INNER JOIN libraries AS l
-            ON rs.library_id = l.id
+        INNER JOIN sources AS s
+            ON rs.source_id = s.id
     WHERE rs.collection_id = ?
     """
 SELECT_IMPORT_RULE_BY_COLLECTION = """
-    SELECT r.*, rs.*, l.name AS library_name
+    SELECT r.*, rs.*, s.name AS source_name
     FROM import_rule AS r
-        RIGHT JOIN collection_library_ruleset AS rs
+        RIGHT JOIN collection_source_ruleset AS rs
             ON r.ruleset_id = rs.ruleset_id
-        INNER JOIN libraries AS l
-            ON rs.library_id = l.id
+        INNER JOIN sources AS s
+            ON rs.source_id = s.id
     WHERE rs.collection_id = ? AND rs.ruleset_id = ?
     """
 INSERT_RULESET_FOR_ROMCOLLECTION = """
-    INSERT INTO collection_library_ruleset (ruleset_id, library_id, collection_id, set_operator) VALUES (?,?,?,?)"
+    INSERT INTO collection_source_ruleset (ruleset_id, source_id, collection_id, set_operator) VALUES (?,?,?,?)"
     """
 UPDATE_RULESET_FOR_ROMCOLLECTION = """
-    UPDATE collection_library_ruleset SET library_id=?, collection_id=?, set_operator=? WHERE ruleset_id=?
+    UPDATE collection_source_ruleset SET source_id=?, collection_id=?, set_operator=? WHERE ruleset_id=?
     """
 INSERT_RULE = "INSERT INTO import_rule (rule_id,ruleset_id,property,value,operator) VALUES (?,?,?,?,?)"
 UPDATE_RULE = "UPDATE import_rule SET property=?, value=?, operator=? WHERE rule_id=?"
@@ -228,11 +228,11 @@ SELECT_ROM_ASSET_MAPPINGS_BY_CATEGORY = """
                                     AND rc.category_id = ?
                                     """
 
-SELECT_ROMS_BY_LIBRARY = "SELECT r.* FROM vw_roms AS r WHERE r.scanned_by_id = ?"
-SELECT_ROM_ASSETS_BY_LIBRARY = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
-SELECT_ROM_ASSETPATHS_BY_LIBRARY = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms AS r ON r.id = rap.rom_id AND r.scanned_by_id = ?"
-SELECT_ROM_TAGS_BY_LIBRARY = "SELECT rt.* FROM vw_rom_tags AS rt INNER JOIN roms AS r ON r.id = rt.rom_id AND r.scanned_by_id = ?"
-SELECT_ROM_ASSET_MAPPINGS_BY_LIBRARY = """
+SELECT_ROMS_BY_SOURCE = "SELECT r.* FROM vw_roms AS r WHERE r.scanned_by_id = ?"
+SELECT_ROM_ASSETS_BY_SOURCE = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_ASSETPATHS_BY_SOURCE = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms AS r ON r.id = rap.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_TAGS_BY_SOURCE = "SELECT rt.* FROM vw_rom_tags AS rt INNER JOIN roms AS r ON r.id = rt.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_ASSET_MAPPINGS_BY_SOURCE = """
                                     SELECT am.*, mm.metadata_id FROM assetmappings AS am 
                                     INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
                                     INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
@@ -312,7 +312,7 @@ DELETE_ROMS_BY_COLLECTION = "DELETE FROM roms WHERE id IN (SELECT rc.rom_id FROM
 SELECT_ROM_SCANNED_DATA = "SELECT s.* FROM scanned_roms_data AS s WHERE s.rom_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_SET = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_romcollection AS rs ON rs.rom_id = s.rom_id AND rs.romcollection_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_CATEGORY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_category AS rc ON rc.rom_id = s.rom_id AND rc.category_id = ?"
-SELECT_ROM_SCANNED_DATA_BY_LIBRARY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms AS r ON r.id = s.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_SCANNED_DATA_BY_SOURCE = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms AS r ON r.id = s.rom_id AND r.scanned_by_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_ROOT_CATEGORY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_category AS rc ON rc.rom_id = s.rom_id AND rc.category_id IS NULL"
 DELETE_SCANNED_DATA = "DELETE FROM scanned_roms_data WHERE rom_id = ?"
 
@@ -334,36 +334,36 @@ SELECT_SCRAPER_ADDONS = "SELECT * FROM akl_addon WHERE addon_type = 'SCRAPER' OR
 INSERT_ADDON = "INSERT INTO akl_addon(id, name, addon_id, version, addon_type, extra_settings) VALUES(?,?,?,?,?,?)"
 UPDATE_ADDON = "UPDATE akl_addon SET name = ?, addon_id = ?, version = ?, addon_type = ?, extra_settings = ? WHERE id = ?"
 
-# Library
-SELECT_LIBRARY = "SELECT * FROM vw_libraries WHERE id = ?"
-SELECT_LIBRARIES = "SELECT * FROM vw_libraries"
-SELECT_LIBRARY_BY_ROM = "SELECT * FROM vw_libraries WHERE scanned_by_id = ?"
-SELECT_ROMCOLLECTION_IDS_BY_LIBRARY = "SELECT collection_id FROM collection_library_ruleset WHERE library_id = ?"
-SELECT_LIBRARIES_BY_ROMCOLLECTION = """
-    SELECT l.* FROM vw_libraries AS l WHERE l.id IN (
+# Source
+SELECT_SOURCE = "SELECT * FROM vw_sources WHERE id = ?"
+SELECT_SOURCES = "SELECT * FROM vw_sources"
+SELECT_SOURCE_BY_ROM = "SELECT * FROM vw_sources WHERE scanned_by_id = ?"
+SELECT_ROMCOLLECTION_IDS_BY_SOURCE = "SELECT collection_id FROM collection_source_ruleset WHERE source_id = ?"
+SELECT_SOURCES_BY_ROMCOLLECTION = """
+    SELECT s.* FROM vw_sources AS s WHERE s.id IN (
         SELECT DISTINCT(r.scanned_by_id)
         FROM roms AS r
         INNER JOIN roms_in_romcollection AS rrs ON r.id = rrs.rom_id AND rrs.romcollection_id = ?)
     """
     
-SELECT_LIBRARY_ASSET_PATHS = "SELECT * FROM vw_library_asset_paths WHERE library_id = ?"
+SELECT_SOURCE_ASSET_PATHS = "SELECT * FROM vw_source_asset_paths WHERE source_id = ?"
 
-INSERT_LIBRARY = """
-                INSERT INTO libraries (id,name,platform,box_size,assets_path,last_scan_timestamp,settings,akl_addon_id)
+INSERT_SOURCE = """
+                INSERT INTO sources (id,name,platform,box_size,assets_path,last_scan_timestamp,settings,akl_addon_id)
                 VALUES (?,?,?,?,?,?,?,?)
                 """
-UPDATE_LIBRARY = "UPDATE libraries SET name=?, platform=?, box_size=?, assets_path=?, last_scan_timestamp=?, settings=? WHERE id =?"
-DELETE_LIBRARY = "DELETE FROM libraries WHERE id = ?"
+UPDATE_SOURCE = "UPDATE sources SET name=?, platform=?, box_size=?, assets_path=?, last_scan_timestamp=?, settings=? WHERE id =?"
+DELETE_SOURCE = "DELETE FROM sources WHERE id = ?"
 
-INSERT_LIBRARY_ASSET_PATH = "INSERT INTO library_assetpaths (library_id, assetpaths_id) VALUES (?, ?)"
-REMOVE_ROMS_FROM_LIBRARY = "DELETE FROM roms WHERE scanned_by_id = ?"
+INSERT_SOURCE_ASSET_PATH = "INSERT INTO source_assetpaths (source_id, assetpaths_id) VALUES (?, ?)"
+REMOVE_ROMS_FROM_SOURCE = "DELETE FROM roms WHERE scanned_by_id = ?"
 
 # Launchers
-SELECT_LIBRARY_LAUNCHERS = "SELECT * FROM vw_library_launchers WHERE library_id = ?"
-INSERT_LIBRARY_LAUNCHER = "INSERT INTO library_launchers (launcher_id, library_id, is_default) VALUES (?,?,?)"
-UPDATE_LIBRARY_LAUNCHER = "UPDATE library_launchers SET is_default = ? WHERE library_id = ? AND launcher_id = ?"
-DELETE_LIBRARY_LAUNCHERS = "DELETE FROM library_launchers WHERE library_id = ?"
-DELETE_LIBRARY_LAUNCHER = "DELETE FROM library_launchers WHERE library_id = ? AND launcher_id = ?"
+SELECT_SOURCE_LAUNCHERS = "SELECT * FROM vw_source_launchers WHERE source_id = ?"
+INSERT_SOURCE_LAUNCHER = "INSERT INTO source_launchers (launcher_id, source_id, is_default) VALUES (?,?,?)"
+UPDATE_SOURCE_LAUNCHER = "UPDATE source_launchers SET is_default = ? WHERE source_id = ? AND launcher_id = ?"
+DELETE_SOURCE_LAUNCHERS = "DELETE FROM source_launchers WHERE source_id = ?"
+DELETE_SOURCE_LAUNCHER = "DELETE FROM source_launchers WHERE source_id = ? AND launcher_id = ?"
 
 SELECT_ROM_LAUNCHERS = "SELECT * FROM vw_rom_launchers WHERE rom_id = ?"
 INSERT_ROM_LAUNCHER = "INSERT INTO rom_launchers (launcher_id, rom_id, is_default) VALUES (?,?,?)"
