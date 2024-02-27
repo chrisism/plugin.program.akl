@@ -282,7 +282,7 @@ def cmd_manage_source_roms(args):
     options['DELETE_ROMS_NFO'] = kodi.translate(42053)
     options['CLEAR_SOURCE_ROMS'] = kodi.translate(42080)
 
-    s = kodi.translate(41161).format(source.get_name())
+    s = kodi.translate(41162).format(source.get_name())
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu

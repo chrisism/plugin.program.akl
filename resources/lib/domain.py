@@ -883,7 +883,8 @@ class RuleSet(object):
         return kodi.translate(42510)  # Rules
         
     def get_set_operator(self):
-        return self.entity_data['set_operator'] if 'set_operator' in self.entity_data else RuleSetOperator.OR
+        operator = self.entity_data['set_operator'] if 'set_operator' in self.entity_data else RuleSetOperator.OR
+        return operator if operator else RuleSetOperator.OR
            
     def get_set_operator_str(self):
         set_operator = self.get_set_operator()
@@ -926,13 +927,13 @@ class RuleSet(object):
         
         for rule in self.rules:
             if rule.applies_to(rom):
-                if self.set_operator == RuleSetOperator.OR:
+                if set_operator == RuleSetOperator.OR:
                     return True
             else:
-                if self.set_operator == RuleSetOperator.AND:
+                if set_operator == RuleSetOperator.AND:
                     return False
                 
-        return self.set_operator == RuleSetOperator.AND
+        return set_operator == RuleSetOperator.AND
 
 
 # -------------------------------------------------------------------------------------------------

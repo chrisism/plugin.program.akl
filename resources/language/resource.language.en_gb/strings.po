@@ -1761,6 +1761,14 @@ msgctxt "#41183"
 msgid "ROMs imported"
 msgstr ""
 
+msgctxt "#41184"
+msgid "Manage ruleset"
+msgstr ""
+
+msgctxt "#41185"
+msgid "Import ROMs by ruleset"
+msgstr ""
+
 ############################
 # List/Action options
 ############################
@@ -2066,7 +2074,7 @@ msgid "Clear ROMs from source"
 msgstr ""
 
 msgctxt "#42081"
-msgid "Edit scanner"
+msgid "Edit source scanner"
 msgstr ""
 
 msgctxt "#42082"

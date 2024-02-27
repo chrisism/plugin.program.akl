@@ -224,17 +224,22 @@ def cmd_edit_import_ruleset(args):
         ruleset = repository.find_ruleset(romcollection_id, ruleset_id)
         
         options = collections.OrderedDict()
-        options["EXECUTE_RULESET"] = kodi.get_listitem(kodi.translate(42089), "")
-        options["SET_RULESET_SOURCE"] = kodi.get_listitem(kodi.translate(42506), ruleset.get_source_name())
-        options["CHANGE_RULESET_OPERATOR"] = kodi.get_listitem(kodi.translate(41060), ruleset.get_set_operator_str())
-        options["CHANGE_RULESET_BY_RULES"] = kodi.get_listitem(kodi.translate(41173), ruleset.get_rules_shortdescription())
+        options["EXECUTE_RULESET"] = kodi.get_listitem(kodi.translate(42089), "",
+                                                       art={'icon': 'DefaultAddonsUpdates.png'})
+        options["SET_RULESET_SOURCE"] = kodi.get_listitem(kodi.translate(42506), ruleset.get_source_name(),
+                                                          art={'icon': 'DefaultPlaylist.png'})
+        options["CHANGE_RULESET_OPERATOR"] = kodi.get_listitem(kodi.translate(41060), ruleset.get_set_operator_str(),
+                                                               art={'icon': 'DefaultMimetypeInfo.png'})
+        options["CHANGE_RULESET_BY_RULES"] = kodi.get_listitem(kodi.translate(41173),
+                                                               ruleset.get_rules_shortdescription(),
+                                                               art={'icon': 'DefaultAddonsSearch.png'})
         for rule in ruleset.get_rules():
             options[rule.get_id()] = kodi.get_listitem(kodi.translate(42511), rule.get_description(),
                                                        art={'icon': 'DefaultScript.png'})
         options["ADD_RULE_TO_RULESET"] = kodi.get_listitem(label=kodi.translate(42086), label2='',
                                                            art={'icon': 'DefaultAddSource.png'})
 
-        s = kodi.translate(41172)
+        s = kodi.translate(41184)
         selected_option = kodi.OrdDictionaryDialog().select(s, options, use_details=True)
         if selected_option is None:
             # >> Exits context menu
@@ -243,6 +248,9 @@ def cmd_edit_import_ruleset(args):
             AppMediator.async_cmd('IMPORT_ROMS', args)
             return
         
+        elif selected_option == 'EXECUTE_RULESET':
+            AppMediator.async_cmd(selected_option, args)
+            
         elif selected_option == 'SET_RULESET_SOURCE':
             source = _select_source_for_rules(uow)
             if source:
@@ -257,10 +265,11 @@ def cmd_edit_import_ruleset(args):
             kodi.notify(kodi.translate(41180))
             
         elif selected_option == 'CHANGE_RULESET_BY_RULES':
-            if ruleset.has_rules() and kodi.dialog_yesno(kodi.translate(41175)):
-                ruleset.clear_rules()
-                repository.update_ruleset_in_romcollection(romcollection_id, ruleset)
-                uow.commit()
+            if ruleset.has_rules():
+                if kodi.dialog_yesno(kodi.translate(41175)):
+                    ruleset.clear_rules()
+                    repository.update_ruleset_in_romcollection(romcollection_id, ruleset)
+                    uow.commit()
             else:
                 kodi.notify(kodi.translate(41176))
                 AppMediator.async_cmd('ADD_RULE_TO_RULESET', args)
@@ -284,8 +293,7 @@ def cmd_add_rule_to_ruleset(args):
     ruleset_id: str = args['ruleset_id'] if 'ruleset_id' in args else None
     
     field_options = collections.OrderedDict()
-    rom = ROM()
-    fields = rom.get_fields_with_translations()
+    fields = ROM.get_fields_with_translations()
     for fieldkey, fieldname in fields.items():
         field_options[fieldkey] = kodi.translate(fieldname)
     
@@ -360,7 +368,7 @@ def cmd_edit_rule(args):
         
         rule = ruleset.get_rule(rule_id)
         if rule is None:
-            kodi.notify_error(41181)
+            kodi.notify_error(kodi.translate(41181))
             return
         
         if selected_action == 1:
@@ -412,24 +420,30 @@ def cmd_execute_ruleset(args):
             
         roms_in_collection = roms_repository.find_roms_by_romcollection(collection)
         collection_rom_ids = [rom.get_id() for rom in roms_in_collection]
-        roms = roms_repository.find_roms_by_source(source)
+        roms = [*roms_repository.find_roms_by_source(source)]
         counter = 0
+        progress_dialog = kodi.ProgressDialog()
+        progress_dialog.startProgress(kodi.translate(41185), num_steps=len(roms))
         for rom in roms:
+            progress_dialog.incrementStep()
             if rom.get_id() in collection_rom_ids:
                 continue
             
             if not ruleset.applies_to(rom):
                 continue
-            
             logger.debug(f"Adding ROM {rom.get_name()} to ROM Collection {collection.get_name()}")
             repository.add_rom_to_romcollection(romcollection_id, rom.get_id())
             counter += 1
+            
+        progress_dialog.endProgress()
+        progress_dialog.close()
         
-        AppMediator.async_cmd('EDIT_IMPORT_RULESET', args)
-        kodi.notify(kodi.translate(41183))
+    AppMediator.async_cmd('EDIT_IMPORT_RULESET', args)
+    AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})
+    kodi.notify(kodi.translate(41183))
 
 
-# --- Empty Launcher ROMs ---
+# --- Empty     Launcher ROMs ---
 @AppMediator.register('CLEAR_ROMS')
 def cmd_clear_roms(args):
     romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None

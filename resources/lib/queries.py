@@ -181,14 +181,14 @@ SELECT_IMPORT_RULE_BY_COLLECTION = """
     WHERE rs.collection_id = ? AND rs.ruleset_id = ?
     """
 INSERT_RULESET_FOR_ROMCOLLECTION = """
-    INSERT INTO collection_source_ruleset (ruleset_id, source_id, collection_id, set_operator) VALUES (?,?,?,?)"
+    INSERT INTO collection_source_ruleset (ruleset_id, source_id, collection_id, set_operator) VALUES (?,?,?,?)
     """
 UPDATE_RULESET_FOR_ROMCOLLECTION = """
     UPDATE collection_source_ruleset SET source_id=?, collection_id=?, set_operator=? WHERE ruleset_id=?
     """
 INSERT_RULE = "INSERT INTO import_rule (rule_id,ruleset_id,property,value,operator) VALUES (?,?,?,?,?)"
 UPDATE_RULE = "UPDATE import_rule SET property=?, value=?, operator=? WHERE rule_id=?"
-DELETE_RULE_FROM_RULESET = "DELETE FROM rules WHERE rule_id = ? AND ruleset_id = ?"
+DELETE_RULE_FROM_RULESET = "DELETE FROM import_rule WHERE rule_id = ? AND ruleset_id = ?"
 
 #
 # ROMsRepository -> ROMs from SQLite DB
@@ -199,7 +199,7 @@ SELECT_ROM_ASSETPATHS = "SELECT * FROM vw_rom_asset_paths WHERE rom_id = ?"
 SELECT_ROM_TAGS = "SELECT * FROM vw_rom_tags WHERE rom_id = ?"
 SELECT_ROM_ASSET_MAPPINGS = """
     SELECT am.*, mm.metadata_id FROM assetmappings AS am 
-    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
+    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id
     INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
     AND r.id = ?
     """
@@ -209,24 +209,24 @@ SELECT_ROM_ASSETS_BY_SET = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms
 SELECT_ROM_ASSETPATHS_BY_SET = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms_in_romcollection AS rs ON rs.rom_id = rap.rom_id AND rs.romcollection_id = ?"
 SELECT_ROM_TAGS_BY_SET = "SELECT rt.* FROM vw_rom_tags AS rt INNER JOIN roms_in_romcollection AS rs ON rs.rom_id = rt.rom_id AND rs.romcollection_id = ?"
 SELECT_ROM_ASSET_MAPPINGS_BY_SET = """
-                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
-                                    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
-                                    INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
-                                    INNER JOIN roms_in_romcollection AS rs ON rs.rom_id = r.id
-                                    AND rs.romcollection_id = ?
-                                    """
+    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
+    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id
+    INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
+    INNER JOIN roms_in_romcollection AS rs ON rs.rom_id = r.id
+    AND rs.romcollection_id = ?
+"""
 
 SELECT_ROMS_BY_CATEGORY = "SELECT r.* FROM vw_roms AS r INNER JOIN roms_in_category AS rc ON rc.rom_id = r.id AND rc.category_id = ?"
 SELECT_ROM_ASSETS_BY_CATEGORY = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms_in_category AS rc ON rc.rom_id = ra.rom_id AND rc.category_id = ?"
 SELECT_ROM_ASSETPATHS_BY_CATEGORY = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms_in_category AS rc ON rc.rom_id = rap.rom_id AND rc.category_id = ?"
 SELECT_ROM_TAGS_BY_CATEGORY = "SELECT rt.* FROM vw_rom_tags AS rt INNER JOIN roms_in_category AS rc ON rc.rom_id = rt.rom_id AND rc.category_id = ?"
 SELECT_ROM_ASSET_MAPPINGS_BY_CATEGORY = """
-                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
-                                    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
-                                    INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
-                                    INNER JOIN roms_in_category AS rc ON rc.rom_id = r.id 
-                                    AND rc.category_id = ?
-                                    """
+    SELECT am.*, mm.metadata_id FROM assetmappings AS am
+    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id
+    INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
+    INNER JOIN roms_in_category AS rc ON rc.rom_id = r.id
+    AND rc.category_id = ?
+"""
 
 SELECT_ROMS_BY_SOURCE = "SELECT r.* FROM vw_roms AS r WHERE r.scanned_by_id = ?"
 SELECT_ROM_ASSETS_BY_SOURCE = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
