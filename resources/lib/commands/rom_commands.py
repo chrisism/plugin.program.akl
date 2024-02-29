@@ -26,15 +26,16 @@ from akl.utils import kodi, text, io
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals, editors
 from resources.lib.repositories import CategoryRepository, ROMsRepository, ROMCollectionRepository, UnitOfWork
-from resources.lib.repositories import AelAddonRepository, SourcesRepository
+from resources.lib.repositories import SourcesRepository
 
-from resources.lib.domain import g_assetFactory, ROM
+from resources.lib.domain import ROMCollection, g_assetFactory
 
 logger = logging.getLogger(__name__)
 
 # -------------------------------------------------------------------------------------------------
 # ROM context menu.
 # -------------------------------------------------------------------------------------------------
+
 
 # --- Main menu command ---
 @AppMediator.register('EDIT_ROM')
@@ -58,7 +59,7 @@ def cmd_edit_rom(args):
     options['ROM_EDIT_ASSETS'] = kodi.translate(40854)
     options['ROM_EDIT_DEFAULT_ASSETS'] = kodi.translate(40859)
     options['EDIT_ROM_STATUS'] = kodi.translate(42013).format(
-                                    kodi.translate(rom.get_finished_str_code()))
+        kodi.translate(rom.get_finished_str_code()))
     if rom.has_launchers():
         options['EDIT_ROM_LAUNCHERS'] = kodi.translate(42016)
     else:
@@ -70,11 +71,11 @@ def cmd_edit_rom(args):
     selected_option = kodi.OrdDictionaryDialog().select(s, options)
     if selected_option is None:
         # >> Exits context menu
-        logger.debug('EDIT_ROM: cmd_edit_rom() Selected None. Closing context menu')
+        logger.debug('EDIT_ROM: Selected None. Closing context menu')
         return
     
     # >> Execute subcommand. May be atomic, maybe a submenu.
-    logger.debug(f'EDIT_ROM: cmd_edit_rom() Selected {selected_option}')
+    logger.debug(f'EDIT_ROM: Selected {selected_option}')
     AppMediator.sync_cmd(selected_option, args)
     
 # --- Submenu commands ---
@@ -725,3 +726,56 @@ def cmd_manage_rom_tags(args):
 
         if did_tag_change:
             uow.commit()
+
+
+@AppMediator.register('LINK_ROM')
+def cmd_link_rom(args):
+    rom_id = args['rom_id'] if 'rom_id' in args else None
+    
+    destination_dialog = kodi.ListDialog()
+    selected_type = destination_dialog.select(kodi.translate(41186), [
+        kodi.translate(42513),  # COLLECTIONS [0]
+        kodi.translate(42512)   # CATEGORIES [1]
+    ])
+    
+    if selected_type is None:
+        logger.debug("LINK_ROM: No destination type selected. Ending")
+        return
+            
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        repository = ROMsRepository(uow)
+        collections_repository = ROMCollectionRepository(uow)
+        categories_repository = CategoryRepository(uow)
+                
+        options = collections.OrderedDict()
+        if selected_type == 0:
+            romcollections = collections_repository.find_all_romcollections()
+            for collection in romcollections:
+                options[collection] = collection.get_name()
+        else:
+            categories = categories_repository.find_all_categories()
+            for category in categories:
+                options[category] = category.get_name()
+                
+        dialog = kodi.OrdDictionaryDialog()
+        selected_destination = dialog.select(kodi.translate(41186), options)
+        
+        if selected_destination is None:
+            logger.debug("LINK_ROM: No destination selected. Ending")
+            return
+        
+        rom = repository.find_rom(rom_id)
+        if selected_type == 0:
+            collections_repository.add_rom_to_romcollection(selected_destination.get_id(), rom.get_id())
+        else:
+            categories_repository.add_rom_to_category(selected_destination.get_id(), rom.get_id())
+                    
+        uow.commit()
+    
+    if selected_type == 0:
+        kodi.notify(kodi.translate(41188).format(rom.get_name(), selected_destination.get_name()))
+        AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': selected_destination.get_id()})
+    else:
+        kodi.notify(kodi.translate(41187).format(rom.get_name(), selected_destination.get_name()))
+        AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': selected_destination.get_id()})

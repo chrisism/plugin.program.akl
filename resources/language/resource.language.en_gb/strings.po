@@ -468,6 +468,14 @@ msgctxt "#42511"
 msgid "Rule"
 msgstr "domain"
 
+msgctxt "#42512"
+msgid "Categories"
+msgstr "domain"
+
+msgctxt "#42513"
+msgid "Collections"
+msgstr "domain"
+
 ############################
 # Advanced Enum values
 ############################
@@ -671,7 +679,7 @@ msgid "Edit ROM"
 msgstr ""
 
 msgctxt "#40884"
-msgid "Link ROM in other collection"
+msgid "Link ROM in other collections/categories"
 msgstr ""
 
 msgctxt "#40885"
@@ -1767,6 +1775,18 @@ msgstr ""
 
 msgctxt "#41185"
 msgid "Import ROMs by ruleset"
+msgstr ""
+
+msgctxt "#41186"
+msgid "Choose destination to link ROM with"
+msgstr ""
+
+msgctxt "#41187"
+msgid "Linked ROM {0} in Category {1}"
+msgstr ""
+
+msgctxt "#41188"
+msgid "Linked ROM {0} in Collection {1}"
 msgstr ""
 
 ############################
