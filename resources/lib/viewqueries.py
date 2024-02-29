@@ -34,7 +34,7 @@ from akl.utils import kodi
 from resources.lib import globals
 from resources.lib.commands.mediator import AppMediator
 from resources.lib.commands import view_rendering_commands
-from resources.lib.repositories import ViewRepository, UnitOfWork, ROMsRepository, SourcesRepository, LaunchersRepository, g_assetFactory
+from resources.lib.repositories import ViewRepository, UnitOfWork, ROMsRepository, LaunchersRepository, g_assetFactory
 
 
 logger = logging.getLogger(__name__)
@@ -323,47 +323,19 @@ def qry_get_view_scanned_data(rom_id: str):
 # Source items
 #
 def qry_get_sources():
-    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
-    container = None
-    with uow:
-        libs_repository = SourcesRepository(uow)
-        sources = libs_repository.find_all()
-        
+    views_repository = ViewRepository(globals.g_PATHS)
+    container = views_repository.find_sources_items()
+    
+    if container is None:
         container = {
             'id': '',
             'name': kodi.translate(constants.OBJ_SOURCE),
             'obj_type': constants.OBJ_SOURCE,
             'items': []
         }
-        
-        listitem_fanart = globals.g_PATHS.FANART_FILE_PATH.getPath()
+    return container
 
-        for source in sources:
-            listitem_name = source.get_name()
-            container['items'].append({
-                'id': source.get_id(),
-                'name': listitem_name,
-                'url': globals.router.url_for_path(f'source/{source.get_id()}'),
-                'is_folder': True,
-                'type': 'video',
-                'info': {
-                    'title': listitem_name,
-                    'plot': f'Source of type {source.addon.get_addon_type()}',
-                    'overlay': 4
-                },
-                'art': {
-                    'fanart': listitem_fanart,
-                    'icon': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_icon.png').getPath(),
-                    'poster': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Sources_poster.png').getPath()
-                },
-                'properties': {
-                    'obj_type': constants.OBJ_SOURCE
-                }
-            })
-        
-        return container
 
-   
 #
 # Launcher items
 #
@@ -776,7 +748,6 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
         commands.append((kodi.translate(40887), _context_menu_url_for(f'/categories/edit/{item_id}')))
         commands.append((kodi.translate(40888), _context_menu_url_for(f'/categories/add/{item_id}/in/{container_id}')))
         commands.append((kodi.translate(40889), _context_menu_url_for(f'/romcollection/add/{item_id}/in/{container_id}')))
-        # commands.append((kodi.translate(40890), _context_menu_url_for(f'/categories/addrom/{item_id}/in/{container_id}')))
         
     if is_romcollection:
         commands.append((kodi.translate(40891), _context_menu_url_for(f'/romcollection/view/{item_id}')))
@@ -798,7 +769,6 @@ def qry_listitem_context_menu_items(list_item_data, container_data) -> typing.Li
     if not is_category and container_is_category:
         commands.append((kodi.translate(40888), _context_menu_url_for(f'/categories/add/{container_id}')))
         commands.append((kodi.translate(40889), _context_menu_url_for(f'/romcollection/add/{container_id}')))
-        # commands.append((kodi.translate(40890), _context_menu_url_for(f'/categories/addrom/{container_id}')))
         
     if is_virtual_category:
         commands.append((kodi.translate(40893).format(item_name), _context_menu_url_for('execute/command/render_vcategory_view', {

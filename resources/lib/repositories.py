@@ -57,6 +57,24 @@ class ViewRepository(object):
         
         return item_data
 
+    def find_sources_items(self):
+        repository_file = self.paths.SOURCES_VIEW_PATH
+        self.logger.debug(f'find_sources_items(): Loading path data from file {repository_file.getPath()}')
+        if not repository_file.exists():
+            self.logger.debug(f'find_sources_items(): Path does not exist {repository_file.getPath()}')
+            return None
+
+        try:
+            item_data = repository_file.readJson()
+        except ValueError as ex:
+            statinfo = repository_file.stat()
+            self.logger.error('find_sources_items(): ValueError exception in file.readJson() function', exc_info=ex)
+            self.logger.error('find_sources_items(): Dir  {}'.format(repository_file.getPath()))
+            self.logger.error('find_sources_items(): Size {}'.format(statinfo.st_size))
+            return None
+        
+        return item_data
+
     def find_items(self, view_id, obj_type: int) -> typing.Any:
         
         repository_file = self._assemble_view_file_name(view_id, obj_type)
@@ -74,7 +92,12 @@ class ViewRepository(object):
     
     def store_root_view(self, view_data):
         repository_file = self.paths.ROOT_PATH
-        self.logger.debug('store_root_view(): Storing data in file {}'.format(repository_file.getPath()))
+        self.logger.debug(f'store_root_view(): Storing data in file {repository_file.getPath()}')
+        repository_file.writeJson(view_data)
+
+    def store_sources_view(self, view_data):
+        repository_file = self.paths.SOURCES_VIEW_PATH
+        self.logger.debug(f'store_sources_view(): Storing data in file {repository_file.getPath()}')
         repository_file.writeJson(view_data)
 
     def store_view(self, view_id: str, object_type: int, view_data):        
@@ -1206,26 +1229,9 @@ class ROMsRepository(object):
 
         self._uow.execute(qry.SELECT_ROM_TAGS_BY_ROOT_CATEGORY)
         tags_data_set = self._uow.result_set()
-     
-        for rom_data in result_set:
-            assets = []
-            asset_paths = []
-            asset_mappings = []
-            tags = {}
-            for asset_data in filter(lambda a: a['rom_id'] == rom_data['id'], assets_result_set):
-                assets.append(Asset(asset_data))    
-            for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
-                asset_paths.append(AssetPath(asset_paths_data))
-            for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
-                asset_mappings.append(RomAssetMapping(mapping_data))
-            for tag in filter(lambda t: t['rom_id'] == rom_data['id'], tags_data_set):
-                tags[tag['tag']] = tag['id']
-                
-            scanned_data = {
-                entry['data_key']: entry['data_value'] 
-                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set)
-            }
-            yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
+
+        return self._process_roms_data(result_set, assets_result_set, asset_paths_result_set, asset_mappings_result_set, 
+                                       scanned_data_result_set, tags_data_set)
  
     def find_roms_by_category(self, category: Category) -> typing.Iterator[ROM]:
         category_id = category.get_id() if category else None
@@ -1248,25 +1254,8 @@ class ROMsRepository(object):
         self._uow.execute(qry.SELECT_ROM_TAGS_BY_CATEGORY, category_id)
         tags_data_set = self._uow.result_set()
      
-        for rom_data in result_set:
-            assets = []
-            asset_paths = []
-            asset_mappings = []
-            tags = {}
-            for asset_data in filter(lambda a: a['rom_id'] == rom_data['id'], assets_result_set):
-                assets.append(Asset(asset_data))
-            for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
-                asset_paths.append(AssetPath(asset_paths_data))
-            for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
-                asset_mappings.append(RomAssetMapping(mapping_data))                
-            for tag in filter(lambda t: t['rom_id'] == rom_data['id'], tags_data_set):
-                tags[tag['tag']] = tag['id']
-                
-            scanned_data = {
-                entry['data_key']: entry['data_value'] 
-                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set)
-            }
-            yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
+        return self._process_roms_data(result_set, assets_result_set, asset_paths_result_set, asset_mappings_result_set, 
+                                       scanned_data_result_set, tags_data_set)
 
     def find_roms_by_romcollection(self, romcollection: ROMCollection) -> typing.Iterator[ROM]:
         is_virtual = romcollection.get_type() == constants.OBJ_COLLECTION_VIRTUAL
@@ -1311,25 +1300,8 @@ class ROMsRepository(object):
             self._uow.execute(qry.SELECT_ROM_TAGS_BY_SET, romcollection_id)
             tags_data_set = self._uow.result_set()
                         
-        for rom_data in result_set:
-            assets = []
-            asset_paths = []
-            asset_mappings = []
-            tags = {}
-            for asset_data in filter(lambda a: a['rom_id'] == rom_data['id'], assets_result_set):
-                assets.append(Asset(asset_data))    
-            for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
-                asset_paths.append(AssetPath(asset_paths_data))
-            for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
-                asset_mappings.append(RomAssetMapping(mapping_data))    
-            for tag in filter(lambda t: t['rom_id'] == rom_data['id'], tags_data_set):
-                tags[tag['tag']] = tag['id']
-                
-            scanned_data = {
-                entry['data_key']: entry['data_value']
-                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set) 
-            }
-            yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
+        return self._process_roms_data(result_set, assets_result_set, asset_paths_result_set, asset_mappings_result_set, 
+                                       scanned_data_result_set, tags_data_set)
 
     def find_roms_by_source(self, source: Source) -> typing.Iterator[ROM]:
         source_id = source.get_id()
@@ -1352,26 +1324,32 @@ class ROMsRepository(object):
         self._uow.execute(qry.SELECT_ROM_TAGS_BY_SOURCE, source_id)
         tags_data_set = self._uow.result_set()
                         
-        for rom_data in result_set:
-            assets = []
-            asset_paths = []
-            asset_mappings = []
-            tags = {}
-            for asset_data in filter(lambda a: a['rom_id'] == rom_data['id'], assets_result_set):
-                assets.append(Asset(asset_data))    
-            for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
-                asset_paths.append(AssetPath(asset_paths_data))
-            for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
-                asset_mappings.append(RomAssetMapping(mapping_data))    
-            for tag in filter(lambda t: t['rom_id'] == rom_data['id'], tags_data_set):
-                tags[tag['tag']] = tag['id']
-                
-            scanned_data = {
-                entry['data_key']: entry['data_value'] 
-                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set)
-            }
-            yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data)
+        return self._process_roms_data(result_set, assets_result_set, asset_paths_result_set, asset_mappings_result_set, 
+                                       scanned_data_result_set, tags_data_set)
   
+    def find_standalone_roms(self) -> typing.Iterator[ROM]:
+        
+        self._uow.execute(qry.SELECT_STANDALONE_ROMS)
+        result_set = self._uow.result_set()
+        
+        self._uow.execute(qry.SELECT_STANDALONE_ROM_ASSETS)
+        assets_result_set = self._uow.result_set()
+        
+        self._uow.execute(qry.SELECT_STANDALONE_ROM_ASSETPATHS)
+        asset_paths_result_set = self._uow.result_set()
+                        
+        self._uow.execute(qry.SELECT_STANDALONE_ROM_ASSET_MAPPINGS)
+        asset_mappings_result_set = self._uow.result_set()
+
+        self._uow.execute(qry.SELECT_STANDALONE_ROM_SCANNED_DATA)
+        scanned_data_result_set = self._uow.result_set()
+
+        self._uow.execute(qry.SELECT_STANDALONE_ROM_TAGS)
+        tags_data_set = self._uow.result_set()
+               
+        return self._process_roms_data(result_set, assets_result_set, asset_paths_result_set, asset_mappings_result_set, 
+                                       scanned_data_result_set, tags_data_set)
+        
     def find_rom(self, rom_id: str) -> ROM:
         self._uow.execute(qry.SELECT_ROM, rom_id)
         rom_data = self._uow.single_result()
@@ -1541,6 +1519,29 @@ class ROMsRepository(object):
     
     def delete_tag(self, tag_id: str):
         self._uow.execute(qry.DELETE_TAG, tag_id)
+
+    def _process_roms_data(self, result_set, assets_result_set, asset_paths_result_set,
+                           asset_mappings_result_set, scanned_data_result_set, tags_data_set) -> typing.Iterator[ROM]:
+         
+        for rom_data in result_set:
+            assets = []
+            asset_paths = []
+            asset_mappings = []
+            tags = {}
+            for asset_data in filter(lambda a: a['rom_id'] == rom_data['id'], assets_result_set):
+                assets.append(Asset(asset_data))    
+            for asset_paths_data in filter(lambda a: a['rom_id'] == rom_data['id'], asset_paths_result_set):
+                asset_paths.append(AssetPath(asset_paths_data))
+            for mapping_data in filter(lambda a: a['metadata_id'] == rom_data['metadata_id'], asset_mappings_result_set):
+                asset_mappings.append(RomAssetMapping(mapping_data))    
+            for tag in filter(lambda t: t['rom_id'] == rom_data['id'], tags_data_set):
+                tags[tag['tag']] = tag['id']
+                
+            scanned_data = {
+                entry['data_key']: entry['data_value']
+                for entry in filter(lambda s: s['rom_id'] == rom_data['id'], scanned_data_result_set)
+            }
+            yield ROM(rom_data, tags, assets, asset_paths, asset_mappings, scanned_data) 
 
     def _insert_asset(self, asset: Asset, rom_obj: ROM):
         asset_db_id = text.misc_generate_random_SID()
@@ -1722,7 +1723,7 @@ class SourcesRepository(object):
         self.logger = logging.getLogger(__name__)
 
     def find(self, id: str) -> Source:
-        if id is None:
+        if id is None or id == '':
             return None
         
         self._uow.execute(qry.SELECT_SOURCE, id)
@@ -1752,30 +1753,6 @@ class SourcesRepository(object):
         for result_set in result_sets:
             addon = AelAddon(result_set.copy())
             yield Source(result_set, addon)
-
-    def find_source_by_rom(self, rom_id) -> Source:
-        self._uow.execute(qry.SELECT_SOURCE_BY_ROM, rom_id)
-        result_set = self._uow.single_result()
-        id = result_set['id']
-        
-        self._uow.execute(qry.SELECT_ADDON, id)
-        addon_data = self._uow.single_result()
-        
-        self._uow.execute(qry.SELECT_SOURCE_ASSET_PATHS, id)
-        asset_paths_result_set = self._uow.result_set()
-        asset_paths = []
-        for asset_paths_data in asset_paths_result_set:
-            asset_paths.append(AssetPath(asset_paths_data))
-        
-        self._uow.execute(qry.SELECT_SOURCE_LAUNCHERS, id)
-        launchers_data = self._uow.result_set()
-        launchers = []
-        for launcher_data in launchers_data:
-            addon = AelAddon(launcher_data.copy())
-            launcher = ROMLauncherAddonFactory.create(addon, launcher_data)
-            launchers.append(launcher)
-        
-        return Source(result_set, AelAddon(addon_data), asset_paths, launchers)
 
     def find_sources_by_collection(self, romcollection_id) -> typing.Iterator[Source]:
         self._uow.execute(qry.SELECT_SOURCES_BY_ROMCOLLECTION, romcollection_id)

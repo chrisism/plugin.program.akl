@@ -78,14 +78,14 @@ SELECT_ROOT_ROMCOLLECTIONS = "SELECT * FROM vw_romcollections WHERE parent_id IS
 SELECT_ROMCOLLECTIONS_BY_PARENT = "SELECT * FROM vw_romcollections WHERE parent_id = ? ORDER BY m_name"
 SELECT_ROMCOLLECTIONS_BY_ROM = "SELECT rs.* FROM vw_romcollections AS rs INNER JOIN roms_in_romcollection AS rr ON rr.romcollection_id = rs.id WHERE rr.rom_id = ?"
 
-SELECT_VCOLLECTION_TITLES = "SELECT DISTINCT(SUBSTR(UPPER(m_name), 1,1)) AS option_value FROM vw_roms"   
-SELECT_VCOLLECTION_GENRES = "SELECT DISTINCT(m_genre) AS option_value FROM vw_roms"   
-SELECT_VCOLLECTION_DEVELOPER = "SELECT DISTINCT(m_developer) AS option_value FROM vw_roms"   
-SELECT_VCOLLECTION_ESRB = "SELECT DISTINCT(m_esrb) AS option_value FROM vw_roms"
-SELECT_VCOLLECTION_PEGI = "SELECT DISTINCT(m_pegi) AS option_value FROM vw_roms"
+SELECT_VCOLLECTION_TITLES = "SELECT DISTINCT(SUBSTR(UPPER(m_name), 1,1)) AS option_value FROM vw_roms"
+SELECT_VCOLLECTION_GENRES = "SELECT DISTINCT(m_genre) AS option_value FROM vw_roms"
+SELECT_VCOLLECTION_DEVELOPER = "SELECT DISTINCT(m_developer) AS option_value FROM vw_roms"
+SELECT_VCOLLECTION_ESRB = "SELECT DISTINCT(esrb) AS option_value FROM vw_roms"
+SELECT_VCOLLECTION_PEGI = "SELECT DISTINCT(pegi) AS option_value FROM vw_roms"
 SELECT_VCOLLECTION_YEAR = "SELECT DISTINCT(m_year) AS option_value FROM vw_roms"
-SELECT_VCOLLECTION_NPLAYERS = "SELECT DISTINCT(m_nplayers) AS option_value FROM vw_roms"   
-SELECT_VCOLLECTION_RATING = "SELECT DISTINCT(m_rating) AS option_value FROM vw_roms"   
+SELECT_VCOLLECTION_NPLAYERS = "SELECT DISTINCT(nplayers) AS option_value FROM vw_roms"
+SELECT_VCOLLECTION_RATING = "SELECT DISTINCT(m_rating) AS option_value FROM vw_roms"
 
 INSERT_ROMCOLLECTION = """
                         INSERT INTO romcollections (id,name,parent_id,metadata_id,platform,box_size) 
@@ -230,16 +230,30 @@ SELECT_ROM_ASSET_MAPPINGS_BY_CATEGORY = """
 
 SELECT_ROMS_BY_SOURCE = "SELECT r.* FROM vw_roms AS r WHERE r.scanned_by_id = ?"
 SELECT_ROM_ASSETS_BY_SOURCE = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ?"
-SELECT_ROM_ASSETPATHS_BY_SOURCE = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms AS r ON r.id = rap.rom_id AND r.scanned_by_id = ?"
+SELECT_ROM_ASSETPATHS_BY_SOURCE = """
+    SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms AS r ON r.id = rap.rom_id AND r.scanned_by_id = ?
+"""
 SELECT_ROM_TAGS_BY_SOURCE = "SELECT rt.* FROM vw_rom_tags AS rt INNER JOIN roms AS r ON r.id = rt.rom_id AND r.scanned_by_id = ?"
 SELECT_ROM_ASSET_MAPPINGS_BY_SOURCE = """
-                                    SELECT am.*, mm.metadata_id FROM assetmappings AS am 
-                                    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id 
-                                    INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
-                                        AND r.scanned_by_id = ?
-                                    """
-
-
+    SELECT am.*, mm.metadata_id FROM assetmappings AS am
+    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id
+    INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
+        AND r.scanned_by_id = ?
+"""
+                                    
+SELECT_STANDALONE_ROMS = "SELECT r.* FROM vw_roms AS r WHERE r.scanned_by_id = ''"
+SELECT_STANDALONE_ROM_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms AS r ON r.id = ra.rom_id AND r.scanned_by_id = ''"
+SELECT_STANDALONE_ROM_ASSETPATHS = """
+    SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms AS r ON r.id = rap.rom_id AND r.scanned_by_id = ''
+"""
+SELECT_STANDALONE_ROM_TAGS = "SELECT rt.* FROM vw_rom_tags AS rt INNER JOIN roms AS r ON r.id = rt.rom_id AND r.scanned_by_id = ''"
+SELECT_STANDALONE_ROM_ASSET_MAPPINGS = """
+    SELECT am.*, mm.metadata_id FROM assetmappings AS am
+    INNER JOIN metadata_assetmappings AS mm ON mm.assetmapping_id = am.id
+    INNER JOIN roms AS r ON mm.metadata_id = r.metadata_id
+        AND r.scanned_by_id = ''
+"""
+                                    
 SELECT_ROMS_BY_ROOT_CATEGORY = "SELECT r.* FROM vw_roms AS r INNER JOIN roms_in_category AS rc ON rc.rom_id = r.id AND rc.category_id IS NULL"
 SELECT_ROM_ASSETS_BY_ROOT_CATEGORY = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN roms_in_category AS rc ON rc.rom_id = ra.rom_id AND rc.category_id IS NULL"
 SELECT_ROM_ASSETPATHS_BY_ROOT_CATEGORY = "SELECT rap.* FROM vw_rom_asset_paths AS rap INNER JOIN roms_in_category AS rc ON rc.rom_id = rap.rom_id AND rc.category_id IS NULL"
@@ -282,18 +296,18 @@ SELECT_BY_TITLE = "SELECT * FROM vw_roms WHERE m_name LIKE ? || '%'"
 SELECT_BY_GENRE = "SELECT * FROM vw_roms WHERE m_genre = ?"
 SELECT_BY_DEVELOPER = "SELECT * FROM vw_roms WHERE m_developer = ?"
 SELECT_BY_YEAR = "SELECT * FROM vw_roms WHERE m_year = ?"
-SELECT_BY_NPLAYERS = "SELECT * FROM vw_roms WHERE m_nplayers = ?"
-SELECT_BY_ESRB = "SELECT * FROM vw_roms WHERE m_esrb = ?"
-SELECT_BY_PEGI = "SELECT * FROM vw_roms WHERE m_pegi = ?"
+SELECT_BY_NPLAYERS = "SELECT * FROM vw_roms WHERE nplayers = ?"
+SELECT_BY_ESRB = "SELECT * FROM vw_roms WHERE esrb = ?"
+SELECT_BY_PEGI = "SELECT * FROM vw_roms WHERE pegi = ?"
 SELECT_BY_RATING = "SELECT * FROM vw_roms WHERE m_rating = ?"
                                 
 SELECT_BY_TITLE_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE UPPER(r.m_name) LIKE ? || '%'"
 SELECT_BY_GENRE_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.m_genre = ?"
 SELECT_BY_DEVELOPER_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.m_developer = ?"
 SELECT_BY_YEAR_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.m_year = ?"
-SELECT_BY_NPLAYERS_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.m_nplayers = ?"
-SELECT_BY_ESRB_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.m_esrb = ?"
-SELECT_BY_PEGI_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.m_pegi = ?"
+SELECT_BY_NPLAYERS_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.nplayers = ?"
+SELECT_BY_ESRB_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.esrb = ?"
+SELECT_BY_PEGI_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.pegi = ?"
 SELECT_BY_RATING_ASSETS = "SELECT ra.* FROM vw_rom_assets AS ra INNER JOIN vw_roms AS r ON r.id = ra.rom_id WHERE r.m_rating = ?"
                                 
 INSERT_ROM_ASSET = "INSERT INTO rom_assets (rom_id, asset_id) VALUES (?, ?)"
@@ -314,6 +328,9 @@ SELECT_ROM_SCANNED_DATA_BY_SET = "SELECT s.* FROM scanned_roms_data AS s INNER J
 SELECT_ROM_SCANNED_DATA_BY_CATEGORY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_category AS rc ON rc.rom_id = s.rom_id AND rc.category_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_SOURCE = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms AS r ON r.id = s.rom_id AND r.scanned_by_id = ?"
 SELECT_ROM_SCANNED_DATA_BY_ROOT_CATEGORY = "SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms_in_category AS rc ON rc.rom_id = s.rom_id AND rc.category_id IS NULL"
+SELECT_STANDALONE_ROM_SCANNED_DATA = """
+    SELECT s.* FROM scanned_roms_data AS s INNER JOIN roms AS r ON r.id = s.rom_id AND r.scanned_by_id = ''
+"""    
 DELETE_SCANNED_DATA = "DELETE FROM scanned_roms_data WHERE rom_id = ?"
 
 SELECT_TAGS = "SELECT * FROM tags"
@@ -337,7 +354,6 @@ UPDATE_ADDON = "UPDATE akl_addon SET name = ?, addon_id = ?, version = ?, addon_
 # Source
 SELECT_SOURCE = "SELECT * FROM vw_sources WHERE id = ?"
 SELECT_SOURCES = "SELECT * FROM vw_sources"
-SELECT_SOURCE_BY_ROM = "SELECT * FROM vw_sources WHERE scanned_by_id = ?"
 SELECT_ROMCOLLECTION_IDS_BY_SOURCE = "SELECT collection_id FROM collection_source_ruleset WHERE source_id = ?"
 SELECT_SOURCES_BY_ROMCOLLECTION = """
     SELECT s.* FROM vw_sources AS s WHERE s.id IN (

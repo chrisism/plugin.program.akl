@@ -31,7 +31,7 @@ def report_print_ROM(slist: list, rom: ROM):
     slist.append("[COLOR violet]m_year[/COLOR]: '{0}'".format(rom.get_releaseyear()))
     slist.append("[COLOR violet]m_genre[/COLOR]: '{0}'".format(rom.get_genre()))
     slist.append("[COLOR violet]m_developer[/COLOR]: '{0}'".format(rom.get_developer()))
-    slist.append("[COLOR violet]m_nplayers[/COLOR]: '{0}'".format(rom.get_number_of_players()))
+    slist.append("[COLOR violet]nplayers[/COLOR]: '{0}'".format(rom.get_number_of_players()))
     slist.append("[COLOR violet]m_esrb[/COLOR]: '{0}'".format(rom.get_esrb_rating()))
     slist.append("[COLOR violet]m_rating[/COLOR]: '{0}'".format(rom.get_rating()))
     slist.append("[COLOR violet]m_plot[/COLOR]: '{0}'".format(rom.get_plot()))

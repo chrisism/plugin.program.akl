@@ -28,7 +28,8 @@ from akl.utils import kodi, io
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals, editors
-from resources.lib.repositories import UnitOfWork, SourcesRepository, ROMsRepository, AelAddonRepository, ROMsJsonFileRepository
+from resources.lib.repositories import UnitOfWork, SourcesRepository, ROMsRepository, ROMsJsonFileRepository
+from resources.lib.repositories import AelAddonRepository, LaunchersRepository
 from resources.lib.domain import ROM, Source, AelAddon, AssetInfo, g_assetFactory, ROMLauncherAddonFactory
 
 logger = logging.getLogger(__name__)
@@ -162,11 +163,11 @@ def cmd_source_title(args):
             repository.update_source(source)
             uow.commit()
             AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
+            AppMediator.async_cmd('RENDER_SOURCES_VIEW')
         else:
             kodi.notify(kodi.translate(40987).format(
                 kodi.translate(constants.OBJ_SOURCE),
                 kodi.translate(40812)))
-        
     AppMediator.sync_cmd('EDIT_SOURCE', args)
 
 
@@ -193,6 +194,7 @@ def cmd_source_metadata_platform(args):
 
             uow.commit()
             AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
+            AppMediator.async_cmd('RENDER_SOURCES_VIEW')
     AppMediator.sync_cmd('EDIT_SOURCE', args)
 
 
@@ -209,6 +211,7 @@ def cmd_source_boxsize(args):
             repository.update_source(source)
             uow.commit()
             AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
+            AppMediator.async_cmd('RENDER_SOURCES_VIEW')
     AppMediator.sync_cmd('EDIT_SOURCE', args)
 
 
@@ -249,6 +252,7 @@ def cmd_source_delete(args):
         logger.info(f'Deleting source "{source_name}" ID {source.get_id()}')
         repository.delete_source(source.get_id())
         uow.commit()
+        AppMediator.async_cmd('RENDER_SOURCES_VIEW')
         
     kodi.notify(kodi.translate(41170).format(source_name))
     for collection_id in collection_ids:
@@ -256,14 +260,18 @@ def cmd_source_delete(args):
     AppMediator.async_cmd('CLEANUP_VIEWS')
 
 
+# -------------------------------------------------------------------------------------------------
+# ROM ADD
+# -------------------------------------------------------------------------------------------------
 @AppMediator.register('STANDALONE_SOURCE')
 def cmd_add_standalone_source(args):
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         roms_repository = ROMsRepository(uow)
         addons_repository = AelAddonRepository(uow)
+        launchers_repository = LaunchersRepository(uow)
         
-        addons = addons_repository.find_all_launcher_addons()
+        launchers = launchers_repository.find_all()
 
         file_path = kodi.dialog_get_file(kodi.translate(40953))
         if file_path is not None:
@@ -286,8 +294,8 @@ def cmd_add_standalone_source(args):
     
         options = collections.OrderedDict()
         options["LAUNCH_DIRECTLY"] = kodi.translate(40952)
-        for addon in addons:
-            options[addon] = addon.get_name()
+        for launcher in launchers:
+            options[launcher] = launcher.get_name()
     
         s = kodi.translate(41106)
         selected_option = kodi.OrdDictionaryDialog().select(s, options)
@@ -295,23 +303,21 @@ def cmd_add_standalone_source(args):
         if selected_option == "LAUNCH_DIRECTLY":
             addon_id = "script.akl.defaults"
             addon = addons_repository.find_by_addon_id(addon_id, constants.AddonType.LAUNCHER)
-            rom_obj.add_launcher(addon, {
-                "addon_id": addon_id,
+            launcher = ROMLauncherAddonFactory.create(addon, None)
+            launcher.set_settings({
+                "name": f"Standalone File Launcher: {rom_name}",
                 "application": file_path,
                 "args": "",
                 "secname": path.getBase()
             })
-            roms_repository.insert_rom(rom_obj)
-            uow.commit()
+            launchers_repository.insert_launcher(launcher)
+            selected_option = launcher
         
-        else:
-            roms_repository.insert_rom(rom_obj)
-            uow.commit()
-            
-            selected_launcher = ROMLauncherAddonFactory.create(selected_option, {})
-            selected_launcher.configure()
+        rom_obj.add_launcher(selected_option, is_default=True)
+        roms_repository.insert_rom(rom_obj)
+        uow.commit()
         
-    AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': constants.VCATEGORY_TITLE_ID})
+    AppMediator.async_cmd('RENDER_SOURCES_VIEW')
     kodi.notify(kodi.translate(41035).format(rom_name))
     kodi.refresh_container()
 

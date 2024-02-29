@@ -75,6 +75,7 @@ class AKL_Paths(object):
         self.DEFAULT_FAV_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-favourites')
         
         # --- Rendered views (normal and virtuals/generated) ---
+        self.SOURCES_VIEW_PATH = self.ADDON_DATA_DIR.pjoin('sources.json')
         self.GENERATED_VIEWS_DIR = self.ADDON_DATA_DIR.pjoin('db_generated_views')
         self.VIEWS_DIR = self.ADDON_DATA_DIR.pjoin('db_views')
         

@@ -573,9 +573,10 @@ def cmd_execute_rom_with_launcher(args):
         logger.info(f'Executing ROM {rom.get_name()}')
         
         romcollections = romcollection_repository.find_romcollections_by_rom(rom.get_id())
-        source = source_repository.find_source_by_rom(rom.get_id())
+        source = source_repository.find(rom.get_scanned_by())
         launchers = rom.get_launchers()
-        launchers.extend(source.get_launchers())
+        if source:
+            launchers.extend(source.get_launchers())
         
         for romcollection in romcollections:
             launchers.extend(romcollection.get_launchers())

@@ -87,6 +87,7 @@ def cmd_set_scanner_settings(args) -> bool:
         uow.commit()
     
     kodi.notify(kodi.translate(41006).format(source.addon.get_name()))
+    AppMediator.async_cmd('RENDER_SOURCES_VIEW')
     
     if kodi.dialog_yesno(kodi.translate(41051)):
         AppMediator.async_cmd('SCAN_ROMS', {'source_id': source_id})

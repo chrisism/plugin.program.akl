@@ -138,7 +138,7 @@ def cmd_rom_assets(args):
         rom = repository.find_rom(rom_id)
         
         source_repository = SourcesRepository(uow)
-        source = source_repository.find_source_by_rom(rom.get_id())
+        source = source_repository.find(rom.get_scanned_by())
         
         romcollection_repository = ROMCollectionRepository(uow)
         rom_romcollections = romcollection_repository.find_romcollections_by_rom(rom_id)
@@ -153,11 +153,12 @@ def cmd_rom_assets(args):
             AppMediator.sync_cmd(editors.SCRAPE_CMD, args)
             return
         
+        assets_root_path = source.get_assets_root_path() if source else None
         asset = g_assetFactory.get_asset_info(selected_asset_to_edit)
         # >> Execute edit asset menu subcommand. Then, execute recursively this submenu again.
         # >> The menu dialog is instantiated again so it reflects the changes just edited.
         # >> If edit_asset() returns a command other than scrape or None changes were made.
-        cmd = editors.edit_asset(rom, asset, source.get_assets_root_path())
+        cmd = editors.edit_asset(rom, asset, assets_root_path)
         if cmd is not None:
             if cmd == 'SCRAPE_ASSET':
                 args['selected_asset'] = asset.id
@@ -724,70 +725,3 @@ def cmd_manage_rom_tags(args):
 
         if did_tag_change:
             uow.commit()
-
-
-# -------------------------------------------------------------------------------------------------
-# ROM ADD
-# -------------------------------------------------------------------------------------------------
-@AppMediator.register('ADD_STANDALONE_ROM')
-def cmd_add_rom(args):
-    parent_id = args['category_id'] if 'category_id' in args else None
-    grand_parent_id = args['parent_category_id'] if 'parent_category_id' in args else None
-    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
-        
-    with uow:
-        category_repository = CategoryRepository(uow)
-        roms_repository = ROMsRepository(uow)
-        
-        parent_category = category_repository.find_category(parent_id) if parent_id is not None else None
-        grand_parent_category = category_repository.find_category(grand_parent_id) if grand_parent_id is not None else None
-        
-        if grand_parent_category is not None:
-            options_dialog = kodi.ListDialog()
-            selected_option = options_dialog.select(kodi.translate(41098), [
-                parent_category.get_name(),
-                grand_parent_category.get_name()])
-            if selected_option > 0:
-                parent_category = grand_parent_category
-        
-        rom_name = ""
-        is_file_based = kodi.dialog_yesno(kodi.translate(40952))
-        file_path = path = None
-        if is_file_based:
-            file_path = kodi.dialog_get_file(kodi.translate(40953))
-            if file_path is not None:
-                path = io.FileName(file_path)
-                rom_name = path.getBaseNoExt()
-            
-        rom_name = kodi.dialog_keyboard(kodi.translate(40815), rom_name)
-        if rom_name is None:
-            return
-        
-        dialog = kodi.ListDialog()
-        selected_idx = dialog.select(kodi.translate(41099), platforms.AKL_platform_list)
-        platform = platforms.AKL_platform_list[selected_idx]
-        
-        rom_obj = ROM()
-        rom_obj.set_name(rom_name)
-        rom_obj.set_platform(platform)
-        if file_path:
-            rom_obj.set_scanned_data_element("file", file_path)
-        if is_file_based:
-            addon_repository = AelAddonRepository(uow)
-            addon_id = "script.akl.defaults"
-            addon = addon_repository.find_by_addon_id(addon_id, constants.AddonType.LAUNCHER)
-            rom_obj.add_launcher(addon, {
-                "addon_id": addon_id,
-                "application": file_path,
-                "args": "",
-                "secname": path.getBase()
-            })
-        
-        roms_repository.insert_rom(rom_obj)
-        category_repository.add_rom_to_category(parent_category.get_id(), rom_obj.get_id())
-        uow.commit()
-        
-    AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': parent_category.get_id()})
-    AppMediator.async_cmd('RENDER_VCATEGORY_VIEW', {'vcategory_id': constants.VCATEGORY_TITLE_ID})
-    kodi.notify(kodi.translate(41035).format(rom_name))
-    kodi.refresh_container()
