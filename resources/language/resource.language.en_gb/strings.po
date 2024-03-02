@@ -2129,6 +2129,10 @@ msgctxt "#42089"
 msgid "Execute ruleset"
 msgstr ""
 
+msgctxt "#42090"
+msgid "Create new launcher..."
+msgstr ""
+
 ############################
 # Context menu item descriptions
 ############################

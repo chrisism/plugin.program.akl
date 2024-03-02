@@ -59,7 +59,7 @@ def cmd_add_launcher(args):
     logger.debug(f'Selected {selected_option.get_id()}')
     
     selected_launcher = ROMLauncherAddonFactory.create(selected_option, {})
-    selected_launcher.configure()
+    selected_launcher.configure(args)
 
 
 @AppMediator.register('EDIT_LAUNCHER')
@@ -211,16 +211,24 @@ def cmd_add_rom_launchers(args):
 
         for launcher in launchers:
             options[launcher] = kodi.get_listitem(launcher.get_name(), launcher.get_addon_name())
-    
+        options["NEW"] = kodi.translate(42090)
+        
         s = kodi.translate(41101)
-        selected_option: ROMLauncherAddon = kodi.OrdDictionaryDialog().select(s, options, use_details=True)
-            
+        selected_option = kodi.OrdDictionaryDialog().select(s, options, use_details=True)
+        
         if selected_option is None:
             # >> Exits context menu
             logger.debug('Selected None. Closing context menu')
             AppMediator.sync_cmd('EDIT_ROM_LAUNCHERS', args)
             return
-            
+        
+        if selected_option == "NEW":
+            args["entity_type"] = constants.OBJ_ROM
+            args["entity_id"] = rom_id
+            AppMediator.sync_cmd("ADD_LAUNCHER", args)
+            return
+        
+        selected_option: ROMLauncherAddon = selected_option
         logger.debug(f'Selected {selected_option.get_id()}')
         is_default = kodi.dialog_yesno(kodi.translate(41171).format(selected_option.get_name()))
         
@@ -228,6 +236,15 @@ def cmd_add_rom_launchers(args):
         rom_repository.update_rom(rom)    
         logger.info(f'Added launcher#{selected_option.get_id()} to ROM {rom.get_id()}')
         uow.commit()
+
+        repository = AelAddonRepository(uow)
+        addons = repository.find_all_launcher_addons()
+
+        for addon in addons:
+            options[addon] = addon.get_name()
+    
+    s = kodi.translate(41106)
+    selected_option: AelAddon = kodi.OrdDictionaryDialog().select(s, options)
     
     kodi.notify(kodi.translate(41109).format(selected_option.get_name()))
     AppMediator.sync_cmd('EDIT_ROM_LAUNCHERS', args)
@@ -248,6 +265,7 @@ def cmd_add_source_launchers(args):
 
         for launcher in launchers:
             options[launcher] = kodi.get_listitem(launcher.get_name(), launcher.get_addon_name())
+        options["NEW"] = kodi.translate(42090)
     
         s = kodi.translate(41101)
         selected_option: ROMLauncherAddon = kodi.OrdDictionaryDialog().select(s, options, use_details=True)
@@ -256,6 +274,12 @@ def cmd_add_source_launchers(args):
             # >> Exits context menu
             logger.debug('ADD_SOURCE_LAUNCHER: Selected None. Closing context menu')
             AppMediator.sync_cmd('EDIT_SOURCE_LAUNCHERS', args)
+            return
+        
+        if selected_option == "NEW":
+            args["entity_type"] = constants.OBJ_SOURCE
+            args["entity_id"] = source_id
+            AppMediator.sync_cmd("ADD_LAUNCHER", args)
             return
         
         logger.debug(f'ADD_SOURCE_LAUNCHER: Selected {selected_option.get_id()}')
@@ -289,6 +313,7 @@ def cmd_add_romcollection_launchers(args):
 
         for launcher in launchers:
             options[launcher] = kodi.get_listitem(launcher.get_name(), launcher.get_addon_name())
+        options["NEW"] = kodi.translate(42090)
            
         s = kodi.translate(41101)
         selected_option: ROMLauncherAddon = kodi.OrdDictionaryDialog().select(s, options, use_details=True)
@@ -299,6 +324,12 @@ def cmd_add_romcollection_launchers(args):
             AppMediator.sync_cmd('EDIT_ROMCOLLECTION_LAUNCHERS', args)
             return
     
+        if selected_option == "NEW":
+            args["entity_type"] = constants.OBJ_ROMCOLLECTION
+            args["entity_id"] = romcollection_id
+            AppMediator.sync_cmd("ADD_LAUNCHER", args)
+            return
+        
         logger.debug(f'ADD_COLLECTION_LAUNCHER: Selected {selected_option.get_id()}')
         is_default = kodi.dialog_yesno(kodi.translate(41171).format(selected_option.get_name()))
         

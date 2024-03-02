@@ -420,6 +420,7 @@ def cmd_category_save_nfo_file(args):
     
     AppMediator.sync_cmd('CATEGORY_EDIT_METADATA', args)
 
+
 @AppMediator.register('CATEGORY_EXPORT_CATEGORY_XML')
 # --- Export Category XML configuration ---
 def cmd_category_export_xml(args):

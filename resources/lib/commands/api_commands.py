@@ -41,7 +41,12 @@ def cmd_set_launcher_args(args) -> bool:
     launcher_id: str = args['launcher_id'] if 'launcher_id' in args else None
     addon_id: str = args['addon_id'] if 'addon_id' in args else None
     launcher_settings = args['settings'] if 'settings' in args else None
+    
+    entity_type = args['entity_type'] if 'entity_type' in args else None
+    entity_id: str = args['entity_id'] if 'entity_id' in args else None
         
+    redirect_to_action = None
+    args = None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         addon_repository = AelAddonRepository(uow)
@@ -58,10 +63,39 @@ def cmd_set_launcher_args(args) -> bool:
             launcher.set_settings(launcher_settings)
             launchers_repository.update_launcher(launcher)
         
+        if entity_type:
+            if entity_type == constants.OBJ_ROM:
+                entity_repo = ROMsRepository(uow)
+                rom = entity_repo.find_rom(entity_id)
+                rom.add_launcher(launcher)
+                entity_repo.update_rom(rom)
+                redirect_to_action = "EDIT_ROM_LAUNCHERS"
+                args = {'rom_id': entity_id}
+                
+            if entity_type == constants.OBJ_ROMCOLLECTION:
+                entity_repo = ROMCollectionRepository(uow)
+                collection = entity_repo.find_romcollection(entity_id)
+                collection.add_launcher(launcher)
+                entity_repo.update_romcollection(collection)
+                redirect_to_action = "EDIT_ROMCOLLECTION_LAUNCHERS"
+                args = {'romcollection_id': entity_id}
+                
+            if entity_type == constants.OBJ_SOURCE:
+                entity_repo = SourcesRepository(uow)
+                source = entity_repo.find(entity_id)
+                source.add_launcher(launcher)
+                entity_repo.update_source(source)
+                redirect_to_action = "EDIT_SOURCE_LAUNCHERS"
+                args = {'source_id': entity_id}
+                
         uow.commit()
     
     kodi.refresh_container()
     kodi.notify(kodi.translate(41005).format(launcher.get_name()))
+    
+    if entity_type:
+        AppMediator.async_cmd(redirect_to_action, args)
+            
     return True
 
 

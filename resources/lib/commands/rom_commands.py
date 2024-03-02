@@ -28,7 +28,7 @@ from resources.lib import globals, editors
 from resources.lib.repositories import CategoryRepository, ROMsRepository, ROMCollectionRepository, UnitOfWork
 from resources.lib.repositories import SourcesRepository
 
-from resources.lib.domain import ROMCollection, g_assetFactory
+from resources.lib.domain import g_assetFactory
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,8 @@ def cmd_edit_rom(args):
     # >> Execute subcommand. May be atomic, maybe a submenu.
     logger.debug(f'EDIT_ROM: Selected {selected_option}')
     AppMediator.sync_cmd(selected_option, args)
-    
+
+
 # --- Submenu commands ---
 @AppMediator.register('ROM_EDIT_METADATA')
 def cmd_rom_metadata(args):

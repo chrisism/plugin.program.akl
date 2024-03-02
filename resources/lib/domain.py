@@ -430,13 +430,15 @@ class ROMLauncherAddon(ROMAddon):
             '--rom_id': rom.get_id()
         }
 
-    def get_configure_command(self) -> dict:
+    def get_configure_command(self, args: dict) -> dict:
         return {
             '--cmd': 'configure',
             '--type': constants.AddonType.LAUNCHER.name,
             '--server_host': globals.WEBSERVER_HOST,
             '--server_port': globals.WEBSERVER_PORT,
-            '--akl_addon_id': self.get_id()
+            '--akl_addon_id': self.get_id(),
+            '--entity_type': args['entity_type'] if 'entity_type' in args else '',
+            '--entity_id': args['entity_id'] if 'entity_id' in args else ''
         }
     
     def launch(self, rom: ROM):
@@ -444,10 +446,10 @@ class ROMLauncherAddon(ROMAddon):
             self.addon.get_addon_id(),
             self.get_launch_command(rom))
 
-    def configure(self):
+    def configure(self, args: dict):
         kodi.run_script(
             self.addon.get_addon_id(),
-            self.get_configure_command())
+            self.get_configure_command(args))
 
 
 class RetroplayerLauncherAddon(ROMLauncherAddon):
