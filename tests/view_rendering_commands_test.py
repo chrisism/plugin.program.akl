@@ -46,6 +46,10 @@ class Test_View_Rendering_Commands(unittest.TestCase):
         
         dbPath = io.FileName(os.path.join(cls.TEST_ASSETS_DIR, 'test_db.db'))
         schemaPath = io.FileName(os.path.join(cls.ROOT_DIR, 'resources/schema.sql'))
+        
+        logger.info('DBPATH: {}'.format(dbPath))
+        logger.info('SCHEMAPATH: {}'.format(schemaPath))
+        
         dbPath.unlink()
         UnitOfWork(dbPath).create_empty_database(schemaPath)
 
@@ -59,15 +63,21 @@ class Test_View_Rendering_Commands(unittest.TestCase):
          
     def store_root_view(obj, view_data):
         Test_View_Rendering_Commands.write_json(view_data)
+         
+    def store_src_view(obj, view_data):
+        Test_View_Rendering_Commands.write_json(view_data)
         
     def store_view(obj, id, type, view_data):
         Test_View_Rendering_Commands.write_json(view_data)
         
     @patch('resources.lib.repositories.ViewRepository.store_root_view', autospec=True, side_effect = store_root_view)
+    @patch('resources.lib.repositories.ViewRepository.store_sources_view', autospec=True, side_effect = store_src_view)
     @patch('resources.lib.repositories.ViewRepository.store_view', autospec=True, side_effect = store_view)
+    @patch('resources.lib.repositories.ViewRepository.cleanup_obsolete_views', autospec=True)
     @patch('akl.utils.kodi.notify', autospec=True)
     @patch('akl.utils.kodi.refresh_container', autospec=True)
-    def test_rendering_views_based_on_database_data(self, refresh_mock, notify_mock, store_mock, store_root_mock):
+    def test_rendering_views_based_on_database_data(self, refresh_mock, notify_mock, cleanup_mock,
+                                                    store_mock, store_src_mock, store_root_mock):
                 
         # arrange
         Test_View_Rendering_Commands.CREATED_VIEWS = []
