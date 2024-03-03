@@ -1074,7 +1074,7 @@ msgid "Stored scraped ROM '{0}'"
 msgstr ""
 
 msgctxt "#41010"
-msgid "Removed ROMS from ROMs Collection '{0}'"
+msgid "Removed ROMS from Source '{0}'"
 msgstr ""
 
 msgctxt "#41011"
@@ -1726,7 +1726,7 @@ msgid "Select source"
 msgstr ""
 
 msgctxt "#41173"
-msgid "Import using rules / Import all"
+msgid "Remove all rules"
 msgstr ""
 
 msgctxt "#41174"
@@ -1738,7 +1738,7 @@ msgid "This action will remove all rules applied.\nAre you sure to continue?"
 msgstr ""
 
 msgctxt "#41176"
-msgid "Create a new rule to change how ROMs are imported."
+msgid "Removed all rules. Now importing all from source."
 msgstr ""
 
 msgctxt "#41177"
@@ -1787,6 +1787,10 @@ msgstr ""
 
 msgctxt "#41188"
 msgid "Linked ROM {0} in Collection {1}"
+msgstr ""
+
+msgctxt "#41189"
+msgid "Currently importing: {0}"
 msgstr ""
 
 ############################

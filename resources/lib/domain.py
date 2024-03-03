@@ -514,8 +514,8 @@ class Source(ROMAddon):
                  asset_paths_data: typing.List[AssetPath] = [],
                  launchers_data: typing.List[ROMLauncherAddon] = []):
         
-        self.launchers_data = launchers_data
         self.asset_paths: typing.Dict[str, AssetPath] = {}
+        self.launchers_data = launchers_data
         if asset_paths_data is not None:
             for path in asset_paths_data:
                 self.asset_paths[path.get_asset_info_id()] = path
@@ -529,7 +529,7 @@ class Source(ROMAddon):
                 'assets_path': '',
                 'num_roms': 0,
                 'last_scan_timestamp': None,
-                'settings': None
+                'settings': '{}'
             }
         super(Source, self).__init__(addon, entity_data)
     

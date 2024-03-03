@@ -72,7 +72,7 @@ def cmd_edit_launcher(args):
         repository = LaunchersRepository(uow)
         launcher = repository.find(launcher_id)
 
-    launcher.configure()
+    launcher.configure(args)
 
 
 @AppMediator.register('DELETE_LAUNCHER')

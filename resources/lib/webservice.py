@@ -266,13 +266,13 @@ class RequestHandler(BaseHTTPRequestHandler):
     def handle_source_queries(self, api_path):
         params = self.get_params()
         id = params.get('id')
-        
+
         if 'source/scanner/settings/' in api_path:
             return apiqueries.qry_get_source_scanner_settings(id)
         if 'source/roms/' in api_path:
             return apiqueries.qry_get_roms(id)
-        if 'source/' in api_path:
-            return apiqueries.qry_get_rom_collection(id)
+        if 'source/launchers' in api_path:
+            return apiqueries.qry_get_source_launchers(id)
         
         return None
             

@@ -218,6 +218,7 @@ def cmd_edit_import_ruleset(args):
     ruleset_id: str = args['ruleset_id'] if 'ruleset_id' in args else None
         
     selected_option = None
+    next_command = None
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         repository = ROMCollectionRepository(uow)
@@ -230,14 +231,14 @@ def cmd_edit_import_ruleset(args):
                                                           art={'icon': 'DefaultPlaylist.png'})
         options["CHANGE_RULESET_OPERATOR"] = kodi.get_listitem(kodi.translate(41060), ruleset.get_set_operator_str(),
                                                                art={'icon': 'DefaultMimetypeInfo.png'})
-        options["CHANGE_RULESET_BY_RULES"] = kodi.get_listitem(kodi.translate(41173),
-                                                               ruleset.get_rules_shortdescription(),
-                                                               art={'icon': 'DefaultAddonsSearch.png'})
         for rule in ruleset.get_rules():
             options[rule.get_id()] = kodi.get_listitem(kodi.translate(42511), rule.get_description(),
                                                        art={'icon': 'DefaultScript.png'})
         options["ADD_RULE_TO_RULESET"] = kodi.get_listitem(label=kodi.translate(42086), label2='',
                                                            art={'icon': 'DefaultAddSource.png'})
+        if ruleset.has_rules():
+            options["REMOVE_ALL_RULES"] = kodi.get_listitem(kodi.translate(41173), kodi.translate(41189).format(
+                                                            ruleset.get_rules_shortdescription()))
 
         s = kodi.translate(41184)
         selected_option = kodi.OrdDictionaryDialog().select(s, options, use_details=True)
@@ -245,46 +246,40 @@ def cmd_edit_import_ruleset(args):
             # >> Exits context menu
             logger.debug('EDIT_IMPORT_RULESET: No action selected. Closing context menu')
             args.pop('ruleset_id')
-            AppMediator.async_cmd('IMPORT_ROMS', args)
+            next_command = 'IMPORT_ROMS'
             return
         
-        elif selected_option == 'EXECUTE_RULESET':
-            AppMediator.async_cmd(selected_option, args)
-            
         elif selected_option == 'SET_RULESET_SOURCE':
             source = _select_source_for_rules(uow)
             if source:
                 ruleset.apply_source(source)
                 repository.update_ruleset_in_romcollection(romcollection_id, ruleset)
                 uow.commit()
-        
+            next_command = 'EDIT_IMPORT_RULESET'
+
         elif selected_option == 'CHANGE_RULESET_OPERATOR':
             ruleset.change_operator()
             repository.update_ruleset_in_romcollection(romcollection_id, ruleset)
             uow.commit()
             kodi.notify(kodi.translate(41180))
-            
-        elif selected_option == 'CHANGE_RULESET_BY_RULES':
-            if ruleset.has_rules():
-                if kodi.dialog_yesno(kodi.translate(41175)):
-                    ruleset.clear_rules()
-                    repository.update_ruleset_in_romcollection(romcollection_id, ruleset)
-                    uow.commit()
-            else:
+            next_command = 'EDIT_IMPORT_RULESET'
+
+        elif selected_option == 'REMOVE_ALL_RULES':
+            if kodi.dialog_yesno(kodi.translate(41175)):
+                ruleset.clear_rules()
+                repository.delete_all_rules_from_ruleset(ruleset)
+                uow.commit()
                 kodi.notify(kodi.translate(41176))
-                AppMediator.async_cmd('ADD_RULE_TO_RULESET', args)
-                return
+            next_command = 'EDIT_IMPORT_RULESET'
+                    
+        elif selected_option == 'EXECUTE_RULESET' or selected_option == 'ADD_RULE_TO_RULESET':
+            next_command = selected_option
             
-        elif selected_option == 'ADD_RULE_TO_RULESET':
-            AppMediator.async_cmd('ADD_RULE_TO_RULESET', args)
-            return
-        
         else:
             args['rule_id'] = selected_option
-            AppMediator.async_cmd('EDIT_RULE', args)
-            return
+            next_command = 'EDIT_RULE'
         
-    AppMediator.async_cmd('EDIT_IMPORT_RULESET', args)
+    AppMediator.sync_cmd(next_command, args)
 
 
 @AppMediator.register('ADD_RULE_TO_RULESET')

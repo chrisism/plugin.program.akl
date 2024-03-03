@@ -933,9 +933,6 @@ class ROMCollectionRepository(object):
         self._uow.execute(qry.SELECT_ROMCOLLECTION_LAUNCHERS_BY_ROM, rom_id)
         launchers_data = self._uow.result_set()
         
-        self._uow.execute(qry.SELECT_ROMCOLLECTION_SCANNERS_BY_ROM, rom_id)
-        scanners_data = self._uow.result_set()
-        
         for romcollection_data in result_set:
             assets = []
             for asset_data in filter(lambda a: a['romcollection_id'] == romcollection_data['id'], assets_result_set):
@@ -957,6 +954,43 @@ class ROMCollectionRepository(object):
                 
             yield ROMCollection(romcollection_data, assets, asset_mappings, rom_asset_mappings, launchers)
     
+    def find_romcollections_by_source(self, source_id: str) -> typing.Iterator[ROMCollection]:
+        self._uow.execute(qry.SELECT_ROMCOLLECTIONS_BY_SOURCE, source_id)
+        result_set = self._uow.result_set()
+        
+        self._uow.execute(qry.SELECT_ROMCOLLECTION_ASSETS_BY_SOURCE, source_id)
+        assets_result_set = self._uow.result_set()
+
+        self._uow.execute(qry.SELECT_ROMCOLLECTION_ASSET_MAPPINGS_BY_SOURCE, source_id)
+        asset_mappings_result_set = self._uow.result_set()
+        
+        self._uow.execute(qry.SELECT_ROMCOLLECTION_ROM_ASSET_MAPPINGS_BY_SOURCE, source_id)
+        rom_asset_mappings_result_set = self._uow.result_set()
+        
+        self._uow.execute(qry.SELECT_ROMCOLLECTION_LAUNCHERS_BY_SOURCE, source_id)
+        launchers_data = self._uow.result_set()
+        
+        for romcollection_data in result_set:
+            assets = []
+            for asset_data in filter(lambda a: a['romcollection_id'] == romcollection_data['id'], assets_result_set):
+                assets.append(Asset(asset_data))
+                                    
+            asset_mappings = []
+            for mapping_data in filter(lambda a: a['metadata_id'] == romcollection_data['metadata_id'], asset_mappings_result_set):
+                asset_mappings.append(AssetMapping(mapping_data))
+                        
+            rom_asset_mappings = []
+            for mapping_data in filter(lambda a: a['romcollection_id'] == romcollection_data['id'], rom_asset_mappings_result_set):
+                rom_asset_mappings.append(RomAssetMapping(mapping_data))
+                
+            launchers = []
+            for launcher_data in launchers_data:
+                addon = AelAddon(launcher_data.copy())
+                launcher = ROMLauncherAddonFactory.create(addon, launcher_data)
+                launchers.append(launcher)
+                
+            yield ROMCollection(romcollection_data, assets, asset_mappings, rom_asset_mappings, launchers)
+        
     def find_import_rules_by_collection(self, romcollection: ROMCollection) -> typing.Iterator[RuleSet]:
         self._uow.execute(qry.SELECT_IMPORT_RULES_BY_COLLECTION, romcollection.get_id())
         result_set = self._uow.result_set()
@@ -1121,6 +1155,9 @@ class ROMCollectionRepository(object):
                 self._insert_rule(rule, ruleset)
             else:
                 self._update_rule(rule, ruleset)
+
+    def delete_all_rules_from_ruleset(self, ruleset: RuleSet):
+        self._uow.execute(qry.DELETE_ALL_RULES_FROM_RULESET, ruleset.get_ruleset_id())
 
     def delete_rule_from_ruleset(self, ruleset: RuleSet, rule: Rule):
         self._uow.execute(qry.DELETE_RULE_FROM_RULESET, rule.get_id(), ruleset.get_ruleset_id())

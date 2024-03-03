@@ -180,20 +180,22 @@ def cmd_remove_roms(args) -> bool:
     
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
-        romcollection_repository = ROMCollectionRepository(uow)
+        sources_repository = SourcesRepository(uow)
+        romcollections_repository = ROMCollectionRepository(uow)
         rom_repository = ROMsRepository(uow)
-        romcollection = romcollection_repository.find_romcollection(romcollection_id)
+        
+        romcollections = romcollections_repository.find_romcollections_by_source(source)
+        source = sources_repository.find(source_id)
         
         for rom_id in rom_ids:
             rom_repository.delete_rom(rom_id)
         uow.commit()
     
-    kodi.notify(kodi.translate(41010).format(romcollection.get_name()))
+    kodi.notify(kodi.translate(41010).format(source.get_name()))
     
-    AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': romcollection_id})
-    AppMediator.async_cmd('RENDER_CATEGORY_VIEW', {'category_id': romcollection.get_parent_id()})
+    AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
     AppMediator.async_cmd('RENDER_VCATEGORY_VIEWS')
-    AppMediator.async_cmd('EDIT_ROMCOLLECTION', {'romcollection_id': romcollection_id})
+    AppMediator.async_cmd('EDIT_SOURCE', {'source_id': source_id})
     return True
 
 

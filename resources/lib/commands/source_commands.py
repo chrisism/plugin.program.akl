@@ -65,9 +65,7 @@ def cmd_add_source(args):
             return
         
         logger.debug(f'ADD_SOURCE: Selected {selected_option.get_id()}')
-        src_name = kodi.dialog_keyboard(kodi.translate(41166))
         source = Source(None, selected_option)
-        source.set_name(src_name)
         
         wizard = kodi.WizardDialog_Selection(None, 'platform', kodi.translate(41099), platforms.AKL_platform_list)
         wizard = kodi.WizardDialog_Dummy(wizard, 'name', '', _get_name_from_platform)
@@ -94,10 +92,10 @@ def cmd_add_source(args):
         source_repository.insert_source(source)
         uow.commit()
         
-        kodi.notify(kodi.translate(40980))
-        kodi.run_script(
-            selected_option.get_addon_id(),
-            source.get_configure_command())
+    kodi.notify(kodi.translate(40980))
+    kodi.run_script(
+        selected_option.get_addon_id(),
+        source.get_configure_command())
 
 
 @AppMediator.register('EDIT_SOURCE')

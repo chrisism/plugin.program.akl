@@ -110,3 +110,20 @@ def qry_get_source_scanner_settings(source_id: str) -> str:
             return None
         
         return source.get_settings_str()
+
+
+def qry_get_source_launchers(source_id: str) -> str:
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        source_repository = SourcesRepository(uow)
+        source = source_repository.find(source_id)
+        
+        if source is None:
+            return None
+        
+        launchers_data = {}
+        launchers = source.get_launchers()
+        for launcher in launchers:
+            launchers_data[launcher.get_id()] = launcher.get_settings()
+            
+        return json.dumps(launchers_data)
