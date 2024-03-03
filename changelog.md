@@ -1,4 +1,6 @@
 ## Current
+- Separated launchers
+- Implemented sources
 - Added extra field to metadata item
 - Search term mode applicable for multi ROM scraping
 - Refactoring of default asset mapping

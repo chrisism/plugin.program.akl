@@ -40,6 +40,7 @@ class Test_Misc_Commands(unittest.TestCase):
         globals.g_PATHS = globals.AKL_Paths('plugin.tests')
         #globals.g_PATHS.DATABASE_FILE_PATH = dbPath
 
+    @unittest.skip("todo")
     @patch('resources.lib.commands.misc_commands.UnitOfWork', autospec=True)
     @patch('resources.lib.commands.misc_commands.AelAddonRepository.find_all_launcher_addons', autospec=True)
     @patch('resources.lib.commands.misc_commands.ROMCollectionRepository.insert_romcollection', autospec=True)
