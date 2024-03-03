@@ -425,7 +425,7 @@ class ROMLauncherAddon(ROMAddon):
             '--cmd': 'launch',
             '--type': constants.AddonType.LAUNCHER.name,
             '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': globals.WEBSERVER_PORT,
+            '--server_port': settings.getSettingAsInt('webserver_port'),
             '--akl_addon_id': self.get_id(),
             '--rom_id': rom.get_id()
         }
@@ -435,7 +435,7 @@ class ROMLauncherAddon(ROMAddon):
             '--cmd': 'configure',
             '--type': constants.AddonType.LAUNCHER.name,
             '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': globals.WEBSERVER_PORT,
+            '--server_port': settings.getSettingAsInt('webserver_port'),
             '--akl_addon_id': self.get_id(),
             '--entity_type': args['entity_type'] if 'entity_type' in args else '',
             '--entity_id': args['entity_id'] if 'entity_id' in args else ''
@@ -489,8 +489,8 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
             'akl_addon_id': self.get_id(),
             'addon_id': self.addon.get_addon_id(),
             'settings': {}
-        }
-        is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST, globals.WEBSERVER_PORT, post_data)
+        }        
+        is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST, settings.getSettingAsInt('webserver_port'), post_data)
         if not is_stored:
             kodi.notify_error(kodi.translate(40958))
             
@@ -500,8 +500,8 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
             'akl_addon_id': self.get_id(),
             'addon_id': self.addon.get_addon_id(),
             'settings': {}
-        }
-        is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST, globals.WEBSERVER_PORT, post_data)
+        }        
+        is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST, settings.getSettingAsInt('webserver_port'), post_data)
         if not is_stored:
             kodi.notify_error(kodi.translate(40958))
      
@@ -669,7 +669,7 @@ class Source(ROMAddon):
             '--cmd': 'scan',
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': globals.WEBSERVER_PORT,
+            '--server_port': settings.getSettingAsInt('webserver_port'),
             '--source_id': self.get_id()
         }
         
@@ -678,7 +678,7 @@ class Source(ROMAddon):
             '--cmd': 'configure',
             '--type': constants.AddonType.SCANNER.name,
             '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': globals.WEBSERVER_PORT,
+            '--server_port': settings.getSettingAsInt('webserver_port'),
             '--source_id': self.get_id()
         }
 
@@ -743,7 +743,7 @@ class ScraperAddon(ROMAddon):
             '--cmd': 'scrape',
             '--type': constants.AddonType.SCRAPER.name,
             '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': globals.WEBSERVER_PORT,
+            '--server_port': settings.getSettingAsInt('webserver_port'),
             '--entity_id': entity.get_id(),
             '--entity_type': entity.get_type(),
             '--akl_addon_id': self.addon.get_id(),

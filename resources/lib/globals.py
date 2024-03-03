@@ -42,7 +42,7 @@ class AKL_Paths(object):
         self.HOME_DIR = io.FileName('special://home')
         self.PROFILE_DIR = io.FileName('special://profile')
         self.ADDONS_DATA_DIR = io.FileName('special://profile/addon_data')
-        #  self.DATABASE_DIR     = io.FileName('special://database')
+        # self.DATABASE_DIR = io.FileName('special://database')
         
         self.ADDON_DATA_DIR = self.ADDONS_DATA_DIR.pjoin(addon_id)
         self.ADDONS_CODE_DIR = self.HOME_DIR.pjoin('addons', True)
@@ -71,7 +71,7 @@ class AKL_Paths(object):
         # --- Artwork and NFO for Categories and Launchers ---
         self.DEFAULT_CAT_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-categories')
         self.DEFAULT_COL_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-collections')
-        self.DEFAULT_ROM_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-roms')
+        self.DEFAULT_LAUN_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-launchers')
         self.DEFAULT_FAV_ASSET_DIR = self.ADDON_DATA_DIR.pjoin('asset-favourites')
         
         # --- Rendered views (normal and virtuals/generated) ---
@@ -112,7 +112,6 @@ class AKL_Paths(object):
 
         return self
 
-
 router: routing.Plugin = routing.Plugin()
 g_PATHS: AKL_Paths
 
@@ -124,5 +123,5 @@ WEBSERVER_PORT = 57300
 # Bootstrap factory object instances.
 #
 def g_bootstrap_instances():
-    global g_PATHS    
+    global g_PATHS
     g_PATHS = AKL_Paths(addon_id).build()

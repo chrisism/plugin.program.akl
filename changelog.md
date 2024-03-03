@@ -6,6 +6,7 @@
 - Changed database migrations system
 - Added 'edit platform' to ROMs
 - Changed platform can be applied to all ROMs in a collection
+- AKL webservice port number can be changed through settings
 
 ## Previous
 - Custom skin view for View ROM

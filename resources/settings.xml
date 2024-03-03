@@ -303,6 +303,13 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
+                <setting id="webserver_port" type="integer" label="40614" help="">
+                    <level>1</level>
+                    <default>5738</default>
+                    <control type="edit" format="integer">
+                        <heading>40614</heading>
+                    </control>
+                </setting>
                 <setting id="regeneration_days_period" type="integer" label="40612" help="">
                     <level>1</level>
                     <default>7</default>

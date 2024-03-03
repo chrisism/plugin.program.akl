@@ -211,6 +211,10 @@ msgctxt "#40613"
 msgid "Automatic fallback to Retroplayer"
 msgstr "settings.xml"
 
+msgctxt "#40614"
+msgid "AKL webserver port to use (restart required)"
+msgstr "settings.xml"
+
 ############################
 # Scraping settings
 ############################
