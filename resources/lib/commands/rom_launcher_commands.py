@@ -90,6 +90,7 @@ def cmd_delete_launcher(args):
             return
         
         repository.delete_launcher(launcher)
+        uow.commit()
         kodi.refresh_container()
 
 
