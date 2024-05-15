@@ -78,7 +78,12 @@ class ViewRepository(object):
     def find_items(self, view_id, obj_type: int) -> typing.Any:
         
         repository_file = self._assemble_view_file_name(view_id, obj_type)
-        self.logger.debug('find_items(): Loading path data from file {}'.format(repository_file.getPath()))
+        self.logger.debug(f'find_items(): Loading path data from file {repository_file.getPath()}')
+        
+        if not repository_file.exists():
+            self.logger.warning(f'File {repository_file.getPath()} does not exist.')
+            return None
+        
         try:
             item_data = repository_file.readJson()
         except ValueError as ex:
