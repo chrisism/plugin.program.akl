@@ -31,3 +31,5 @@ pyrightconfig.json
 tests/assets/test_db.db
 tools/
 .fuse_hidden000*
+.DS_Store
+

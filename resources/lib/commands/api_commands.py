@@ -263,7 +263,8 @@ def cmd_store_scraped_roms(args) -> bool:
                 metadata_to_update,
                 assets_to_update,
                 overwrite_existing_metadata=applied_settings.overwrite_existing_meta,
-                overwrite_existing_assets=applied_settings.overwrite_existing_assets)
+                overwrite_existing_assets=applied_settings.overwrite_existing_assets,
+                update_scanned_data=not settings.getSettingAsBool('scan_ignore_scrap_title'))
             # rom_obj.scraped_with(scraper_id)
             
             rom_repository.update_rom(rom_obj)
@@ -324,7 +325,8 @@ def cmd_store_scraped_single_rom(args) -> bool:
                         metadata_to_update,
                         assets_to_update,
                         overwrite_existing_metadata=applied_settings.overwrite_existing_meta,
-                        overwrite_existing_assets=applied_settings.overwrite_existing_assets)
+                        overwrite_existing_assets=applied_settings.overwrite_existing_assets,
+                        update_scanned_data=not settings.getSettingAsBool('scan_ignore_scrap_title'))
         #  rom_obj.scraped_with(scraper_id)
         
         rom_repository.update_rom(rom)
