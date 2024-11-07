@@ -277,9 +277,9 @@ def cmd_add_source_launchers(args):
         logger.debug(f'ADD_SOURCE_LAUNCHER: Selected {selected_option.get_id()}')
         is_default = kodi.dialog_yesno(kodi.translate(41171).format(selected_option.get_name()))
         
-        source.add_launcher(launcher, is_default)
+        source.add_launcher(selected_option, is_default)
         if kodi.dialog_yesno(kodi.translate(41050)):
-            source.import_data_dic(launcher.get_settings()['romcollection'])
+            source.import_data_dic(selected_option.get_settings()['romcollection'])
             
         source_repository.update_source(source)
         logger.info(f'Added launcher#{selected_option.get_id()} to Source {source.get_id()}')
@@ -325,9 +325,9 @@ def cmd_add_romcollection_launchers(args):
         logger.debug(f'ADD_COLLECTION_LAUNCHER: Selected {selected_option.get_id()}')
         is_default = kodi.dialog_yesno(kodi.translate(41171).format(selected_option.get_name()))
         
-        romcollection.add_launcher(launcher, is_default)
+        romcollection.add_launcher(selected_option, is_default)
         if kodi.dialog_yesno(kodi.translate(41050)):
-            romcollection.import_data_dic(launcher.get_settings()['romcollection'])
+            romcollection.import_data_dic(selected_option.get_settings()['romcollection'])
             metadata_updated = True
             
         romcollection_repository.update_romcollection(romcollection)
