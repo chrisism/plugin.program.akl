@@ -270,7 +270,7 @@ def cmd_store_scraped_roms(args) -> bool:
             rom_repository.update_rom(rom_obj)
         uow.commit()
     
-    kodi.notify(kodi.translate(41008).format(romcollection.get_name()))
+    kodi.notify(kodi.translate(41008).format(entity_name))
     
     if metadata_is_updated:
         AppMediator.async_cmd('RENDER_VCATEGORY_VIEWS')
