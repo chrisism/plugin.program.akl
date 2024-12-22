@@ -607,30 +607,30 @@ def cmd_execute_rom_with_launcher(args):
         for romcollection in romcollections:
             launchers.extend(romcollection.get_launchers())
         
-        if launchers is None or len(launchers) == 0:
+        if len(launchers) == 0:
             is_standalone_src = rom.get_scanned_data_element("standalone")
+            file_path = rom.get_scanned_data_element("file")
+            
             standalone_launchable = is_standalone_src and int(is_standalone_src) == 1
             
-            logger.warning(f'No launcher configured for ROM {rom.get_name()}')
+            if not standalone_launchable or not file_path:
+                logger.warning(f'No launcher configured for ROM {rom.get_name()}')
+                
             if not standalone_launchable and settings.getSettingAsBool('fallback_to_retroplayer'):
                 logger.info('Automatic fallback to Retroplayer as launcher applied.')
                 retroplayer_addon = addon_repository.find_by_addon_id(constants.RETROPLAYER_LAUNCHER_APP_NAME, constants.AddonType.LAUNCHER)
                 retroplayer_launcher = ROMLauncherAddonFactory.create(retroplayer_addon, {})
                 launchers.append(retroplayer_launcher)
             
-            file_path = rom.get_scanned_data_element("file")
             if file_path:
                 addon_id = "script.akl.defaults"
                 addon = addon_repository.find_by_addon_id(addon_id, constants.AddonType.LAUNCHER)
                 launcher = ROMLauncherAddonFactory.create(addon, None)
-                launcher.set_settings({
-                    "name": f"Standalone File Launcher: {file_path}",
-                    "application": file_path,
-                    "args": ""
-                })
+                launcher.set_settings({"name": f"Standalone File Launcher: {file_path}"})
+                launcher.set_id("STANDALONE")
                 launchers.append(launcher)
                             
-            if launchers is None or len(launchers) == 0:
+            if len(launchers) == 0:
                 kodi.notify_warn(kodi.translate(41001))
                 return
             

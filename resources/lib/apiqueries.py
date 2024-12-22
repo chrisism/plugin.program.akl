@@ -96,6 +96,13 @@ def qry_get_roms_by_romcollection(collection_id: str) -> str:
 
 
 def qry_get_launcher_settings(launcher_id: str) -> str:
+    if launcher_id == "STANDALONE":
+        settings = {
+            "name": "Standalone File Launcher",
+            "application": "FILE",
+        }
+        return json.dumps(settings)
+    
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         repository = LaunchersRepository(uow)
@@ -110,6 +117,13 @@ def qry_get_launcher_settings(launcher_id: str) -> str:
     
 
 def qry_get_collection_launcher_settings(collection_id: str, launcher_id: str) -> str:
+    if launcher_id == "STANDALONE":
+        settings = {
+            "name": "Standalone File Launcher",
+            "application": "FILE",
+        }
+        return json.dumps(settings)
+    
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         collection_repository = ROMCollectionRepository(uow)
@@ -117,10 +131,11 @@ def qry_get_collection_launcher_settings(collection_id: str, launcher_id: str) -
         
         if rom_collection is None:
             return None
-        
+    
         launcher = rom_collection.get_launcher(launcher_id)
         settings = launcher.get_settings()
         settings['name'] = launcher.get_name()
+        
         return json.dumps(settings)
 
 
