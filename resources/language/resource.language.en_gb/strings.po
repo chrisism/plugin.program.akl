@@ -2330,3 +2330,19 @@ msgstr "viewqueries"
 msgctxt "#44033"
 msgid "Manage your game [COLOR orange]launchers[/COLOR]."
 msgstr "viewqueries"
+
+msgctxt "#44034"
+msgid "Directory or service containing games and ROMs or simply standalone executables"
+msgstr ""
+
+msgctxt "#44035"
+msgid "Emulator/application that can launch or execute the source"
+msgstr ""
+
+msgctxt "#44036"
+msgid "Group your collections of games/ROMs by subject/company/theme"
+msgstr ""
+
+msgctxt "#44037"
+msgid "Create a specific collection of games/ROMs from your sources"
+msgstr ""

@@ -284,7 +284,8 @@ def cmd_add_standalone_source(args):
         rom_obj.set_platform(platform)
         if file_path:
             rom_obj.set_scanned_data_element("file", file_path)
-    
+        rom_obj.set_scanned_data_element("standalone", 1)
+            
         roms_repository.insert_rom(rom_obj)
         uow.commit()
         

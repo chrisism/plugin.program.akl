@@ -36,14 +36,15 @@ def cmd_add_item(args):
     logger.debug('cmd_add_item() BEGIN')
     
     options = collections.OrderedDict()
-    options['ADD_SOURCE'] = kodi.translate(42506)
-    options['ADD_LAUNCHER'] = kodi.translate(42514)
-    options['ADD_CATEGORY'] = kodi.translate(42501)
-    options['ADD_ROMCOLLECTION'] = kodi.translate(42503)
-    
+    options['ADD_SOURCE'] = kodi.get_listitem(kodi.translate(42506), kodi.translate(44034))
+    options['ADD_LAUNCHER'] = kodi.get_listitem(kodi.translate(42514), kodi.translate(44035))
+    options['ADD_CATEGORY'] = kodi.get_listitem(kodi.translate(42501), kodi.translate(44036))
+    options['ADD_ROMCOLLECTION'] = kodi.get_listitem(kodi.translate(42503), kodi.translate(44037))
+       
     selected_option = kodi.OrdDictionaryDialog().select(
         kodi.translate(41192),
-        options)
+        options,
+        use_details=True)
     
     if selected_option is None:
         return
