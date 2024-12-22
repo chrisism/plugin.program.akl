@@ -1708,7 +1708,7 @@ class ROM(MetaDataItemABC):
         
     def __init__(self,
                  rom_data: dict = None,
-                 tag_data: dict = None, 
+                 tag_data: dict = None,
                  assets_data: typing.List[Asset] = None,
                  asset_paths_data: typing.List[AssetPath] = None,
                  asset_mappings: typing.List[RomAssetMapping] = [],
