@@ -412,17 +412,21 @@ class ROMLauncherAddon(ROMAddon):
     
     def set_default(self, default_launcher=False):
         self.entity_data['is_default'] = default_launcher
+
+    def get_launch_command(self, rom: ROM) -> dict:
+        return {
+            '--cmd': 'launch',
+            '--type': constants.AddonType.LAUNCHER.name,
+            '--server_host': globals.WEBSERVER_HOST,
+            '--server_port': settings.getSettingAsInt('webserver_port'),
+            '--akl_addon_id': self.get_id(),
+            '--rom_id': rom.get_id()
+        }
         
     def launch(self, rom: ROM):
         kodi.run_script(
             self.addon.get_addon_id(),
-            addons.create_launch_command(
-                globals.WEBSERVER_HOST,
-                settings.getSettingAsInt('webserver_port'),
-                self.get_id(),
-                rom.get_type(),
-                rom.get_id()
-            ))
+            self.get_launch_command(rom))
 
     def configure(self, args: dict):
         kodi.run_script(
