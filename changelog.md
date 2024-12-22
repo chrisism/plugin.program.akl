@@ -1,4 +1,5 @@
 ## Current
+- Fixed launching standalone sources
 - Several fixes by mallexxx
 
 ## Previous
