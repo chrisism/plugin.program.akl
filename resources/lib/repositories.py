@@ -801,6 +801,10 @@ class ROMCollectionRepository(object):
         self._uow.execute(qry.SELECT_ROMCOLLECTION, romcollection_id)
         romcollection_data = self._uow.single_result()
         
+        if not romcollection_data:
+            self.logger.error(f'Could not find romcollection with id: {romcollection_id}')
+            return None
+        
         self._uow.execute(qry.SELECT_ROMCOLLECTION_ASSETS_BY_SET, romcollection_id)
         assets_result_set = self._uow.result_set()
         assets = []

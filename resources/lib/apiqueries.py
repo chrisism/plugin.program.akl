@@ -82,6 +82,9 @@ def qry_get_roms_by_romcollection(collection_id: str) -> str:
         rom_repository = ROMsRepository(uow)
         
         collection = collection_repository.find_romcollection(collection_id)
+        if not collection:
+            return None
+        
         roms = rom_repository.find_roms_by_romcollection(collection)
         
         if roms is None:
