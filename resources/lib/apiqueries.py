@@ -67,8 +67,11 @@ def qry_get_roms(source_id: str) -> str:
         if roms is None:
             return None
         
+        asset_paths_by_source = source.get_asset_paths()
+        
         data = []
         for rom in roms:
+            rom.update_missing_asset_paths(asset_paths_by_source)
             rom_dto = rom.create_dto()
             data.append(rom_dto.get_data_dic())
             
@@ -90,8 +93,11 @@ def qry_get_roms_by_romcollection(collection_id: str) -> str:
         if roms is None:
             return None
         
+        asset_paths_by_collection = collection.get_asset_paths()
+        
         data = []
         for rom in roms:
+            rom.update_missing_asset_paths(asset_paths_by_collection)
             rom_dto = rom.create_dto()
             data.append(rom_dto.get_data_dic())
             

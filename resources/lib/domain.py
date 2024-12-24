@@ -1169,6 +1169,11 @@ class MetaDataItemABC(EntityABC):
         
         self.asset_paths[asset_info.id] = asset_path
     
+    def update_missing_asset_paths(self, asset_paths: typing.List[AssetPath]):
+        for asset_path in asset_paths:
+            if asset_path.get_asset_info_id() not in self.asset_paths:
+                self.set_asset_path(asset_path.get_asset_info(), asset_path.get_path())
+                  
     @abc.abstractmethod
     def get_asset_ids_list(self) -> typing.List[str]:
         pass

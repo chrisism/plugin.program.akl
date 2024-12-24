@@ -1059,7 +1059,7 @@ class ROMCollectionRepository(object):
                           romcollection_obj.get_box_sizing())
         
         romcollection_assets = romcollection_obj.get_assets()
-        for asset in romcollection_assets: 
+        for asset in romcollection_assets:
             self._insert_asset(asset, romcollection_obj)
             
         asset_paths = romcollection_obj.get_asset_paths()
