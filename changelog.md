@@ -1,6 +1,7 @@
 ## Current
 - Fixed launching standalone sources
 - Several fixes by mallexxx
+- Moved default asset paths to edit assets/artwork menu
 
 ## Previous
 - Separated launchers
