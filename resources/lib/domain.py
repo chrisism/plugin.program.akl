@@ -60,11 +60,11 @@ def _is_empty_or_default(input: any, default: any):
 class AssetInfo(object):
     id = ''
     key = ''
-    name_id = '' 
+    name_id = ''
     name = ''
     description = name
     plural = ''
-    fname_infix = '' # Used only when searching assets when importing XML
+    fname_infix = ''  # Used only when searching assets when importing XML
     kind_str = ''
     exts = []
     exts_dialog = ''
@@ -731,18 +731,18 @@ class ScraperAddon(ROMAddon):
     def set_scraper_settings(self, settings: ScraperSettings):
         self.entity_data['settings'] = json.dumps(settings.get_data_dic())
            
-    def get_scrape_command(self, entity: EntityABC) -> dict:
-        return {
-            '--cmd': 'scrape',
-            '--type': constants.AddonType.SCRAPER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': settings.getSettingAsInt('webserver_port'),
-            '--entity_id': entity.get_id(),
-            '--entity_type': entity.get_type(),
-            '--akl_addon_id': self.addon.get_id(),
-            '--settings': io.parse_to_json_arg(self.get_settings())
-        }
- 
+    def scrape(self, entity: EntityABC):
+        kodi.run_script(
+            self.addon.get_addon_id(),
+            addons.create_scraper_command(
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                self.addon.get_id(),
+                entity.get_type(),
+                entity.get_id(),
+                io.parse_to_json_arg(self.get_settings())
+            ))
+
 
 class RuleSetOperator(IntEnum):
     AND = 1
@@ -2155,7 +2155,7 @@ class ROM(MetaDataItemABC):
         if constants.META_DEVELOPER_ID in metadata_to_update \
             and api_rom_obj.get_developer() \
             and (overwrite_existing_metadata or
-                 _is_empty_or_default(self.get_developer(), constants.DEFAULT_META_DEVELOPER)):         
+                 _is_empty_or_default(self.get_developer(), constants.DEFAULT_META_DEVELOPER)):
             self.set_developer(api_rom_obj.get_developer())
         
         if constants.META_NPLAYERS_ID in metadata_to_update \
@@ -2185,7 +2185,7 @@ class ROM(MetaDataItemABC):
         if constants.META_RATING_ID in metadata_to_update \
                 and api_rom_obj.get_rating() \
                 and (overwrite_existing_metadata or
-                     _is_empty_or_default(self.get_rating(), constants.DEFAULT_META_RATING)):            
+                     _is_empty_or_default(self.get_rating(), constants.DEFAULT_META_RATING)):      
             self.set_rating(api_rom_obj.get_rating())
         
         if constants.META_TAGS_ID in metadata_to_update and api_rom_obj.get_tags() is not None:
@@ -2479,65 +2479,65 @@ class AssetInfoFactory(object):
                 
         # >> These are used very frequently so I think it is better to have a cached list.
         a = AssetInfo()
-        a.id                            = constants.ASSET_ICON_ID
-        a.name_id                       = 43001
-        a.name                          = 'Icon'
-        a.plural                        = 'Icons'
-        a.fname_infix                   = 'icon'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_icon'        
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_ICON_ID
+        a.name_id = 43001
+        a.name = 'Icon'
+        a.plural = 'Icons'
+        a.fname_infix = 'icon'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_icon'        
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()
-        a.id                            = constants.ASSET_FANART_ID
-        a.name_id                       = 43002
-        a.name                          = 'Fanart'
-        a.plural                        = 'Fanarts'
-        a.fname_infix                   = 'fanart'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_fanart'
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_FANART_ID
+        a.name_id = 43002
+        a.name = 'Fanart'
+        a.plural = 'Fanarts'
+        a.fname_infix = 'fanart'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_fanart'
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()
-        a.id                            = constants.ASSET_BANNER_ID
-        a.name_id                       = 43003
-        a.name                          = 'Banner'
-        a.description                   = 'Banner / Marquee'
-        a.plural                        = 'Banners'
-        a.fname_infix                   = 'banner'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_banner'
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_BANNER_ID
+        a.name_id = 43003
+        a.name = 'Banner'
+        a.description = 'Banner / Marquee'
+        a.plural = 'Banners'
+        a.fname_infix = 'banner'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_banner'
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()        
-        a.id                            = constants.ASSET_POSTER_ID
-        a.name_id                       = 43004
-        a.name                          = 'Poster'
-        a.plural                        = 'Posters'
-        a.fname_infix                   = 'poster'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_poster'
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_POSTER_ID
+        a.name_id = 43004
+        a.name = 'Poster'
+        a.plural = 'Posters'
+        a.fname_infix = 'poster'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_poster'
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()
-        a.id                            = constants.ASSET_CLEARLOGO_ID
-        a.name_id                       = 43005
-        a.name                          = 'Clearlogo'
-        a.plural                        = 'Clearlogos'
-        a.fname_infix                   = 'clearlogo'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_clearlogo'
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_CLEARLOGO_ID
+        a.name_id = 43005
+        a.name = 'Clearlogo'
+        a.plural = 'Clearlogos'
+        a.fname_infix = 'clearlogo'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_clearlogo'
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()
         a.id                            = constants.ASSET_CONTROLLER_ID
@@ -2967,4 +2967,4 @@ def _get_default_asset_data_model():
         'id' : '',
         'filepath' : '',
         'asset_type' : ''
-    }    
+    }

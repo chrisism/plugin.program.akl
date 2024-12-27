@@ -33,10 +33,13 @@ from resources.lib.domain import ROMCollection, Source, ScraperAddon, g_assetFac
 logger = logging.getLogger(__name__)
 
 
+SCRAPE_ROMS = 'SCRAPE_ROMS'
+SCRAPE_ROMS_WITH_SETTINGS = 'SCRAPE_ROMS_WITH_SETTINGS'
+
 # -------------------------------------------------------------------------------------------------
 # Start scraping
 # -------------------------------------------------------------------------------------------------
-@AppMediator.register('SCRAPE_ROMS')
+@AppMediator.register(SCRAPE_ROMS)
 def cmd_scrape_romcollection(args):
     romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
     
@@ -64,7 +67,7 @@ def cmd_scrape_romcollection(args):
         args['scraper_supported_metadata'] = selected_addon.get_supported_metadata()
         args['scraper_supported_assets'] = selected_addon.get_supported_assets()
         
-    AppMediator.sync_cmd('SCRAPE_ROMS_WITH_SETTINGS', args)
+    AppMediator.sync_cmd(SCRAPE_ROMS_WITH_SETTINGS, args)
 
 
 @AppMediator.register('SCRAPE_SOURCE_ROMS')
@@ -95,7 +98,7 @@ def cmd_scrape_source(args):
         args['scraper_supported_metadata'] = selected_addon.get_supported_metadata()
         args['scraper_supported_assets'] = selected_addon.get_supported_assets()
         
-    AppMediator.sync_cmd('SCRAPE_ROMS_WITH_SETTINGS', args)
+    AppMediator.sync_cmd(SCRAPE_ROMS_WITH_SETTINGS, args)
 
 
 # Scrape ROM - Select scraper to use
@@ -130,7 +133,7 @@ def cmd_scrape_rom(args):
     AppMediator.sync_cmd('SCRAPE_ROM_WITH_SETTINGS', args)
 
 
-@AppMediator.register('SCRAPE_ROMS_WITH_SETTINGS')
+@AppMediator.register(SCRAPE_ROMS_WITH_SETTINGS)
 def cmd_scrape_roms_in_collection_or_source(args):
     romcollection_id: str = args['romcollection_id'] if 'romcollection_id' in args else None
     source_id: str = args['source_id'] if 'source_id' in args else None
@@ -177,7 +180,7 @@ def cmd_scrape_roms_in_collection_or_source(args):
             return
         
         if selected_option != 'SCRAPE':
-            args['ret_cmd'] = 'SCRAPE_ROMS_WITH_SETTINGS'
+            args['ret_cmd'] = SCRAPE_ROMS_WITH_SETTINGS
             AppMediator.sync_cmd(selected_option, args)
             return
 
@@ -191,9 +194,8 @@ def cmd_scrape_roms_in_collection_or_source(args):
     selected_addon.set_scraper_settings(scraper_settings)
     kodi.notify(kodi.translate(40979))
     entity = collection if collection else source
-    kodi.run_script(
-        selected_addon.addon.get_addon_id(),
-        selected_addon.get_scrape_command(entity))
+    
+    selected_addon.scrape(entity)
     
 
 # Scrape ROM - Apply settings and run scrape action
@@ -243,10 +245,8 @@ def cmd_scrape_rom_with_settings(args):
 
         # >> Execute scraper
         selected_addon.set_scraper_settings(scraper_settings)
-        kodi.notify(kodi.translate(40979))   
-        kodi.run_script(
-            selected_addon.addon.get_addon_id(),
-            selected_addon.get_scrape_command(rom))
+        kodi.notify(kodi.translate(40979))
+        selected_addon.scrape(rom)
 
 
 @AppMediator.register('SCRAPE_ROM_METADATA')
@@ -288,9 +288,7 @@ def cmd_scrape_rom_metadata(args):
     # >> Execute scraper
     selected_addon.set_scraper_settings(scraper_settings)
     kodi.notify(kodi.translate(40979))
-    kodi.run_script(
-        selected_addon.addon.get_addon_id(),
-        selected_addon.get_scrape_command(rom))
+    selected_addon.scrape(rom)
 
 
 @AppMediator.register('SCRAPE_ROM_ASSET')
@@ -325,9 +323,7 @@ def cmd_scrape_rom_asset(args):
     logger.debug(f'SCRAPE_ROM_ASSET: Selected scraper#{selected_addon.get_name()}')
     
     kodi.notify(kodi.translate(40979))
-    kodi.run_script(
-        selected_addon.addon.get_addon_id(),
-        selected_addon.get_scrape_command(rom))    
+    selected_addon.scrape(rom)
 
 
 @AppMediator.register('SCRAPE_ROM_ASSETS')
@@ -372,9 +368,7 @@ def cmd_scrape_rom_assets(args):
     selected_addon.set_scraper_settings(scraper_settings)
     kodi.notify(kodi.translate(40979))
     # >> Execute scraper
-    kodi.run_script(
-        selected_addon.addon.get_addon_id(),
-        selected_addon.get_scrape_command(rom))
+    selected_addon.scrape(rom)
 
 
 # -------------------------------------------------------------------------------------------------
@@ -524,7 +518,7 @@ def cmd_configure_scraper_assets_to_scrape(args):
         AppMediator.sync_cmd(args['ret_cmd'], args)
         return
     
-    scraper_settings.asset_IDs_to_scrape = selected_options  
+    scraper_settings.asset_IDs_to_scrape = selected_options
     args['scraper_settings'] = scraper_settings
     AppMediator.sync_cmd(args['ret_cmd'], args)
     return
