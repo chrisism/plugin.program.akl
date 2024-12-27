@@ -438,7 +438,7 @@ def cmd_category_save_nfo_file(args):
     # >> user, so display nothing to not overwrite error notification.
     try:
         category.export_to_NFO_file(NFO_FileName)
-    except:
+    except Exception:
         kodi.notify_warn(kodi.translate(41042).format(NFO_FileName.getPath()))
         logger.error("cmd_category_save_nfo_file() Exception writing'{0}'".format(NFO_FileName.getPath()))
     else:

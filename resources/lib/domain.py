@@ -740,7 +740,7 @@ class ScraperAddon(ROMAddon):
                 self.addon.get_id(),
                 entity.get_type(),
                 entity.get_id(),
-                self.get_settings()
+                self.get_settings() 
             ))
 
 

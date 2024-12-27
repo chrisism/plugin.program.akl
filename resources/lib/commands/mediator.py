@@ -1,8 +1,9 @@
 import logging
 
-from akl.utils import text, kodi
+from akl.utils import kodi
 
 logger = logging.getLogger(__name__)
+
 
 class AppMediator(object):
 
@@ -26,14 +27,14 @@ class AppMediator(object):
     def sync_cmd(cls, command='undefined', args=None):
         logger.debug('Invoking {}'.format(command))
         if command not in cls._commands:
-            logger.warning('Command "{}" not registered'.format(command))
+            logger.warning(f'Command "{command}" not registered')
             return
         commands_by_event = cls._commands[command]
         for a_command in commands_by_event:
             try:
                 return a_command(args)
             except Exception as ex:
-                logger.fatal('Failure processing command "{}"'.format(command), exc_info=ex)
+                logger.fatal(f'Failure processing command "{command}"', exc_info=ex)
                 kodi.notify_error(kodi.translate(41043).format(command))
             
     @classmethod
