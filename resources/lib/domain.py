@@ -2433,25 +2433,31 @@ class AssetInfoFactory(object):
 
         return local_asset_list
 
-    #
-    # A) This function checks if all path_* share a common root directory. If so
-    #    this function returns that common directory as an Unicode string.
-    # B) If path_* do not share a common root directory this function returns ''.
-    #
-    def assets_get_ROM_asset_path(self, launcher):
-        ROM_asset_path = ''
-        duplicated_bool_list = [False] * len(constants.ROM_ASSET_ID_LIST)
-        AInfo_first = g_assetFactory.get_asset_info(constants.ROM_ASSET_ID_LIST[0])
-        path_first_asset_FN = io.FileName(launcher[AInfo_first.path_key])
-        logger.debug('assets_get_ROM_asset_path() path_first_asset "{0}"'.format(path_first_asset_FN.getPath()))
-        for i, asset_kind in enumerate(constants.ROM_ASSET_ID_LIST):
-            AInfo = g_assetFactory.get_asset_info(asset_kind)
-            current_path_FN = io.FileName(launcher[AInfo.path_key])
-            if current_path_FN.getDir() == path_first_asset_FN.getDir():
-                duplicated_bool_list[i] = True
-
-        return path_first_asset_FN.getDir() if all(duplicated_bool_list) else ''
-
+    def get_rom_asset_paths(self, rom: ROM = None, source: Source = None):
+        asset_paths = []
+        
+        for asset_id in constants.ROM_ASSET_ID_LIST:
+            asset_info = self.get_asset_info(asset_id)
+            path = self.get_rom_asset_path(asset_info, rom, source)
+            asset_paths.append(path)
+        return asset_paths
+        
+    def get_rom_asset_path(self, asset_info: AssetInfo, rom: ROM = None, source: Source = None):
+        if rom:
+            path = rom.get_asset_path(asset_info)
+        if path:
+            return path
+        
+        if source:
+            path = source.get_asset_path(asset_info, True)
+        if path:
+            return path
+        
+        fallback_assets_dir = settings.getSettingAsFilePath('launchers_asset_dir', isdir=True,
+                                                            fallback=globals.g_PATHS.DEFAULT_ROM_ASSET_DIR)
+        path = fallback_assets_dir.pjoin(asset_info.plural.lower(), isdir=True)
+        return path
+    
     #
     # Gets extensions to be used in regular expressions.
     # Input : ['png', 'jpg']

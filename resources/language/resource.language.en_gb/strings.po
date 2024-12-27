@@ -2195,6 +2195,10 @@ msgctxt "#42092"
 msgid "Remove ROM from collection"
 msgstr ""
 
+msgctxt "#42093"
+msgid "Manage ROM asset directories ..."
+msgstr ""
+
 ############################
 # Context menu item descriptions
 ############################

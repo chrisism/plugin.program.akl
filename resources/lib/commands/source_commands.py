@@ -21,8 +21,6 @@ import logging
 import collections
 import typing
 
-import xbmcgui
-
 from akl import constants, platforms
 from akl.utils import kodi, io
 
@@ -339,7 +337,7 @@ def cmd_manage_source_roms(args):
 
 
 @AppMediator.register('SET_ROMS_ASSET_DIRS')
-def cmd_set_rom_asset_dirs(args):
+def cmd_set_roms_asset_dirs(args):
     source_id: str = args['source_id'] if 'source_id' in args else None
     
     list_items = collections.OrderedDict()
@@ -353,14 +351,14 @@ def cmd_set_rom_asset_dirs(args):
         root_path = source.get_assets_root_path()
         root_path_str = root_path.getPath() if root_path else kodi.translate(41158)
         
-        gui_listitem = xbmcgui.ListItem(label=kodi.translate(42083), label2=root_path_str)
-        gui_listitem.setArt({'icon': 'DefaultFolder.png'})
+        gui_listitem = kodi.get_listitem(kodi.translate(42083), root_path_str, art={'icon': 'DefaultFolder.png'})
         list_items[AssetInfo()] = gui_listitem
         for asset_info in assets:
             path = source.get_asset_path(asset_info)
             if path:
-                gui_listitem = xbmcgui.ListItem(label=kodi.translate(42084).format(asset_info.plural), label2=path.getPath())
-                gui_listitem.setArt({'icon': 'DefaultFolder.png'})
+                gui_listitem = kodi.get_listitem(kodi.translate(42084).format(asset_info.plural),
+                                                 path.getPath(),
+                                                 art={'icon': 'DefaultFolder.png'})
                 list_items[asset_info] = gui_listitem
 
         dialog = kodi.OrdDictionaryDialog()

@@ -24,6 +24,7 @@ import json
 
 # AKL modules
 from resources.lib import globals
+from resources.lib.domain import g_assetFactory
 from resources.lib.repositories import UnitOfWork, ROMsRepository, ROMCollectionRepository, SourcesRepository, LaunchersRepository
 
 logger = logging.getLogger(__name__)
@@ -67,8 +68,7 @@ def qry_get_roms(source_id: str) -> str:
         if roms is None:
             return None
         
-        asset_paths_by_source = source.get_asset_paths()
-        
+        asset_paths_by_source = g_assetFactory.get_rom_asset_paths(source=source)
         data = []
         for rom in roms:
             rom.update_missing_asset_paths(asset_paths_by_source)
@@ -93,11 +93,11 @@ def qry_get_roms_by_romcollection(collection_id: str) -> str:
         if roms is None:
             return None
         
-        asset_paths_by_collection = collection.get_asset_paths()
+        fallback_asset_paths = g_assetFactory.get_rom_asset_paths()
         
         data = []
         for rom in roms:
-            rom.update_missing_asset_paths(asset_paths_by_collection)
+            rom.update_missing_asset_paths(fallback_asset_paths)
             rom_dto = rom.create_dto()
             data.append(rom_dto.get_data_dic())
             

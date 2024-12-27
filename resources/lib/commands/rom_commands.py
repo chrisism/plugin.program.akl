@@ -28,13 +28,15 @@ from resources.lib import globals, editors
 from resources.lib.repositories import CategoryRepository, ROMsRepository, ROMCollectionRepository, UnitOfWork
 from resources.lib.repositories import SourcesRepository
 
-from resources.lib.domain import g_assetFactory
+from resources.lib.domain import g_assetFactory, AssetInfo
 
 logger = logging.getLogger(__name__)
 
 # -------------------------------------------------------------------------------------------------
 # ROM context menu.
 # -------------------------------------------------------------------------------------------------
+ROM_EDIT_DEFAULT_ASSETS = 'ROM_EDIT_DEFAULT_ASSETS'
+SET_ROM_ASSET_DIRS = 'SET_ROM_ASSET_DIRS'
 
 
 # --- Main menu command ---
@@ -57,7 +59,6 @@ def cmd_edit_rom(args):
     options = collections.OrderedDict()
     options['ROM_EDIT_METADATA'] = kodi.translate(40853)
     options['ROM_EDIT_ASSETS'] = kodi.translate(40854)
-    options['ROM_EDIT_DEFAULT_ASSETS'] = kodi.translate(40859)
     options['EDIT_ROM_STATUS'] = kodi.translate(42013).format(
         kodi.translate(rom.get_finished_str_code()))
     if rom.has_launchers():
@@ -158,6 +159,14 @@ def cmd_rom_assets(args):
             AppMediator.sync_cmd(editors.SCRAPE_CMD, args)
             return
         
+        if selected_asset_to_edit == editors.ROM_SET_ASSET_PATHS:
+            AppMediator.sync_cmd(editors.ROM_SET_ASSET_PATHS, args)
+            return
+        
+        if selected_asset_to_edit == editors.EDIT_DEFAULT_ASSETS:
+            AppMediator.sync_cmd(ROM_EDIT_DEFAULT_ASSETS, args)
+            return
+        
         assets_root_path = source.get_assets_root_path() if source else None
         asset = g_assetFactory.get_asset_info(selected_asset_to_edit)
         # >> Execute edit asset menu subcommand. Then, execute recursively this submenu again.
@@ -178,7 +187,7 @@ def cmd_rom_assets(args):
     AppMediator.sync_cmd('ROM_EDIT_ASSETS', {'rom_id': rom_id, 'selected_asset': asset.id})
 
 
-@AppMediator.register('ROM_EDIT_DEFAULT_ASSETS')
+@AppMediator.register(ROM_EDIT_DEFAULT_ASSETS)
 def cmd_rom_edit_default_assets(args):
     rom_id: str = args['rom_id'] if 'rom_id' in args else None
     preselected_option = args['selected_asset'] if 'selected_asset' in args else None
@@ -191,7 +200,7 @@ def cmd_rom_edit_default_assets(args):
         selected_asset_to_edit = editors.edit_object_default_assets(rom, preselected_option)
         if selected_asset_to_edit is None:
             args["selected_asset"] = None
-            AppMediator.sync_cmd('EDIT_ROM', args)
+            AppMediator.sync_cmd('ROM_EDIT_ASSETS', args)
             return
 
         if editors.edit_default_asset(rom, selected_asset_to_edit):
@@ -199,6 +208,50 @@ def cmd_rom_edit_default_assets(args):
             uow.commit()
         
     AppMediator.sync_cmd('ROM_EDIT_DEFAULT_ASSETS', {'rom_id': rom.get_id(), 'selected_asset': selected_asset_to_edit.id})         
+
+
+@AppMediator.register(SET_ROM_ASSET_DIRS)
+def cmd_set_rom_asset_dirs(args):
+    rom_id: str = args['rom_id'] if 'rom_id' in args else None
+    
+    list_items = collections.OrderedDict()
+    assets = g_assetFactory.get_assets_for_type(constants.OBJ_ROM)
+
+    uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
+    with uow:
+        repository = ROMsRepository(uow)
+        source_repository = SourcesRepository(uow)
+        
+        rom = repository.find_rom(rom_id)
+        source = source_repository.find(rom.get_scanned_by())
+                
+        for asset_info in assets:
+            path = g_assetFactory.get_rom_asset_path(asset_info, rom, source)
+            gui_listitem = kodi.get_listitem(kodi.translate(42084).format(asset_info.name),
+                                             path.getPath(),
+                                             art={'icon': 'DefaultFolder.png'})
+            list_items[asset_info] = gui_listitem
+                
+        dialog = kodi.OrdDictionaryDialog()
+        selected_asset: AssetInfo = dialog.select(kodi.translate(41129), list_items, use_details=True)
+
+        if selected_asset is None:
+            AppMediator.sync_cmd('ROM_EDIT_ASSETS', args)
+            return
+
+        selected_asset_path = g_assetFactory.get_rom_asset_path(selected_asset, rom, source)
+        dir_path = kodi.browse(type=0, text=kodi.translate(41160).format(selected_asset.plural),
+                               preselected_path=selected_asset_path.getPath())
+        if not dir_path or dir_path == selected_asset_path.getPath():
+            AppMediator.sync_cmd(SET_ROM_ASSET_DIRS, args)
+            return
+        
+        rom.set_asset_path(selected_asset, dir_path)
+        repository.update_rom(rom)
+        uow.commit()
+                
+    kodi.notify(kodi.translate(40984).format(selected_asset.name, dir_path))
+    AppMediator.sync_cmd(SET_ROM_ASSET_DIRS, args)
 
 
 @AppMediator.register('REMOVE_ROM_FROM_COLLECTION')

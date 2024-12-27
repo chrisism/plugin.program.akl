@@ -177,6 +177,8 @@ def import_TXT_file(text_file: io.FileName):
 
 
 SCRAPE_CMD = 'SCRAPE_ROM_ASSETS'
+ROM_SET_ASSET_PATHS = 'SET_ROM_ASSET_DIRS'
+EDIT_DEFAULT_ASSETS = 'EDIT_DEFAULT_ASSETS'
 
 
 def edit_object_assets(obj_instance: MetaDataItemABC, preselected_asset=None) -> str:
@@ -211,8 +213,11 @@ def edit_object_assets(obj_instance: MetaDataItemABC, preselected_asset=None) ->
         # --- Append to list of ListItems ---
         options[asset_info_obj.id] = list_item
 
-    # if ROM then add scrape option
-    if obj_instance.get_object_name() == 'ROM':
+    options[EDIT_DEFAULT_ASSETS] = kodi.translate(40859)
+    
+    # if ROM then add scrape and asset paths option
+    if obj_instance.get_type() == constants.OBJ_ROM:
+        options[ROM_SET_ASSET_PATHS] = kodi.translate(42093)
         options[SCRAPE_CMD] = kodi.translate(41120)
     
     # --- Customize function for each object type ---

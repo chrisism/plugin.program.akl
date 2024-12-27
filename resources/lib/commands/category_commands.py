@@ -112,7 +112,6 @@ def cmd_edit_category(args):
         options = collections.OrderedDict()
         options['CATEGORY_EDIT_METADATA'] = kodi.translate(40853)
         options['CATEGORY_EDIT_ASSETS'] = kodi.translate(40854)
-        options['CATEGORY_EDIT_DEFAULT_ASSETS'] = kodi.translate(40859)
         options['EDIT_PARENT_CATEGORY'] = kodi.translate(42040).format(parent_category.get_name())
         options['CATEGORY_STATUS'] = f'{kodi.translate(40860)} {kodi.translate(category.get_finished_str_code())}'
         options['EXPORT_CATEGORY_XML'] = kodi.translate(40861)
@@ -187,12 +186,11 @@ def cmd_category_edit_assets(args):
             AppMediator.async_cmd('EDIT_CATEGORY', args)
             return
         
+        if selected_asset_to_edit == editors.EDIT_DEFAULT_ASSETS:
+            AppMediator.async_cmd('CATEGORY_EDIT_DEFAULT_ASSETS', args)
+            return
+        
         asset = g_assetFactory.get_asset_info(selected_asset_to_edit)
-        #  if selected_asset_to_edit == editors.SCRAPE_CMD:
-        #    AppMediator.async_cmd('EDIT_CATEGORY_MENU', args)
-        #    globals.run_command(scrape_cmd, rom=obj_instance)
-        #    edit_object_assets(obj_instance, selected_option)
-        #    return True
         
         # >> Execute edit asset menu subcommand. Then, execute recursively this submenu again.
         # >> The menu dialog is instantiated again so it reflects the changes just edited.
