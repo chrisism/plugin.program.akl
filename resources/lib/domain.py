@@ -2433,13 +2433,17 @@ class AssetInfoFactory(object):
 
         return local_asset_list
 
-    def get_rom_asset_paths(self, rom: ROM = None, source: Source = None):
+    def get_rom_asset_paths(self, rom: ROM = None, source: Source = None) -> typing.List[AssetInfo]:
         asset_paths = []
         
         for asset_id in constants.ROM_ASSET_ID_LIST:
             asset_info = self.get_asset_info(asset_id)
             path = self.get_rom_asset_path(asset_info, rom, source)
-            asset_paths.append(path)
+            
+            asset_path_obj = AssetPath()
+            asset_path_obj.set_path(path)
+            asset_path_obj.set_asset_info(asset_info)
+            asset_paths.append(asset_path_obj)
         return asset_paths
         
     def get_rom_asset_path(self, asset_info: AssetInfo, rom: ROM = None, source: Source = None):
