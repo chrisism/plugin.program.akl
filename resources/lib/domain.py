@@ -2445,13 +2445,13 @@ class AssetInfoFactory(object):
     def get_rom_asset_path(self, asset_info: AssetInfo, rom: ROM = None, source: Source = None):
         if rom:
             path = rom.get_asset_path(asset_info)
-        if path:
-            return path
+            if path:
+                return path
         
         if source:
             path = source.get_asset_path(asset_info, True)
-        if path:
-            return path
+            if path:
+                return path
         
         fallback_assets_dir = settings.getSettingAsFilePath('launchers_asset_dir', isdir=True,
                                                             fallback=globals.g_PATHS.DEFAULT_ROM_ASSET_DIR)
