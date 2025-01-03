@@ -414,14 +414,13 @@ class ROMLauncherAddon(ROMAddon):
         self.entity_data['is_default'] = default_launcher
 
     def get_launch_command(self, rom: ROM) -> dict:
-        return {
-            '--cmd': 'launch',
-            '--type': constants.AddonType.LAUNCHER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': settings.getSettingAsInt('webserver_port'),
-            '--akl_addon_id': self.get_id(),
-            '--rom_id': rom.get_id()
-        }
+        return addons.create_launch_command(
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'),
+            self.get_id(),
+            constants.OBJ_ROM,
+            rom.get_id()    
+        )
         
     def launch(self, rom: ROM):
         kodi.run_script(
@@ -653,22 +652,22 @@ class Source(ROMAddon):
         return self.entity_data["last_scan_timestamp"]
     
     def get_scan_command(self) -> dict:
-        return {
-            '--cmd': 'scan',
-            '--type': constants.AddonType.SCANNER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': settings.getSettingAsInt('webserver_port'),
-            '--source_id': self.get_id()
-        }
+        return addons.create_scan_command(
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'),
+            self.get_id(),
+            constants.OBJ_SOURCE,
+            self.get_id()
+        )
         
     def get_configure_command(self) -> dict:
-        return {
-            '--cmd': 'configure',
-            '--type': constants.AddonType.SCANNER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': settings.getSettingAsInt('webserver_port'),
-            '--source_id': self.get_id()
-        }
+        return addons.create_configure_scan_command(
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'),
+            self.get_id(),
+            constants.OBJ_SOURCE,
+            self.get_id()
+        )
 
 
 class ScraperAddon(ROMAddon):
@@ -740,7 +739,7 @@ class ScraperAddon(ROMAddon):
                 self.addon.get_id(),
                 entity.get_type(),
                 entity.get_id(),
-                self.get_settings() 
+                self.get_settings()
             ))
 
 
