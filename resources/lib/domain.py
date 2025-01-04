@@ -2116,7 +2116,7 @@ class ROM(MetaDataItemABC):
     # Updates an ROM entity with the API object given.
     # Flags indicate which elements are allowed to be updated/altered with the incoming data.
     #
-    def update_with(self, 
+    def update_with(self,
                     api_rom_obj: api.ROMObj,
                     metadata_to_update=[],
                     assets_to_update=[],
