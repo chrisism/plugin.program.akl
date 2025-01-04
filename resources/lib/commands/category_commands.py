@@ -36,14 +36,15 @@ def cmd_add_item(args):
     logger.debug('cmd_add_item() BEGIN')
     
     options = collections.OrderedDict()
-    options['ADD_SOURCE'] = kodi.translate(42506)
-    options['ADD_LAUNCHER'] = kodi.translate(42514)
-    options['ADD_CATEGORY'] = kodi.translate(42501)
-    options['ADD_ROMCOLLECTION'] = kodi.translate(42503)
-    
+    options['ADD_SOURCE'] = kodi.get_listitem(kodi.translate(42506), kodi.translate(44034))
+    options['ADD_LAUNCHER'] = kodi.get_listitem(kodi.translate(42514), kodi.translate(44035))
+    options['ADD_CATEGORY'] = kodi.get_listitem(kodi.translate(42501), kodi.translate(44036))
+    options['ADD_ROMCOLLECTION'] = kodi.get_listitem(kodi.translate(42503), kodi.translate(44037))
+       
     selected_option = kodi.OrdDictionaryDialog().select(
         kodi.translate(41192),
-        options)
+        options,
+        use_details=True)
     
     if selected_option is None:
         return
@@ -111,7 +112,6 @@ def cmd_edit_category(args):
         options = collections.OrderedDict()
         options['CATEGORY_EDIT_METADATA'] = kodi.translate(40853)
         options['CATEGORY_EDIT_ASSETS'] = kodi.translate(40854)
-        options['CATEGORY_EDIT_DEFAULT_ASSETS'] = kodi.translate(40859)
         options['EDIT_PARENT_CATEGORY'] = kodi.translate(42040).format(parent_category.get_name())
         options['CATEGORY_STATUS'] = f'{kodi.translate(40860)} {kodi.translate(category.get_finished_str_code())}'
         options['EXPORT_CATEGORY_XML'] = kodi.translate(40861)
@@ -186,12 +186,11 @@ def cmd_category_edit_assets(args):
             AppMediator.async_cmd('EDIT_CATEGORY', args)
             return
         
+        if selected_asset_to_edit == editors.EDIT_DEFAULT_ASSETS:
+            AppMediator.async_cmd('CATEGORY_EDIT_DEFAULT_ASSETS', args)
+            return
+        
         asset = g_assetFactory.get_asset_info(selected_asset_to_edit)
-        #  if selected_asset_to_edit == editors.SCRAPE_CMD:
-        #    AppMediator.async_cmd('EDIT_CATEGORY_MENU', args)
-        #    globals.run_command(scrape_cmd, rom=obj_instance)
-        #    edit_object_assets(obj_instance, selected_option)
-        #    return True
         
         # >> Execute edit asset menu subcommand. Then, execute recursively this submenu again.
         # >> The menu dialog is instantiated again so it reflects the changes just edited.
@@ -439,7 +438,7 @@ def cmd_category_save_nfo_file(args):
     # >> user, so display nothing to not overwrite error notification.
     try:
         category.export_to_NFO_file(NFO_FileName)
-    except:
+    except Exception:
         kodi.notify_warn(kodi.translate(41042).format(NFO_FileName.getPath()))
         logger.error("cmd_category_save_nfo_file() Exception writing'{0}'".format(NFO_FileName.getPath()))
     else:

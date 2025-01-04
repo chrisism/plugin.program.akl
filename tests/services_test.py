@@ -53,6 +53,7 @@ class Test_services(unittest.TestCase):
             FakeFile('1.3.0_002.sql'),
             FakeFile('/files/1.3.0.sql'),
             FakeFile('1.1.5.sql'),
+            FakeFile('1.1.5_002.sql'),
             FakeFile('/migrations/with/1.2.7.sql')
         ]
         
@@ -72,9 +73,10 @@ class Test_services(unittest.TestCase):
         # assert
         self.assertIsNotNone(actual)
         self.assertEqual(actual[0].getPath(), '1.1.5.sql')
-        self.assertEqual(actual[1].getPath(), '1.2.1.sql')
-        self.assertEqual(actual[2].getPath(), '/migrations/with/1.2.7.sql')
-        self.assertEqual(actual[3].getPath(), '/files/1.3.0.sql')
-        self.assertEqual(actual[4].getPath(), '1.3.0_001.sql')
-        self.assertEqual(actual[5].getPath(), '1.3.0_002.sql')
-        self.assertEqual(actual[6].getPath(), '1.3.0_004.sql')
+        self.assertEqual(actual[1].getPath(), '1.1.5_002.sql')
+        self.assertEqual(actual[2].getPath(), '1.2.1.sql')
+        self.assertEqual(actual[3].getPath(), '/migrations/with/1.2.7.sql')
+        self.assertEqual(actual[4].getPath(), '/files/1.3.0.sql')
+        self.assertEqual(actual[5].getPath(), '1.3.0_001.sql')
+        self.assertEqual(actual[6].getPath(), '1.3.0_002.sql')
+        self.assertEqual(actual[7].getPath(), '1.3.0_004.sql')

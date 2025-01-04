@@ -90,6 +90,7 @@ def cmd_delete_launcher(args):
             return
         
         repository.delete_launcher(launcher)
+        uow.commit()
         kodi.refresh_container()
 
 
@@ -276,9 +277,9 @@ def cmd_add_source_launchers(args):
         logger.debug(f'ADD_SOURCE_LAUNCHER: Selected {selected_option.get_id()}')
         is_default = kodi.dialog_yesno(kodi.translate(41171).format(selected_option.get_name()))
         
-        source.add_launcher(launcher, is_default)
+        source.add_launcher(selected_option, is_default)
         if kodi.dialog_yesno(kodi.translate(41050)):
-            source.import_data_dic(launcher.get_settings()['romcollection'])
+            source.import_data_dic(selected_option.get_setting('romcollection'))
             
         source_repository.update_source(source)
         logger.info(f'Added launcher#{selected_option.get_id()} to Source {source.get_id()}')
@@ -324,9 +325,9 @@ def cmd_add_romcollection_launchers(args):
         logger.debug(f'ADD_COLLECTION_LAUNCHER: Selected {selected_option.get_id()}')
         is_default = kodi.dialog_yesno(kodi.translate(41171).format(selected_option.get_name()))
         
-        romcollection.add_launcher(launcher, is_default)
+        romcollection.add_launcher(selected_option, is_default)
         if kodi.dialog_yesno(kodi.translate(41050)):
-            romcollection.import_data_dic(launcher.get_settings()['romcollection'])
+            romcollection.import_data_dic(selected_option.get_setting('romcollection'))
             metadata_updated = True
             
         romcollection_repository.update_romcollection(romcollection)
@@ -597,22 +598,41 @@ def cmd_execute_rom_with_launcher(args):
         romcollections = romcollection_repository.find_romcollections_by_rom(rom.get_id())
         source = source_repository.find(rom.get_scanned_by())
         launchers = rom.get_launchers()
+        if launchers is None:
+            launchers = []
+        
         if source:
             launchers.extend(source.get_launchers())
         
         for romcollection in romcollections:
             launchers.extend(romcollection.get_launchers())
         
-        if launchers is None or len(launchers) == 0:
-            logger.warning(f'No launcher configured for ROM {rom.get_name()}')
-            if not settings.getSettingAsBool('fallback_to_retroplayer'):
+        if len(launchers) == 0:
+            is_standalone_src = rom.get_scanned_data_element("standalone")
+            file_path = rom.get_scanned_data_element("file")
+            
+            standalone_launchable = is_standalone_src and int(is_standalone_src) == 1
+            
+            if not standalone_launchable or not file_path:
+                logger.warning(f'No launcher configured for ROM {rom.get_name()}')
+                
+            if not standalone_launchable and settings.getSettingAsBool('fallback_to_retroplayer'):
+                logger.info('Automatic fallback to Retroplayer as launcher applied.')
+                retroplayer_addon = addon_repository.find_by_addon_id(constants.RETROPLAYER_LAUNCHER_APP_NAME, constants.AddonType.LAUNCHER)
+                retroplayer_launcher = ROMLauncherAddonFactory.create(retroplayer_addon, {})
+                launchers.append(retroplayer_launcher)
+            
+            if file_path:
+                addon_id = "script.akl.defaults"
+                addon = addon_repository.find_by_addon_id(addon_id, constants.AddonType.LAUNCHER)
+                launcher = ROMLauncherAddonFactory.create(addon, None)
+                launcher.set_settings({"name": f"Standalone File Launcher: {file_path}"})
+                launcher.set_id("STANDALONE")
+                launchers.append(launcher)
+                            
+            if len(launchers) == 0:
                 kodi.notify_warn(kodi.translate(41001))
                 return
-            
-            logger.info('Automatic fallback to Retroplayer as launcher applied.')
-            retroplayer_addon = addon_repository.find_by_addon_id(constants.RETROPLAYER_LAUNCHER_APP_NAME, constants.AddonType.LAUNCHER)
-            retroplayer_launcher = ROMLauncherAddonFactory.create(retroplayer_addon, {})
-            launchers.append(retroplayer_launcher)
             
     selected_launcher = launchers[0]
     if len(launchers) > 1:

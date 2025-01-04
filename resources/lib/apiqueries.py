@@ -24,6 +24,7 @@ import json
 
 # AKL modules
 from resources.lib import globals
+from resources.lib.domain import g_assetFactory
 from resources.lib.repositories import UnitOfWork, ROMsRepository, ROMCollectionRepository, SourcesRepository, LaunchersRepository
 
 logger = logging.getLogger(__name__)
@@ -67,8 +68,10 @@ def qry_get_roms(source_id: str) -> str:
         if roms is None:
             return None
         
+        asset_paths_by_source = g_assetFactory.get_rom_asset_paths(source=source)
         data = []
         for rom in roms:
+            rom.update_missing_asset_paths(asset_paths_by_source)
             rom_dto = rom.create_dto()
             data.append(rom_dto.get_data_dic())
             
@@ -82,13 +85,19 @@ def qry_get_roms_by_romcollection(collection_id: str) -> str:
         rom_repository = ROMsRepository(uow)
         
         collection = collection_repository.find_romcollection(collection_id)
+        if not collection:
+            return None
+        
         roms = rom_repository.find_roms_by_romcollection(collection)
         
         if roms is None:
             return None
         
+        fallback_asset_paths = g_assetFactory.get_rom_asset_paths()
+        
         data = []
         for rom in roms:
+            rom.update_missing_asset_paths(fallback_asset_paths)
             rom_dto = rom.create_dto()
             data.append(rom_dto.get_data_dic())
             
@@ -96,6 +105,13 @@ def qry_get_roms_by_romcollection(collection_id: str) -> str:
 
 
 def qry_get_launcher_settings(launcher_id: str) -> str:
+    if launcher_id == "STANDALONE":
+        settings = {
+            "name": "Standalone File Launcher",
+            "application": "FILE",
+        }
+        return json.dumps(settings)
+    
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         repository = LaunchersRepository(uow)
@@ -110,6 +126,13 @@ def qry_get_launcher_settings(launcher_id: str) -> str:
     
 
 def qry_get_collection_launcher_settings(collection_id: str, launcher_id: str) -> str:
+    if launcher_id == "STANDALONE":
+        settings = {
+            "name": "Standalone File Launcher",
+            "application": "FILE",
+        }
+        return json.dumps(settings)
+    
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     with uow:
         collection_repository = ROMCollectionRepository(uow)
@@ -117,10 +140,11 @@ def qry_get_collection_launcher_settings(collection_id: str, launcher_id: str) -
         
         if rom_collection is None:
             return None
-        
+    
         launcher = rom_collection.get_launcher(launcher_id)
         settings = launcher.get_settings()
         settings['name'] = launcher.get_name()
+        
         return json.dumps(settings)
 
 

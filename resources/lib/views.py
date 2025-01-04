@@ -103,7 +103,7 @@ def vw_route_render_view(view_id: str):
     obj_type = vw_get_object_type_by_url(router.path)
     container = viewqueries.qry_get_view_items(view_id, obj_type)
     container_context_items = viewqueries.qry_container_context_menu_items(container)
-    container_type = container['obj_type'] if 'obj_type' in container else constants.OBJ_NONE
+    container_type = container['obj_type'] if container and 'obj_type' in container else constants.OBJ_NONE
 
     filter_type = router.args['filter'][0] if 'filter' in router.args else None
     filter_term = router.args['term'][0] if 'term' in router.args else None

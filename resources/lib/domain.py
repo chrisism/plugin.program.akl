@@ -34,7 +34,7 @@ from resources.lib import globals
 from akl import api
 from akl.utils import io, kodi, text
 from akl.scrapers import ScraperSettings
-from akl import settings, constants
+from akl import settings, constants, addons
 
 logger = logging.getLogger(__name__)
 
@@ -60,11 +60,11 @@ def _is_empty_or_default(input: any, default: any):
 class AssetInfo(object):
     id = ''
     key = ''
-    name_id = '' 
+    name_id = ''
     name = ''
     description = name
     plural = ''
-    fname_infix = '' # Used only when searching assets when importing XML
+    fname_infix = ''  # Used only when searching assets when importing XML
     kind_str = ''
     exts = []
     exts_dialog = ''
@@ -412,28 +412,16 @@ class ROMLauncherAddon(ROMAddon):
     
     def set_default(self, default_launcher=False):
         self.entity_data['is_default'] = default_launcher
-        
-    def get_launch_command(self, rom: ROM) -> dict:
-        return {
-            '--cmd': 'launch',
-            '--type': constants.AddonType.LAUNCHER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': settings.getSettingAsInt('webserver_port'),
-            '--akl_addon_id': self.get_id(),
-            '--rom_id': rom.get_id()
-        }
 
-    def get_configure_command(self, args: dict) -> dict:
-        return {
-            '--cmd': 'configure',
-            '--type': constants.AddonType.LAUNCHER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': settings.getSettingAsInt('webserver_port'),
-            '--akl_addon_id': self.get_id(),
-            '--entity_type': args['entity_type'] if 'entity_type' in args else '',
-            '--entity_id': args['entity_id'] if 'entity_id' in args else ''
-        }
-    
+    def get_launch_command(self, rom: ROM) -> dict:
+        return addons.create_launch_command(
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'),
+            self.get_id(),
+            constants.OBJ_ROM,
+            rom.get_id()    
+        )
+        
     def launch(self, rom: ROM):
         kodi.run_script(
             self.addon.get_addon_id(),
@@ -442,7 +430,13 @@ class ROMLauncherAddon(ROMAddon):
     def configure(self, args: dict):
         kodi.run_script(
             self.addon.get_addon_id(),
-            self.get_configure_command(args))
+            addons.create_configure_launch_command(
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                self.get_id(),
+                args['entity_type'] if 'entity_type' in args else '',
+                args['entity_id'] if 'entity_id' in args else ''
+            ))
 
 
 class RetroplayerLauncherAddon(ROMLauncherAddon):
@@ -484,7 +478,7 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
             'entity_id': args['entity_id'] if 'entity_id' in args else '',
             'settings': {}
         }
-        is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST, 
+        is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST,
                                                       settings.getSettingAsInt('webserver_port'),
                                                       post_data)
         if not is_stored:
@@ -658,22 +652,22 @@ class Source(ROMAddon):
         return self.entity_data["last_scan_timestamp"]
     
     def get_scan_command(self) -> dict:
-        return {
-            '--cmd': 'scan',
-            '--type': constants.AddonType.SCANNER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': settings.getSettingAsInt('webserver_port'),
-            '--source_id': self.get_id()
-        }
+        return addons.create_scan_command(
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'),
+            self.get_id(),
+            constants.OBJ_SOURCE,
+            self.get_id()
+        )
         
     def get_configure_command(self) -> dict:
-        return {
-            '--cmd': 'configure',
-            '--type': constants.AddonType.SCANNER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': settings.getSettingAsInt('webserver_port'),
-            '--source_id': self.get_id()
-        }
+        return addons.create_configure_scan_command(
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'),
+            self.get_id(),
+            constants.OBJ_SOURCE,
+            self.get_id()
+        )
 
 
 class ScraperAddon(ROMAddon):
@@ -736,18 +730,18 @@ class ScraperAddon(ROMAddon):
     def set_scraper_settings(self, settings: ScraperSettings):
         self.entity_data['settings'] = json.dumps(settings.get_data_dic())
            
-    def get_scrape_command(self, entity: EntityABC) -> dict:
-        return {
-            '--cmd': 'scrape',
-            '--type': constants.AddonType.SCRAPER.name,
-            '--server_host': globals.WEBSERVER_HOST,
-            '--server_port': settings.getSettingAsInt('webserver_port'),
-            '--entity_id': entity.get_id(),
-            '--entity_type': entity.get_type(),
-            '--akl_addon_id': self.addon.get_id(),
-            '--settings': io.parse_to_json_arg(self.get_settings())
-        }
- 
+    def scrape(self, entity: EntityABC):
+        kodi.run_script(
+            self.addon.get_addon_id(),
+            addons.create_scraper_command(
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                self.addon.get_id(),
+                entity.get_type(),
+                entity.get_id(),
+                self.get_settings()
+            ))
+
 
 class RuleSetOperator(IntEnum):
     AND = 1
@@ -1174,6 +1168,11 @@ class MetaDataItemABC(EntityABC):
         
         self.asset_paths[asset_info.id] = asset_path
     
+    def update_missing_asset_paths(self, asset_paths: typing.List[AssetPath]):
+        for asset_path in asset_paths:
+            if asset_path.get_asset_info_id() not in self.asset_paths:
+                self.set_asset_path(asset_path.get_asset_info(), asset_path.get_path())
+                  
     @abc.abstractmethod
     def get_asset_ids_list(self) -> typing.List[str]:
         pass
@@ -1708,7 +1707,7 @@ class ROM(MetaDataItemABC):
         
     def __init__(self,
                  rom_data: dict = None,
-                 tag_data: dict = None, 
+                 tag_data: dict = None,
                  assets_data: typing.List[Asset] = None,
                  asset_paths_data: typing.List[AssetPath] = None,
                  asset_mappings: typing.List[RomAssetMapping] = [],
@@ -2155,7 +2154,7 @@ class ROM(MetaDataItemABC):
         if constants.META_DEVELOPER_ID in metadata_to_update \
             and api_rom_obj.get_developer() \
             and (overwrite_existing_metadata or
-                 _is_empty_or_default(self.get_developer(), constants.DEFAULT_META_DEVELOPER)):         
+                 _is_empty_or_default(self.get_developer(), constants.DEFAULT_META_DEVELOPER)):
             self.set_developer(api_rom_obj.get_developer())
         
         if constants.META_NPLAYERS_ID in metadata_to_update \
@@ -2185,7 +2184,7 @@ class ROM(MetaDataItemABC):
         if constants.META_RATING_ID in metadata_to_update \
                 and api_rom_obj.get_rating() \
                 and (overwrite_existing_metadata or
-                     _is_empty_or_default(self.get_rating(), constants.DEFAULT_META_RATING)):            
+                     _is_empty_or_default(self.get_rating(), constants.DEFAULT_META_RATING)):      
             self.set_rating(api_rom_obj.get_rating())
         
         if constants.META_TAGS_ID in metadata_to_update and api_rom_obj.get_tags() is not None:
@@ -2433,25 +2432,35 @@ class AssetInfoFactory(object):
 
         return local_asset_list
 
-    #
-    # A) This function checks if all path_* share a common root directory. If so
-    #    this function returns that common directory as an Unicode string.
-    # B) If path_* do not share a common root directory this function returns ''.
-    #
-    def assets_get_ROM_asset_path(self, launcher):
-        ROM_asset_path = ''
-        duplicated_bool_list = [False] * len(constants.ROM_ASSET_ID_LIST)
-        AInfo_first = g_assetFactory.get_asset_info(constants.ROM_ASSET_ID_LIST[0])
-        path_first_asset_FN = io.FileName(launcher[AInfo_first.path_key])
-        logger.debug('assets_get_ROM_asset_path() path_first_asset "{0}"'.format(path_first_asset_FN.getPath()))
-        for i, asset_kind in enumerate(constants.ROM_ASSET_ID_LIST):
-            AInfo = g_assetFactory.get_asset_info(asset_kind)
-            current_path_FN = io.FileName(launcher[AInfo.path_key])
-            if current_path_FN.getDir() == path_first_asset_FN.getDir():
-                duplicated_bool_list[i] = True
-
-        return path_first_asset_FN.getDir() if all(duplicated_bool_list) else ''
-
+    def get_rom_asset_paths(self, rom: ROM = None, source: Source = None) -> typing.List[AssetInfo]:
+        asset_paths = []
+        
+        for asset_id in constants.ROM_ASSET_ID_LIST:
+            asset_info = self.get_asset_info(asset_id)
+            path = self.get_rom_asset_path(asset_info, rom, source)
+            
+            asset_path_obj = AssetPath()
+            asset_path_obj.set_path(path)
+            asset_path_obj.set_asset_info(asset_info)
+            asset_paths.append(asset_path_obj)
+        return asset_paths
+        
+    def get_rom_asset_path(self, asset_info: AssetInfo, rom: ROM = None, source: Source = None):
+        if rom:
+            path = rom.get_asset_path(asset_info)
+            if path:
+                return path
+        
+        if source:
+            path = source.get_asset_path(asset_info, True)
+            if path:
+                return path
+        
+        fallback_assets_dir = settings.getSettingAsFilePath('launchers_asset_dir', isdir=True,
+                                                            fallback=globals.g_PATHS.DEFAULT_ROM_ASSET_DIR)
+        path = fallback_assets_dir.pjoin(asset_info.plural.lower(), isdir=True)
+        return path
+    
     #
     # Gets extensions to be used in regular expressions.
     # Input : ['png', 'jpg']
@@ -2473,65 +2482,65 @@ class AssetInfoFactory(object):
                 
         # >> These are used very frequently so I think it is better to have a cached list.
         a = AssetInfo()
-        a.id                            = constants.ASSET_ICON_ID
-        a.name_id                       = 43001
-        a.name                          = 'Icon'
-        a.plural                        = 'Icons'
-        a.fname_infix                   = 'icon'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_icon'        
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_ICON_ID
+        a.name_id = 43001
+        a.name = 'Icon'
+        a.plural = 'Icons'
+        a.fname_infix = 'icon'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_icon'        
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()
-        a.id                            = constants.ASSET_FANART_ID
-        a.name_id                       = 43002
-        a.name                          = 'Fanart'
-        a.plural                        = 'Fanarts'
-        a.fname_infix                   = 'fanart'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_fanart'
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_FANART_ID
+        a.name_id = 43002
+        a.name = 'Fanart'
+        a.plural = 'Fanarts'
+        a.fname_infix = 'fanart'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_fanart'
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()
-        a.id                            = constants.ASSET_BANNER_ID
-        a.name_id                       = 43003
-        a.name                          = 'Banner'
-        a.description                   = 'Banner / Marquee'
-        a.plural                        = 'Banners'
-        a.fname_infix                   = 'banner'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_banner'
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_BANNER_ID
+        a.name_id = 43003
+        a.name = 'Banner'
+        a.description = 'Banner / Marquee'
+        a.plural = 'Banners'
+        a.fname_infix = 'banner'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_banner'
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()        
-        a.id                            = constants.ASSET_POSTER_ID
-        a.name_id                       = 43004
-        a.name                          = 'Poster'
-        a.plural                        = 'Posters'
-        a.fname_infix                   = 'poster'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_poster'
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_POSTER_ID
+        a.name_id = 43004
+        a.name = 'Poster'
+        a.plural = 'Posters'
+        a.fname_infix = 'poster'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_poster'
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()
-        a.id                            = constants.ASSET_CLEARLOGO_ID
-        a.name_id                       = 43005
-        a.name                          = 'Clearlogo'
-        a.plural                        = 'Clearlogos'
-        a.fname_infix                   = 'clearlogo'
-        a.kind_str                      = 'image'
-        a.exts                          = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.exts_dialog                   = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
-        a.path_key                      = 'path_clearlogo'
-        self.ASSET_INFO_ID_DICT[a.id]   = a
+        a.id = constants.ASSET_CLEARLOGO_ID
+        a.name_id = 43005
+        a.name = 'Clearlogo'
+        a.plural = 'Clearlogos'
+        a.fname_infix = 'clearlogo'
+        a.kind_str = 'image'
+        a.exts = self.asset_get_filesearch_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.exts_dialog = self.asset_get_dialog_extension_list(constants.IMAGE_EXTENSION_LIST)
+        a.path_key = 'path_clearlogo'
+        self.ASSET_INFO_ID_DICT[a.id] = a
 
         a = AssetInfo()
         a.id                            = constants.ASSET_CONTROLLER_ID
@@ -2961,4 +2970,4 @@ def _get_default_asset_data_model():
         'id' : '',
         'filepath' : '',
         'asset_type' : ''
-    }    
+    }

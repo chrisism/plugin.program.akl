@@ -32,6 +32,7 @@ from resources.lib import globals
 
 logger = logging.getLogger(__name__)
 
+
 @AppMediator.register('CHECK_COLLECTIONS')
 def cmd_check_collections(args):
     logger.debug('cmd_check_collections() Beginning...')
@@ -336,7 +337,7 @@ def cmd_delete_redundant_rom_artwork(args):
 
             num_assets_by_collection = 0
             for rom in roms:
-                assets      = rom.get_assets()
+                assets = rom.get_assets()
                 asset_paths = rom.get_asset_paths()
                 for asset in assets:
                     if not asset.get_path_FN(): continue

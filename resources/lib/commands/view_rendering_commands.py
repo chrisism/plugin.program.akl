@@ -23,7 +23,6 @@ import time
 
 from datetime import datetime
 from datetime import timedelta
-from datetime import date
 
 from akl import constants, settings
 from akl.utils import kodi
@@ -38,8 +37,12 @@ from resources.lib.domain import VirtualCollectionFactory, VirtualCategoryFactor
 
 logger = logging.getLogger(__name__)
 
+RENDER_VIEWS = 'RENDER_VIEWS'
+RENDER_SOURCES_VIEW = 'RENDER_SOURCES_VIEW'
+RENDER_VIRTUAL_VIEWS = 'RENDER_VIRTUAL_VIEWS'
 
-@AppMediator.register('RENDER_VIEWS')
+
+@AppMediator.register(RENDER_VIEWS)
 def cmd_render_views_data(args):
     kodi.notify(kodi.translate(40968))
     force = args['force'] if 'force' in args else False
@@ -76,13 +79,13 @@ def cmd_render_view_data(args):
         if render_selection is None:
             return
         if render_selection > 0:
-            AppMediator.sync_cmd('RENDER_VIEWS', args)
+            AppMediator.sync_cmd(RENDER_VIEWS, args)
             return
         
     kodi.notify(kodi.translate(40967))
     category_id = args['category_id'] if 'category_id' in args else None
     render_recursive = args['render_recursive'] if 'render_recursive' in args else False
-    force =  True
+    force = True
     changed_since_date = args['changed_since_date'] if 'changed_since_date' in args else None
     if changed_since_date is None:
         changed_since_date = datetime.combine(datetime.today() - timedelta(days=7), datetime.min.time())
@@ -109,7 +112,7 @@ def cmd_render_view_data(args):
     kodi.refresh_container()
 
 
-@AppMediator.register('RENDER_VIRTUAL_VIEWS')
+@AppMediator.register(RENDER_VIRTUAL_VIEWS)
 def cmd_render_virtual_views(args):
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
     do_notification = not settings.getSettingAsBool("display_hide_rendering_notifications")
@@ -181,7 +184,7 @@ def cmd_render_vcategory(args):
         if render_selection is None:
             return
         if render_selection > 0:
-            AppMediator.sync_cmd('RENDER_VIEWS')
+            AppMediator.sync_cmd(RENDER_VIEWS)
             return
         
     vcategory_id = args['vcategory_id'] if 'vcategory_id' in args else None
@@ -223,7 +226,7 @@ def cmd_render_romcollection_view_data(args):
         if render_selection is None:
             return
         if render_selection > 0:
-            AppMediator.sync_cmd('RENDER_VIEWS', args)
+            AppMediator.sync_cmd(RENDER_VIEWS, args)
             return
         
     romcollection_id = args['romcollection_id'] if 'romcollection_id' in args else None
@@ -247,7 +250,7 @@ def cmd_render_romcollection_view_data(args):
     kodi.refresh_container()
 
 
-@AppMediator.register('RENDER_SOURCES_VIEW')
+@AppMediator.register(RENDER_SOURCES_VIEW)
 def cmd_render_sources_view_data(args):
     do_notification = not settings.getSettingAsBool("display_hide_rendering_notifications")
     
@@ -279,11 +282,15 @@ def cmd_render_source_view_data(args):
         if render_selection is None:
             return
         if render_selection > 0:
-            AppMediator.sync_cmd('RENDER_VIEWS', args)
+            AppMediator.sync_cmd(RENDER_VIEWS, args)
             return
      
     source_id = args['source_id'] if 'source_id' in args else None
     do_notification = not settings.getSettingAsBool("display_hide_rendering_notifications")
+    
+    if source_id is None:
+        AppMediator.sync_cmd(RENDER_SOURCES_VIEW, args)
+        return
     
     if do_notification:
         kodi.notify(kodi.translate(41161))
@@ -313,7 +320,7 @@ def cmd_render_vcollection(args):
         if render_selection is None:
             return
         if render_selection > 0:
-            AppMediator.sync_cmd('RENDER_VIEWS', args)
+            AppMediator.sync_cmd(RENDER_VIEWS, args)
             return
         
     vcollection_id = args['vcollection_id'] if 'vcollection_id' in args else None

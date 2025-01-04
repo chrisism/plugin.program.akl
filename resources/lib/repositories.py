@@ -78,7 +78,12 @@ class ViewRepository(object):
     def find_items(self, view_id, obj_type: int) -> typing.Any:
         
         repository_file = self._assemble_view_file_name(view_id, obj_type)
-        self.logger.debug('find_items(): Loading path data from file {}'.format(repository_file.getPath()))
+        self.logger.debug(f'find_items(): Loading path data from file {repository_file.getPath()}')
+        
+        if not repository_file.exists():
+            self.logger.warning(f'File {repository_file.getPath()} does not exist.')
+            return None
+        
         try:
             item_data = repository_file.readJson()
         except ValueError as ex:
@@ -796,6 +801,10 @@ class ROMCollectionRepository(object):
         self._uow.execute(qry.SELECT_ROMCOLLECTION, romcollection_id)
         romcollection_data = self._uow.single_result()
         
+        if not romcollection_data:
+            self.logger.error(f'Could not find romcollection with id: {romcollection_id}')
+            return None
+        
         self._uow.execute(qry.SELECT_ROMCOLLECTION_ASSETS_BY_SET, romcollection_id)
         assets_result_set = self._uow.result_set()
         assets = []
@@ -1050,7 +1059,7 @@ class ROMCollectionRepository(object):
                           romcollection_obj.get_box_sizing())
         
         romcollection_assets = romcollection_obj.get_assets()
-        for asset in romcollection_assets: 
+        for asset in romcollection_assets:
             self._insert_asset(asset, romcollection_obj)
             
         asset_paths = romcollection_obj.get_asset_paths()

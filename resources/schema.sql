@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS romcollection_launchers(
     is_default INTEGER DEFAULT 0 NOT NULL,
     FOREIGN KEY (romcollection_id) REFERENCES romcollections (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
+    FOREIGN KEY (launcher_id) REFERENCES launchers (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS source_launchers(
     is_default INTEGER DEFAULT 0 NOT NULL,
     FOREIGN KEY (source_id) REFERENCES sources (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
+    FOREIGN KEY (launcher_id) REFERENCES launchers (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS rom_launchers(
     is_default INTEGER DEFAULT 0 NOT NULL,
     FOREIGN KEY (rom_id) REFERENCES roms (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION,
-    FOREIGN KEY (launcher_id) REFERENCES launcher (id) 
+    FOREIGN KEY (launcher_id) REFERENCES launchers (id) 
         ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -449,7 +449,7 @@ CREATE VIEW IF NOT EXISTS vw_source_launchers AS SELECT
     l.settings,
     sl.is_default
 FROM source_launchers AS sl
-    INNER JOIN launchers AS l ON sl.source_id = l.id
+    INNER JOIN launchers AS l ON sl.launcher_id = l.id
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
 
 CREATE VIEW IF NOT EXISTS vw_rom_launchers AS SELECT
@@ -465,7 +465,7 @@ CREATE VIEW IF NOT EXISTS vw_rom_launchers AS SELECT
     l.settings,
     rl.is_default
 FROM rom_launchers AS rl
-    INNER JOIN launchers AS l ON rl.rom_id = l.id
+    INNER JOIN launchers AS l ON rl.launcher_id = l.id
     INNER JOIN akl_addon AS a ON l.akl_addon_id = a.id;
 
 CREATE TABLE IF NOT EXISTS akl_version(
@@ -501,4 +501,5 @@ INSERT INTO akl_migrations (migration_file, applied_version, execution_date, app
      ('1.5.0_001.sql','1.5.0',CURRENT_TIMESTAMP,1),
      ('1.5.0_002.sql','1.5.0',CURRENT_TIMESTAMP,1),
      ('1.5.0_003.sql','1.5.0',CURRENT_TIMESTAMP,1),
-     ('1.5.0_004.sql','1.5.0',CURRENT_TIMESTAMP,1);
+     ('1.5.0_004.sql','1.5.0',CURRENT_TIMESTAMP,1),
+     ('1.5.2.sql','1.5.2',CURRENT_TIMESTAMP,1);
