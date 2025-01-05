@@ -510,21 +510,22 @@ class DefaultLauncherAddon(ROMLauncherAddon):
             launcher.launch()
         except Exception as e:
             logger.error('Exception while executing ROM', exc_info=e)
-            kodi.notify_error('Failed to execute ROM')
+            kodi.notify_error(kodi.translate(42094))
         
     def configure(self, args: dict):
         logger.debug('App Launcher: Configuring ...')
             
         launcher = AppLauncher(
             self.get_id(),
-            self.addon.get_addon_id(),
+            args['entity_id'] if 'entity_id' in args else '',
             globals.WEBSERVER_HOST,
             settings.getSettingAsInt('webserver_port'))
         
         if launcher.build():
             launcher.store_settings()
+            return
             
-        kodi.notify_warn('Cancelled creating launcher')
+        kodi.notify_warn(kodi.translate(42095))
 
 
 class Source(ROMAddon):
@@ -2922,6 +2923,7 @@ class ROMLauncherAddonFactory(object):
 
     @staticmethod
     def create(addon: AklAddon, data: dict) -> ROMLauncherAddon:
+        logger.debug(f'Creating addon for id#{addon.get_id()} type: {addon.get_addon_id()}')
         if addon.get_addon_id() == constants.RETROPLAYER_LAUNCHER_APP_NAME:
             return RetroplayerLauncherAddon(data, addon)
         

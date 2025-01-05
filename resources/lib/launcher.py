@@ -40,8 +40,7 @@ class AppLauncher(LauncherABC):
         return 'App Launcher'
      
     def get_launcher_addon_id(self) -> str:
-        addon_id = kodi.get_addon_id()
-        return addon_id
+        return 'script.akl.defaults'  # TODO: add to constants
 
     # --------------------------------------------------------------------------------------------
     # Launcher build wizard methods
@@ -134,7 +133,7 @@ class AppLauncher(LauncherABC):
         # --- Check for errors and abort if errors found ---
         if not application.exists():
             logger.error('Launching app not found "{0}"'.format(application.getPath()))
-            kodi.notify_warn('App {0} not found.'.format(application.getPath()))
+            kodi.notify_warn(kodi.translate(42096).format(application.getPath()))
             return None
         
         return application.getPath()

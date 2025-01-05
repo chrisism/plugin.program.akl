@@ -481,8 +481,9 @@ CREATE TABLE IF NOT EXISTS akl_migrations(
 );
 
 -- STATIC VALUES
-INSERT INTO akl_addon (id, name, addon_id, version, addon_type)
-    VALUES ('856f1cd76f2148aba7953f20f10ec11d', 'Retroplayer', 'retroplayer_launcher_app', '1.0', 'LAUNCHER');
+INSERT INTO akl_addon (id, name, addon_id, version, addon_type) VALUES
+    ('856f1cd76f2148aba7953f20f10ec11d', 'Retroplayer', 'retroplayer_launcher_app', '1.0', 'LAUNCHER'),
+    ('507e025ae0644b9cbdf5be0aa95532b9', 'App Launcher', 'script.akl.defaults', '1.6', 'LAUNCHER');
 
 INSERT INTO tags (id, tag) VALUES 
     ('2e1f3086c96b44d2a81f5c08876b4ef6', 'co-op'),

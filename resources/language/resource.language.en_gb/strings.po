@@ -2242,6 +2242,18 @@ msgctxt "#42093"
 msgid "Manage ROM asset directories ..."
 msgstr ""
 
+msgctxt "#42094"
+msgid "Failed to execute ROM"
+msgstr ""
+
+msgctxt "#42095"
+msgid "Cancelled creating launcher"
+msgstr ""
+
+msgctxt "#42096"
+msgid "App {0} not found."
+msgstr ""
+
 ############################
 # Context menu item descriptions
 ############################
