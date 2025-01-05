@@ -1,6 +1,13 @@
 import os
-
+import random
+ 
 from akl.utils import io
+from akl.executors import ExecutorABC
+from akl.utils.kodi import ProgressDialog
+
+def random_string(length:int):
+    return ''.join(random.choice([chr(i) for i in range(ord('a'),ord('z'))]) for _ in range(length))
+
 class FakeFile(io.FileName):
 
     def __init__(self, pathString):
@@ -88,3 +95,36 @@ class FakeUnitOfWork():
 
     def get_migrations_history(self):
         return []
+
+
+class FakeExecutor(ExecutorABC):
+    
+    def __init__(self):
+        self.actualApplication = None
+        self.actualArgs = None
+        self.actualKwargs = None
+        super(FakeExecutor, self).__init__(None)
+        
+    def getActualApplication(self):
+        return self.actualApplication
+
+    def getActualArguments(self):
+        return self.actualArgs
+
+    def getActualKwargs(self):
+        return self.actualKwargs
+
+    def execute(self, application, *args, **kwargs):
+        self.actualApplication = application
+        self.actualArgs = list(args)
+        self.actualKwargs = dict(kwargs)
+        pass        
+
+class FakeProgressDialog(ProgressDialog):
+    def startProgress(self, message, num_steps = 100):pass
+    def updateProgress(self, step_index, message = None):pass
+    def updateMessage(self, message):pass
+    def isCanceled(self): return False
+    def close(self): pass
+    def endProgress(self): pass
+    def reopen(self): pass

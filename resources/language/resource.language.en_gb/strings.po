@@ -42,6 +42,10 @@ msgctxt "#40017"
 msgid "Plugins"
 msgstr "settings.xml"
 
+msgctxt "#40018"
+msgid "Launching"
+msgstr "settings.xml"
+
 ############################
 # Settings groupings
 ############################
@@ -213,6 +217,45 @@ msgstr "settings.xml"
 
 msgctxt "#40614"
 msgid "AKL webserver port to use (restart required)"
+msgstr "settings.xml"
+
+############################
+# Settings options - Launching
+############################
+msgctxt "#30121"
+msgid "Action on Kodi playing media"
+msgstr "settings.xml"
+
+msgctxt "#30122"
+msgid "After/before launch delay (ms)"
+msgstr "settings.xml"
+
+msgctxt "#30123"
+msgid "Suspend/resume Kodi audio engine"
+msgstr "settings.xml"
+
+msgctxt "#30124"
+msgid "Suspend/resume Kodi screensaver"
+msgstr "settings.xml"
+
+msgctxt "#30125"
+msgid "Escape $rom$ quotes"
+msgstr "settings.xml"
+
+msgctxt "#30126"
+msgid "Disable LIRC (Linux only)"
+msgstr "settings.xml"
+
+msgctxt "#30127"
+msgid "Close file descriptors (Windows only)"
+msgstr "settings.xml"
+
+msgctxt "#30128"
+msgid "CD into aplication dir (Windows only)"
+msgstr "settings.xml"
+
+msgctxt "#30130"
+msgid "Suspend/resume Kodi joystick engine"
 msgstr "settings.xml"
 
 ############################
@@ -2197,6 +2240,18 @@ msgstr ""
 
 msgctxt "#42093"
 msgid "Manage ROM asset directories ..."
+msgstr ""
+
+msgctxt "#42094"
+msgid "Failed to execute ROM"
+msgstr ""
+
+msgctxt "#42095"
+msgid "Cancelled creating launcher"
+msgstr ""
+
+msgctxt "#42096"
+msgid "App {0} not found."
 msgstr ""
 
 ############################

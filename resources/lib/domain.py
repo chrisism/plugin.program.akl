@@ -30,11 +30,12 @@ from enum import IntEnum
 
 # --- AKL packages ---
 from resources.lib import globals
+from resources.lib.launcher import AppLauncher
 
-from akl import api
+from akl import settings, constants, addons, api
 from akl.utils import io, kodi, text
 from akl.scrapers import ScraperSettings
-from akl import settings, constants, addons
+from akl.launchers import ExecutionSettings, get_executor_factory
 
 logger = logging.getLogger(__name__)
 
@@ -412,20 +413,17 @@ class ROMLauncherAddon(ROMAddon):
     
     def set_default(self, default_launcher=False):
         self.entity_data['is_default'] = default_launcher
-
-    def get_launch_command(self, rom: ROM) -> dict:
-        return addons.create_launch_command(
-            globals.WEBSERVER_HOST,
-            settings.getSettingAsInt('webserver_port'),
-            self.get_id(),
-            constants.OBJ_ROM,
-            rom.get_id()    
-        )
         
     def launch(self, rom: ROM):
         kodi.run_script(
             self.addon.get_addon_id(),
-            self.get_launch_command(rom))
+            addons.create_launch_command(
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                self.get_id(),
+                constants.OBJ_ROM,
+                rom.get_id()
+            ))
 
     def configure(self, args: dict):
         kodi.run_script(
@@ -441,12 +439,6 @@ class ROMLauncherAddon(ROMAddon):
 
 class RetroplayerLauncherAddon(ROMLauncherAddon):
     
-    def get_launch_command(self, rom: ROM) -> dict:
-        return None
-
-    def get_configure_command(self, romcollection: ROMCollection) -> dict:
-        return None
-
     def launch(self, rom: ROM):
         rom_file_path = rom.get_scanned_data_element_as_file('file')
         if rom_file_path is None:
@@ -483,6 +475,57 @@ class RetroplayerLauncherAddon(ROMLauncherAddon):
                                                       post_data)
         if not is_stored:
             kodi.notify_error(kodi.translate(40958))
+
+
+class DefaultLauncherAddon(ROMLauncherAddon):
+
+    def launch(self, rom: ROM):
+        logger.debug('App Launcher: Starting ...')
+        
+        try:
+            execution_settings = ExecutionSettings()
+            execution_settings.delay_tempo = settings.getSettingAsInt('delay_tempo')
+            execution_settings.display_launcher_notify = settings.getSettingAsBool('display_launcher_notify')
+            execution_settings.is_non_blocking = settings.getSettingAsBool('is_non_blocking')
+            execution_settings.media_state_action = settings.getSettingAsInt('media_state_action')
+            execution_settings.suspend_audio_engine = settings.getSettingAsBool('suspend_audio_engine')
+            execution_settings.suspend_screensaver = settings.getSettingAsBool('suspend_screensaver')
+            execution_settings.suspend_joystick_engine = settings.getSettingAsBool('suspend_joystick')
+                    
+            addon_dir = kodi.getAddonDir()
+            report_path = addon_dir.pjoin('reports')
+            if not report_path.exists():
+                report_path.makedirs()
+            report_path = report_path.pjoin(f'{self.get_id()}-{rom.get_id()}.txt')
+            
+            executor_factory = get_executor_factory(report_path)
+            launcher = AppLauncher(
+                self.get_id(),
+                rom.get_id(),
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                executor_factory,
+                execution_settings)
+            
+            launcher.launch()
+        except Exception as e:
+            logger.error('Exception while executing ROM', exc_info=e)
+            kodi.notify_error(kodi.translate(42094))
+        
+    def configure(self, args: dict):
+        logger.debug('App Launcher: Configuring ...')
+            
+        launcher = AppLauncher(
+            self.get_id(),
+            args['entity_id'] if 'entity_id' in args else '',
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'))
+        
+        if launcher.build():
+            launcher.store_settings()
+            return
+            
+        kodi.notify_warn(kodi.translate(42095))
 
 
 class Source(ROMAddon):
@@ -2880,8 +2923,12 @@ class ROMLauncherAddonFactory(object):
 
     @staticmethod
     def create(addon: AklAddon, data: dict) -> ROMLauncherAddon:
+        logger.debug(f'Creating addon for id#{addon.get_id()} type: {addon.get_addon_id()}')
         if addon.get_addon_id() == constants.RETROPLAYER_LAUNCHER_APP_NAME:
             return RetroplayerLauncherAddon(data, addon)
+        
+        if addon.get_addon_id() == 'script.akl.defaults':  # TODO: add to constants
+            return DefaultLauncherAddon(data, addon)
                     
         return ROMLauncherAddon(data, addon)
 
