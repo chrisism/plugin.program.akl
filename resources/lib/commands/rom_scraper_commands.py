@@ -28,7 +28,7 @@ from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
 from resources.lib.repositories import UnitOfWork, AklAddonRepository, ROMsRepository
 from resources.lib.repositories import ROMCollectionRepository, SourcesRepository
-from resources.lib.domain import ROMCollection, Source, ScraperAddon, g_assetFactory
+from resources.lib.domain import Source, ScraperAddon, ScraperAddonFactory, g_assetFactory
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +150,7 @@ def cmd_scrape_roms_in_collection_or_source(args):
         collection = collection_repository.find_romcollection(romcollection_id)
         source = source_repository.find(source_id)
         addon = addon_repository.find(scraper_id)
-        selected_addon = ScraperAddon(addon, scraper_settings)
+        selected_addon = ScraperAddonFactory.create(addon, scraper_settings)
         
         assets_to_scrape = g_assetFactory.get_asset_list_by_IDs(scraper_settings.asset_IDs_to_scrape)
         metadata_to_scrape = [constants.METADATA_DESCRIPTIONS[meta_id] for meta_id in scraper_settings.metadata_IDs_to_scrape]
@@ -212,7 +212,7 @@ def cmd_scrape_rom_with_settings(args):
         
         rom = roms_repository.find_rom(rom_id)   
         addon = addon_repository.find(scraper_id)
-        selected_addon = ScraperAddon(addon, scraper_settings)
+        selected_addon = ScraperAddonFactory.create(addon, scraper_settings)
         
         assets_to_scrape = g_assetFactory.get_asset_list_by_IDs(scraper_settings.asset_IDs_to_scrape)
         metadata_to_scrape = [constants.METADATA_DESCRIPTIONS[meta_id] for meta_id in scraper_settings.metadata_IDs_to_scrape]
@@ -556,7 +556,7 @@ def _select_scraper(uow: UnitOfWork, title: str, scraper_settings: ScraperSettin
     # --- Make a menu list of available metadata scrapers ---
     options = {}
     for addon in addons:
-        scraper_addon = ScraperAddon(addon, scraper_settings)
+        scraper_addon = ScraperAddonFactory.create(addon, scraper_settings)
         if scraper_addon.settings_are_applicable():
             options[scraper_addon] = addon.get_name()
                     
