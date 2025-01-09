@@ -28,7 +28,7 @@ from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
 from resources.lib.repositories import UnitOfWork, AklAddonRepository, ROMsRepository
 from resources.lib.repositories import ROMCollectionRepository, SourcesRepository
-from resources.lib.domain import ROMCollection, Source, ScraperAddon, g_assetFactory
+from resources.lib.domain import Source, ScraperAddon, g_assetFactory
 
 logger = logging.getLogger(__name__)
 

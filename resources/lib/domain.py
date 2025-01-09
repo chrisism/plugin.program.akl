@@ -3,7 +3,7 @@
 # Advanced Kodi Launcher miscellaneous set of objects
 #
 # Copyright (c) Chrisism <crizizz@gmail.com>
-# Portions (c) Wintermute0110 <wintermute0110@gmail.com> 
+# Portions (c) Wintermute0110 <wintermute0110@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,10 +31,11 @@ from enum import IntEnum
 # --- AKL packages ---
 from resources.lib import globals
 from resources.lib.launcher import AppLauncher
+from resources.lib.scraper import LocalFilesScraper
 
 from akl import settings, constants, addons, api
 from akl.utils import io, kodi, text
-from akl.scrapers import ScraperSettings
+from akl.scrapers import ScraperSettings, ScrapeStrategy
 from akl.launchers import ExecutionSettings, get_executor_factory
 
 logger = logging.getLogger(__name__)
@@ -387,147 +388,6 @@ class ROMAddon(EntityABC):
         return self.addon
 
 
-class ROMLauncherAddon(ROMAddon):
-    __metaclass__ = abc.ABCMeta
-      
-    def __init__(self,
-                 entity_data: dict = None,
-                 addon: AklAddon = None):
-        
-        if entity_data is None:
-            entity_data = {
-                'id': text.misc_generate_random_SID(),
-                'name': '',
-                'is_default': False
-            }
-        super(ROMLauncherAddon, self).__init__(addon, entity_data)
-        
-    def get_name(self):
-        if not self.entity_data['name']:
-            return super().get_addon_name()
-        
-        return self.entity_data["name"]
-        
-    def is_default(self) -> bool:
-        return self.entity_data['is_default'] if 'is_default' in self.entity_data else False
-    
-    def set_default(self, default_launcher=False):
-        self.entity_data['is_default'] = default_launcher
-        
-    def launch(self, rom: ROM):
-        kodi.run_script(
-            self.addon.get_addon_id(),
-            addons.create_launch_command(
-                globals.WEBSERVER_HOST,
-                settings.getSettingAsInt('webserver_port'),
-                self.get_id(),
-                constants.OBJ_ROM,
-                rom.get_id()
-            ))
-
-    def configure(self, args: dict):
-        kodi.run_script(
-            self.addon.get_addon_id(),
-            addons.create_configure_launch_command(
-                globals.WEBSERVER_HOST,
-                settings.getSettingAsInt('webserver_port'),
-                self.get_id(),
-                args['entity_type'] if 'entity_type' in args else '',
-                args['entity_id'] if 'entity_id' in args else ''
-            ))
-
-
-class RetroplayerLauncherAddon(ROMLauncherAddon):
-    
-    def launch(self, rom: ROM):
-        rom_file_path = rom.get_scanned_data_element_as_file('file')
-        if rom_file_path is None:
-            logger.warning(f'Cannot launch ROM {rom.get_rom_identifier()}. No path provided.')
-            kodi.notify_warn(kodi.translate(40957))
-            return
-            
-        # >> How to fill gameclient = string (game.libretro.fceumm) ???
-        game_info = {
-            'title': rom.get_name(),
-            'platform': rom.get_platform(),
-            'genres': [rom.get_genre()],
-            'developer': rom.get_developer(),
-            'overview': rom.get_plot(),
-            'year': rom.get_releaseyear()
-        }
-        logger.info(f'launch() name     "{rom.get_name()}"')
-        logger.info(f'launch() path     "{rom_file_path.getPath()}"')
-
-        logger.debug('Executing Retroplayer')
-        kodi.play_item(rom.get_name(), rom_file_path.getPath(), 'game', game_info)
-        logger.debug('Retroyplayer call finished')
-   
-    def configure(self, args: dict):
-        post_data = {
-            'akl_addon_id': self.get_id(),
-            'addon_id': self.addon.get_addon_id(),
-            'entity_type': args['entity_type'] if 'entity_type' in args else '',
-            'entity_id': args['entity_id'] if 'entity_id' in args else '',
-            'settings': {}
-        }
-        is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST,
-                                                      settings.getSettingAsInt('webserver_port'),
-                                                      post_data)
-        if not is_stored:
-            kodi.notify_error(kodi.translate(40958))
-
-
-class DefaultLauncherAddon(ROMLauncherAddon):
-
-    def launch(self, rom: ROM):
-        logger.debug('App Launcher: Starting ...')
-        
-        try:
-            execution_settings = ExecutionSettings()
-            execution_settings.delay_tempo = settings.getSettingAsInt('delay_tempo')
-            execution_settings.display_launcher_notify = settings.getSettingAsBool('display_launcher_notify')
-            execution_settings.is_non_blocking = settings.getSettingAsBool('is_non_blocking')
-            execution_settings.media_state_action = settings.getSettingAsInt('media_state_action')
-            execution_settings.suspend_audio_engine = settings.getSettingAsBool('suspend_audio_engine')
-            execution_settings.suspend_screensaver = settings.getSettingAsBool('suspend_screensaver')
-            execution_settings.suspend_joystick_engine = settings.getSettingAsBool('suspend_joystick')
-                    
-            addon_dir = kodi.getAddonDir()
-            report_path = addon_dir.pjoin('reports')
-            if not report_path.exists():
-                report_path.makedirs()
-            report_path = report_path.pjoin(f'{self.get_id()}-{rom.get_id()}.txt')
-            
-            executor_factory = get_executor_factory(report_path)
-            launcher = AppLauncher(
-                self.get_id(),
-                rom.get_id(),
-                globals.WEBSERVER_HOST,
-                settings.getSettingAsInt('webserver_port'),
-                executor_factory,
-                execution_settings)
-            
-            launcher.launch()
-        except Exception as e:
-            logger.error('Exception while executing ROM', exc_info=e)
-            kodi.notify_error(kodi.translate(42094))
-        
-    def configure(self, args: dict):
-        logger.debug('App Launcher: Configuring ...')
-            
-        launcher = AppLauncher(
-            self.get_id(),
-            args['entity_id'] if 'entity_id' in args else '',
-            globals.WEBSERVER_HOST,
-            settings.getSettingAsInt('webserver_port'))
-        
-        if launcher.build():
-            launcher.store_settings()
-            return
-            
-        kodi.notify_warn(kodi.translate(42095))
-
-
 class Source(ROMAddon):
     
     def __init__(self,
@@ -713,6 +573,147 @@ class Source(ROMAddon):
         )
 
 
+class ROMLauncherAddon(ROMAddon):
+    __metaclass__ = abc.ABCMeta
+      
+    def __init__(self,
+                 entity_data: dict = None,
+                 addon: AklAddon = None):
+        
+        if entity_data is None:
+            entity_data = {
+                'id': text.misc_generate_random_SID(),
+                'name': '',
+                'is_default': False
+            }
+        super(ROMLauncherAddon, self).__init__(addon, entity_data)
+        
+    def get_name(self):
+        if not self.entity_data['name']:
+            return super().get_addon_name()
+        
+        return self.entity_data["name"]
+        
+    def is_default(self) -> bool:
+        return self.entity_data['is_default'] if 'is_default' in self.entity_data else False
+    
+    def set_default(self, default_launcher=False):
+        self.entity_data['is_default'] = default_launcher
+        
+    def launch(self, rom: ROM):
+        kodi.run_script(
+            self.addon.get_addon_id(),
+            addons.create_launch_command(
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                self.get_id(),
+                constants.OBJ_ROM,
+                rom.get_id()
+            ))
+
+    def configure(self, args: dict):
+        kodi.run_script(
+            self.addon.get_addon_id(),
+            addons.create_configure_launch_command(
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                self.get_id(),
+                args['entity_type'] if 'entity_type' in args else '',
+                args['entity_id'] if 'entity_id' in args else ''
+            ))
+
+
+class RetroplayerLauncherAddon(ROMLauncherAddon):
+    
+    def launch(self, rom: ROM):
+        rom_file_path = rom.get_scanned_data_element_as_file('file')
+        if rom_file_path is None:
+            logger.warning(f'Cannot launch ROM {rom.get_rom_identifier()}. No path provided.')
+            kodi.notify_warn(kodi.translate(40957))
+            return
+            
+        # >> How to fill gameclient = string (game.libretro.fceumm) ???
+        game_info = {
+            'title': rom.get_name(),
+            'platform': rom.get_platform(),
+            'genres': [rom.get_genre()],
+            'developer': rom.get_developer(),
+            'overview': rom.get_plot(),
+            'year': rom.get_releaseyear()
+        }
+        logger.info(f'launch() name     "{rom.get_name()}"')
+        logger.info(f'launch() path     "{rom_file_path.getPath()}"')
+
+        logger.debug('Executing Retroplayer')
+        kodi.play_item(rom.get_name(), rom_file_path.getPath(), 'game', game_info)
+        logger.debug('Retroyplayer call finished')
+   
+    def configure(self, args: dict):
+        post_data = {
+            'akl_addon_id': self.get_id(),
+            'addon_id': self.addon.get_addon_id(),
+            'entity_type': args['entity_type'] if 'entity_type' in args else '',
+            'entity_id': args['entity_id'] if 'entity_id' in args else '',
+            'settings': {}
+        }
+        is_stored = api.client_post_launcher_settings(globals.WEBSERVER_HOST,
+                                                      settings.getSettingAsInt('webserver_port'),
+                                                      post_data)
+        if not is_stored:
+            kodi.notify_error(kodi.translate(40958))
+
+
+class DefaultLauncherAddon(ROMLauncherAddon):
+
+    def launch(self, rom: ROM):
+        logger.debug('App Launcher: Starting ...')
+        
+        try:
+            execution_settings = ExecutionSettings()
+            execution_settings.delay_tempo = settings.getSettingAsInt('delay_tempo')
+            execution_settings.display_launcher_notify = settings.getSettingAsBool('display_launcher_notify')
+            execution_settings.is_non_blocking = settings.getSettingAsBool('is_non_blocking')
+            execution_settings.media_state_action = settings.getSettingAsInt('media_state_action')
+            execution_settings.suspend_audio_engine = settings.getSettingAsBool('suspend_audio_engine')
+            execution_settings.suspend_screensaver = settings.getSettingAsBool('suspend_screensaver')
+            execution_settings.suspend_joystick_engine = settings.getSettingAsBool('suspend_joystick')
+                    
+            addon_dir = kodi.getAddonDir()
+            report_path = addon_dir.pjoin('reports')
+            if not report_path.exists():
+                report_path.makedirs()
+            report_path = report_path.pjoin(f'{self.get_id()}-{rom.get_id()}.txt')
+            
+            executor_factory = get_executor_factory(report_path)
+            launcher = AppLauncher(
+                self.get_id(),
+                rom.get_id(),
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                executor_factory,
+                execution_settings)
+            
+            launcher.launch()
+        except Exception as e:
+            logger.error('Exception while executing ROM', exc_info=e)
+            kodi.notify_error(kodi.translate(42094))
+        
+    def configure(self, args: dict):
+        logger.debug('App Launcher: Configuring ...')
+            
+        launcher = AppLauncher(
+            self.get_id(),
+            args['entity_id'] if 'entity_id' in args else '',
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'))
+        
+        if launcher.build():
+            launcher.store_settings()
+            return
+            
+        kodi.notify_warn(kodi.translate(42095))
+
+
 class ScraperAddon(ROMAddon):
     
     def __init__(self, addon: AklAddon, scraper_settings: ScraperSettings):
@@ -784,6 +785,65 @@ class ScraperAddon(ROMAddon):
                 entity.get_id(),
                 self.get_settings()
             ))
+
+
+class DefaultScraperAddon(ScraperAddon):
+    
+    def get_name(self):
+        return 'Local files scraper'
+    
+    def get_supported_metadata(self) -> typing.List[str]:
+        return [
+            constants.META_TITLE_ID,
+            constants.META_YEAR_ID,
+            constants.META_GENRE_ID,
+            constants.META_DEVELOPER_ID,
+            constants.META_NPLAYERS_ID,
+            constants.META_ESRB_ID,
+            constants.META_PLOT_ID
+        ]
+    
+    def get_supported_assets(self) -> typing.List[str]:
+        return constants.ROM_ASSET_ID_LIST
+    
+    def scrape(self, entity: EntityABC):
+        logger.debug('========== Local files.run_scraper() BEGIN ==================================================')
+        pdialog = kodi.ProgressDialog()
+        scrape_settings = self.get_scraper_settings()
+        
+        # OVERRIDES
+        scrape_settings.search_term_mode = constants.SCRAPE_AUTOMATIC
+        scrape_settings.game_selection_mode = constants.SCRAPE_AUTOMATIC
+        scrape_settings.asset_selection_mode = constants.SCRAPE_AUTOMATIC
+        scrape_settings.overwrite_existing_assets = constants.SCRAPE_AUTOMATIC
+        scrape_settings.overwrite_existing_meta = constants.SCRAPE_AUTOMATIC
+        
+        if scrape_settings.scrape_metadata_policy != constants.SCRAPE_ACTION_NONE:
+            scrape_settings.scrape_metadata_policy = constants.SCRAPE_POLICY_LOCAL_ONLY
+        if scrape_settings.scrape_assets_policy != constants.SCRAPE_ACTION_NONE:
+            scrape_settings.scrape_assets_policy = constants.SCRAPE_POLICY_LOCAL_ONLY
+            
+        scraper_strategy = ScrapeStrategy(
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'),
+            scrape_settings,
+            LocalFilesScraper(),
+            pdialog)
+        
+        if entity.get_type() == constants.OBJ_ROM:
+            scraped_rom = scraper_strategy.process_single_rom(entity.get_id())
+            pdialog.endProgress()
+            pdialog.startProgress('Saving ROM in database ...')
+            scraper_strategy.store_scraped_rom(self.addon.get_addon_id(), entity.get_id(), scraped_rom)
+        else:
+            scraped_roms = scraper_strategy.process_roms(entity.get_type(), entity.get_id())
+            pdialog.endProgress()
+            pdialog.startProgress('Saving ROMs in database ...')
+            scraper_strategy.store_scraped_roms(self.addon.get_addon_id(),
+                                                entity.get_type(),
+                                                entity.get_id(),
+                                                scraped_roms)
+        pdialog.endProgress()
 
 
 class RuleSetOperator(IntEnum):
@@ -2721,12 +2781,14 @@ class AssetInfoFactory(object):
         a.path_key                      = 'path_3dbox'
         self.ASSET_INFO_ID_DICT[a.id]   = a
 
+
 # --- Global object to get asset info ---
 g_assetFactory = AssetInfoFactory()
 
+
 # Factory class to create VirtualCollection instances.
 # A VirtualCollection is similar to a ROMCollection except for the fact that the contents are
-# generated based on either certain flags or conditions of the ROMs. 
+# generated based on either certain flags or conditions of the ROMs.
 class VirtualCollectionFactory(object):
     
     @staticmethod
@@ -2802,26 +2864,30 @@ class VirtualCollectionFactory(object):
             })
         ])
 
+
 class VirtualCategoryFactory(object):
     
     @staticmethod
     def create(vcategory_id: str) -> VirtualCategory:
         
         default_entity_data = _get_default_category_data_model()   
-        if vcategory_id  == constants.VCATEGORY_ROOT_ID:
-             return VirtualCategory(dict(default_entity_data, **{
-                'id' : vcategory_id,
-                'm_name' : kodi.translate(42066),
+        if vcategory_id == constants.VCATEGORY_ROOT_ID:
+            return VirtualCategory(dict(default_entity_data, **{
+                'id': vcategory_id,
+                'm_name': kodi.translate(42066),
                 'plot': kodi.translate(44009),
                 'finished': settings.getSettingAsBool('display_hide_vcategories')
             }), [
-                Asset({'id' : '', 'asset_type' : constants.ASSET_FANART_ID, 'filepath' : globals.g_PATHS.FANART_FILE_PATH.getPath()}),
-                Asset({'id' : '', 'asset_type' : constants.ASSET_ICON_ID,   'filepath' : globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Browse_by_icon.png').getPath()}),
-                Asset({'id' : '', 'asset_type' : constants.ASSET_POSTER_ID, 'filepath' : globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Browse_by_poster.png').getPath()}),
+                Asset({'id': '', 'asset_type': constants.ASSET_FANART_ID, 
+                       'filepath': globals.g_PATHS.FANART_FILE_PATH.getPath()}),
+                Asset({'id': '', 'asset_type': constants.ASSET_ICON_ID, 
+                       'filepath': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Browse_by_icon.png').getPath()}),
+                Asset({'id': '', 'asset_type': constants.ASSET_POSTER_ID, 
+                       'filepath': globals.g_PATHS.ADDON_CODE_DIR.pjoin('media/theme/Browse_by_poster.png').getPath()}),
             ])
             
         if vcategory_id == constants.VCATEGORY_TITLE_ID:
-             return VirtualCategory(dict(default_entity_data, **{
+            return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42067),
                 'plot': kodi.translate(44010),
@@ -2833,7 +2899,7 @@ class VirtualCategoryFactory(object):
             ])
              
         if vcategory_id == constants.VCATEGORY_YEARS_ID:
-             return VirtualCategory(dict(default_entity_data, **{
+            return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42068),
                 'plot': kodi.translate(44011),
@@ -2845,7 +2911,7 @@ class VirtualCategoryFactory(object):
             ])     
              
         if vcategory_id == constants.VCATEGORY_GENRE_ID:
-             return VirtualCategory(dict(default_entity_data, **{
+            return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42069),
                 'plot': kodi.translate(44012),
@@ -2857,7 +2923,7 @@ class VirtualCategoryFactory(object):
             ])     
              
         if vcategory_id == constants.VCATEGORY_DEVELOPER_ID:
-             return VirtualCategory(dict(default_entity_data, **{
+            return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42070),
                 'plot': kodi.translate(44013),
@@ -2869,7 +2935,7 @@ class VirtualCategoryFactory(object):
             ])     
              
         if vcategory_id == constants.VCATEGORY_NPLAYERS_ID:
-             return VirtualCategory(dict(default_entity_data, **{
+            return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name' : kodi.translate(42071),
                 'plot': kodi.translate(44014),
@@ -2881,7 +2947,7 @@ class VirtualCategoryFactory(object):
             ])    
                     
         if vcategory_id == constants.VCATEGORY_ESRB_ID:
-             return VirtualCategory(dict(default_entity_data, **{
+            return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name': kodi.translate(42072),
                 'plot': kodi.translate(44015),
@@ -2893,7 +2959,7 @@ class VirtualCategoryFactory(object):
             ])  
              
         if vcategory_id == constants.VCATEGORY_PEGI_ID:
-             return VirtualCategory({
+            return VirtualCategory({
                 'id' : vcategory_id,
                 'm_name': kodi.translate(42073),
                 'plot': kodi.translate(44016),
@@ -2905,7 +2971,7 @@ class VirtualCategoryFactory(object):
             ])  
                      
         if vcategory_id == constants.VCATEGORY_RATING_ID:
-             return VirtualCategory(dict(default_entity_data, **{
+            return VirtualCategory(dict(default_entity_data, **{
                 'id' : vcategory_id,
                 'm_name': kodi.translate(42074),
                 'plot': kodi.translate(44017),
@@ -2932,14 +2998,26 @@ class ROMLauncherAddonFactory(object):
                     
         return ROMLauncherAddon(data, addon)
 
+
+class ScrapperAddonFactory(object):
     
+    @staticmethod
+    def create(addon: AklAddon, settings: dict) -> ScraperAddon:
+        logger.debug(f'Creating addon for id#{addon.get_id()} type: {addon.get_addon_id()}')
+            
+        if addon.get_addon_id() == 'script.akl.defaults':  # TODO: add to constants
+            return DefaultScraperAddon(addon, settings)
+                    
+        return ScraperAddon(addon, settings)
+
+
 # -------------------------------------------------------------------------------------------------
 # Data model used in the plugin
 # Internally all string in the data model are Unicode. They will be encoded to
 # UTF-8 when writing files.
 # -------------------------------------------------------------------------------------------------
-# These functions create a new data structure for the given object and (very importantly) 
-# fill the correct default values). 
+# These functions create a new data structure for the given object and (very importantly)
+# fill the correct default values).
 #
 def _get_default_category_data_model():
     return {
@@ -2954,6 +3032,7 @@ def _get_default_category_data_model():
         'finished' : False,
         #'Asset_Prefix' : '',
     }
+
 
 def _get_default_ROMCollection_data_model():
     return {
