@@ -2999,10 +2999,10 @@ class ROMLauncherAddonFactory(object):
         return ROMLauncherAddon(data, addon)
 
 
-class ScrapperAddonFactory(object):
+class ScraperAddonFactory(object):
     
     @staticmethod
-    def create(addon: AklAddon, settings: dict) -> ScraperAddon:
+    def create(addon: AklAddon, settings: ScraperSettings) -> ScraperAddon:
         logger.debug(f'Creating addon for id#{addon.get_id()} type: {addon.get_addon_id()}')
             
         if addon.get_addon_id() == 'script.akl.defaults':  # TODO: add to constants
