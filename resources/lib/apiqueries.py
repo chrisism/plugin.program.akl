@@ -45,8 +45,8 @@ def qry_get_rom(rom_id: str) -> str:
             source_repository = SourcesRepository(uow)
             source = source_repository.find(rom.get_scanned_by())
         
-        asset_paths_by_source = g_assetFactory.get_rom_asset_paths(source=source)
-        rom.update_missing_asset_paths(asset_paths_by_source)
+        fallback_asset_paths = g_assetFactory.get_rom_asset_paths(source=source)
+        rom.update_missing_asset_paths(fallback_asset_paths)
             
         rom_dto = rom.create_dto()
         return json.dumps(rom_dto.get_data_dic())
