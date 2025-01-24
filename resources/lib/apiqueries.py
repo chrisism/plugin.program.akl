@@ -37,8 +37,17 @@ def qry_get_rom(rom_id: str) -> str:
         rom = rom_repository.find_rom(rom_id)
         
         if rom is None:
+            logger.info(f"Requested ROM#{rom_id} was not found")
             return None
         
+        source = None
+        if rom.get_scanned_by():
+            source_repository = SourcesRepository(uow)
+            source = source_repository.find(rom.get_scanned_by())
+        
+        fallback_asset_paths = g_assetFactory.get_rom_asset_paths(source=source)
+        rom.update_missing_asset_paths(fallback_asset_paths)
+            
         rom_dto = rom.create_dto()
         return json.dumps(rom_dto.get_data_dic())
 

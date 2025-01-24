@@ -277,8 +277,11 @@ class AssetPath(EntityABC):
     def get_path_FN(self) -> io.FileName:
         return self._get_filename_from_field('path')
     
-    def set_path(self, path_str):
+    def set_path(self, path_str: str):
         self.entity_data['path'] = path_str
+    
+    def set_path_FN(self, path: io.FileName):
+        self.entity_data['path'] = path.getPath()
     
     def set_asset_info(self, info: AssetInfo):
         self.asset_info = info
@@ -2543,7 +2546,7 @@ class AssetInfoFactory(object):
             path = self.get_rom_asset_path(asset_info, rom, source)
             
             asset_path_obj = AssetPath()
-            asset_path_obj.set_path(path)
+            asset_path_obj.set_path_FN(path)
             asset_path_obj.set_asset_info(asset_info)
             asset_paths.append(asset_path_obj)
         return asset_paths
