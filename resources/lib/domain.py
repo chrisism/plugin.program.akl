@@ -32,6 +32,7 @@ from enum import IntEnum
 from resources.lib import globals
 from resources.lib.launcher import AppLauncher
 from resources.lib.scraper import LocalFilesScraper
+from resources.lib.scanner import RomFolderScanner
 
 from akl import settings, constants, addons, api
 from akl.utils import io, kodi, text
@@ -557,23 +558,86 @@ class Source(ROMAddon):
     def get_last_scan_timestamp(self):
         return self.entity_data["last_scan_timestamp"]
     
-    def get_scan_command(self) -> dict:
-        return addons.create_scan_command(
-            globals.WEBSERVER_HOST,
-            settings.getSettingAsInt('webserver_port'),
-            self.get_id(),
-            constants.OBJ_SOURCE,
-            self.get_id()
-        )
+    def scan(self):
+        if self.get_addon().get_addon_id() == 'script.akl.defaults':  # TODO: add to constants
+            self._scan_default()
+            return
         
-    def get_configure_command(self) -> dict:
-        return addons.create_configure_scan_command(
+        kodi.run_script(
+            self.get_addon().get_addon_id(),
+            addons.create_scan_command(
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                self.get_id(),
+                constants.OBJ_SOURCE,
+                self.get_id()
+            ))
+    
+    def configure(self):
+        if self.get_addon().get_addon_id() == 'script.akl.defaults':  # TODO: add to constants
+            self._configure_default()
+            return
+        
+        kodi.run_script(
+            self.get_addon().get_addon_id(),
+            addons.create_configure_scan_command(
+                globals.WEBSERVER_HOST,
+                settings.getSettingAsInt('webserver_port'),
+                self.get_id(),
+                constants.OBJ_SOURCE,
+                self.get_id()
+            ))
+
+    def _scan_default(self):
+        logger.debug('ROM Folder scanner: Starting scan ...')
+        progress_dialog = kodi.ProgressDialog()
+
+        addon_dir = kodi.getAddonDir()
+        report_path = addon_dir.pjoin('reports')
+                
+        scanner = RomFolderScanner(
+            report_path,
+            self.get_id(),
             globals.WEBSERVER_HOST,
             settings.getSettingAsInt('webserver_port'),
+            progress_dialog)
+            
+        scanner.scan()
+        progress_dialog.endProgress()
+        
+        logger.debug('scan_for_roms(): Finished scanning')
+        
+        amount_dead = scanner.amount_of_dead_roms()
+        if amount_dead > 0:
+            logger.info(f'scan_for_roms(): {amount_dead} roms marked as dead')
+            scanner.remove_dead_roms()
+            
+        amount_scanned = scanner.amount_of_scanned_roms()
+        if amount_scanned == 0:
+            logger.info('scan_for_roms(): No roms scanned')
+        else:
+            logger.info(f'scan_for_roms(): {amount_scanned} roms scanned')
+            scanner.store_scanned_roms()
+            
+        kodi.notify('ROMs scanning done')
+            
+    def _configure_default(self):
+        logger.debug('ROM Folder scanner: Configuring ...')
+        addon_dir = kodi.getAddonDir()
+        report_path = addon_dir.pjoin('reports')
+        
+        scanner = RomFolderScanner(
+            report_path,
             self.get_id(),
-            constants.OBJ_SOURCE,
-            self.get_id()
-        )
+            globals.WEBSERVER_HOST,
+            settings.getSettingAsInt('webserver_port'),
+            kodi.ProgressDialog())
+        
+        if scanner.configure():
+            scanner.store_settings()
+            return
+        
+        kodi.notify_warn('Cancelled configuring scanner')
 
 
 class ROMLauncherAddon(ROMAddon):
