@@ -90,10 +90,8 @@ def cmd_add_source(args):
         uow.commit()
         
     kodi.notify(kodi.translate(40980))
-    kodi.run_script(
-        selected_option.get_addon_id(),
-        source.get_configure_command())
-
+    source.configure()
+    
 
 @AppMediator.register('EDIT_SOURCE')
 def cmd_edit_source(args):
@@ -219,9 +217,7 @@ def cmd_edit_source_scanner(args):
         source = repository.find(source_id)
      
     kodi.notify(kodi.translate(40980))
-    kodi.run_script(
-        source.addon.get_addon_id(),
-        source.get_configure_command())
+    source.configure()
        
 
 @AppMediator.register('DELETE_SOURCE')
@@ -466,9 +462,7 @@ def cmd_execute_rom_scanner(args):
 
     logger.info(f'SCAN_ROMS: scanner for source "{source.get_name()}"')
     kodi.notify(kodi.translate(40980))
-    kodi.run_script(
-        source.addon.get_addon_id(),
-        source.get_scan_command())
+    source.scan()
 
 
 def _get_name_from_platform(input, item_key, entity_data):
