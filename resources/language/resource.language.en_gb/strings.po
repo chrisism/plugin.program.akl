@@ -1843,6 +1843,10 @@ msgctxt "#41197"
 msgid "From which ROM collection"
 msgstr ""
 
+msgctxt "#41198"
+msgid "Configured asset directories do not exist for: {0}.\nDo you want to create them? If not these specific assets will be disabled for scanning."
+msgstr ""
+
 ############################
 # List/Action options
 ############################
