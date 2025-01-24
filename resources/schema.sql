@@ -481,9 +481,11 @@ CREATE TABLE IF NOT EXISTS akl_migrations(
 );
 
 -- STATIC VALUES
-INSERT INTO akl_addon (id, name, addon_id, version, addon_type) VALUES
-    ('856f1cd76f2148aba7953f20f10ec11d', 'Retroplayer', 'retroplayer_launcher_app', '1.0', 'LAUNCHER'),
-    ('507e025ae0644b9cbdf5be0aa95532b9', 'App Launcher', 'script.akl.defaults', '1.6', 'LAUNCHER');
+INSERT INTO akl_addon (id, name, addon_id, version, addon_type, extra_settings) VALUES
+    ('856f1cd76f2148aba7953f20f10ec11d', 'Retroplayer', 'retroplayer_launcher_app', '1.0', 'LAUNCHER', NULL),
+    ('507e025ae0644b9cbdf5be0aa95532b9', 'Application/Emulator Launcher', 'script.akl.defaults', '1.6', 'LAUNCHER', NULL),
+    ('3fc8b1f8b2b2ea440f4553d1146bd8cf', 'Folder scanner', 'script.akl.defaults', '1.6', 'SCANNER', NULL),
+    ('3fc8b1f8b2b2ea440f4553d1146bd8cf', 'Local files', 'script.akl.defaults', '1.6', 'SCRAPER', '{"supported_metadata": "title|year|genre|developer|nplayers|esrb|plot", "supported_assets": "fanart|banner|snap|clearlogo|title|boxfront|boxback|3dbox|cartridge|flyer|map|manual|trailer"}');
 
 INSERT INTO tags (id, tag) VALUES 
     ('2e1f3086c96b44d2a81f5c08876b4ef6', 'co-op'),

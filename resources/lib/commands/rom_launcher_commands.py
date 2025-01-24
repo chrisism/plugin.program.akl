@@ -21,8 +21,9 @@ import logging
 import collections
 
 from akl.utils import kodi
-from akl import settings, constants
+from akl import constants
 
+from resources.lib import commands
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
 from resources.lib.repositories import UnitOfWork, AklAddonRepository, LaunchersRepository
@@ -35,7 +36,7 @@ logger = logging.getLogger(__name__)
 # -------------------------------------------------------------------------------------------------
 # Launcher management.
 # -------------------------------------------------------------------------------------------------
-@AppMediator.register('ADD_LAUNCHER')
+@AppMediator.register(commands.ADD_LAUNCHER)
 def cmd_add_launcher(args):
     options = collections.OrderedDict()
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
@@ -226,7 +227,7 @@ def cmd_add_rom_launchers(args):
         if selected_option == "NEW":
             args["entity_type"] = constants.OBJ_ROM
             args["entity_id"] = rom_id
-            AppMediator.sync_cmd("ADD_LAUNCHER", args)
+            AppMediator.sync_cmd(commands.ADD_LAUNCHER, args)
             return
         
         selected_option: ROMLauncherAddon = selected_option
@@ -271,7 +272,7 @@ def cmd_add_source_launchers(args):
         if selected_option == "NEW":
             args["entity_type"] = constants.OBJ_SOURCE
             args["entity_id"] = source_id
-            AppMediator.sync_cmd("ADD_LAUNCHER", args)
+            AppMediator.sync_cmd(commands.ADD_LAUNCHER, args)
             return
         
         logger.debug(f'ADD_SOURCE_LAUNCHER: Selected {selected_option.get_id()}')
@@ -319,7 +320,7 @@ def cmd_add_romcollection_launchers(args):
         if selected_option == "NEW":
             args["entity_type"] = constants.OBJ_ROMCOLLECTION
             args["entity_id"] = romcollection_id
-            AppMediator.sync_cmd("ADD_LAUNCHER", args)
+            AppMediator.sync_cmd(commands.ADD_LAUNCHER, args)
             return
         
         logger.debug(f'ADD_COLLECTION_LAUNCHER: Selected {selected_option.get_id()}')
@@ -608,20 +609,9 @@ def cmd_execute_rom_with_launcher(args):
             launchers.extend(romcollection.get_launchers())
         
         if len(launchers) == 0:
-            is_standalone_src = rom.get_scanned_data_element("standalone")
+            # In the case of no launchers attached, but the ROM has a file path
+            # automatically apply the standalone default launcher.
             file_path = rom.get_scanned_data_element("file")
-            
-            standalone_launchable = is_standalone_src and int(is_standalone_src) == 1
-            
-            if not standalone_launchable or not file_path:
-                logger.warning(f'No launcher configured for ROM {rom.get_name()}')
-                
-            if not standalone_launchable and settings.getSettingAsBool('fallback_to_retroplayer'):
-                logger.info('Automatic fallback to Retroplayer as launcher applied.')
-                retroplayer_addon = addon_repository.find_by_addon_id(constants.RETROPLAYER_LAUNCHER_APP_NAME, constants.AddonType.LAUNCHER)
-                retroplayer_launcher = ROMLauncherAddonFactory.create(retroplayer_addon, {})
-                launchers.append(retroplayer_launcher)
-            
             if file_path:
                 addon_id = "script.akl.defaults"
                 addon = addon_repository.find_by_addon_id(addon_id, constants.AddonType.LAUNCHER)
@@ -629,7 +619,9 @@ def cmd_execute_rom_with_launcher(args):
                 launcher.set_settings({"name": f"Standalone File Launcher: {file_path}"})
                 launcher.set_id("STANDALONE")
                 launchers.append(launcher)
-                            
+            else:
+                logger.warning(f'No launcher configured for ROM {rom.get_name()}')
+                         
             if len(launchers) == 0:
                 kodi.notify_warn(kodi.translate(41001))
                 return

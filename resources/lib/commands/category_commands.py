@@ -23,6 +23,7 @@ import collections
 from akl.utils import kodi, text, io
 from akl import constants
 
+from resources.lib import commands
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals, editors
 from resources.lib.repositories import UnitOfWork, CategoryRepository
@@ -36,8 +37,8 @@ def cmd_add_item(args):
     logger.debug('cmd_add_item() BEGIN')
     
     options = collections.OrderedDict()
-    options['ADD_SOURCE'] = kodi.get_listitem(kodi.translate(42506), kodi.translate(44034))
-    options['ADD_LAUNCHER'] = kodi.get_listitem(kodi.translate(42514), kodi.translate(44035))
+    options[commands.ADD_SOURCE] = kodi.get_listitem(kodi.translate(42506), kodi.translate(44034))
+    options[commands.ADD_LAUNCHER] = kodi.get_listitem(kodi.translate(42514), kodi.translate(44035))
     options['ADD_CATEGORY'] = kodi.get_listitem(kodi.translate(42501), kodi.translate(44036))
     options['ADD_ROMCOLLECTION'] = kodi.get_listitem(kodi.translate(42503), kodi.translate(44037))
        

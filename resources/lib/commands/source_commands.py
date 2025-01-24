@@ -24,6 +24,7 @@ import typing
 from akl import constants, platforms
 from akl.utils import kodi, io
 
+from resources.lib import commands
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals, editors
 from resources.lib.repositories import UnitOfWork, SourcesRepository, ROMsRepository, ROMsJsonFileRepository, AklAddonRepository
@@ -33,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 # --- Main menu commands ---
-@AppMediator.register('ADD_SOURCE')
+@AppMediator.register(commands.ADD_SOURCE)
 def cmd_add_source(args):
     logger.debug('cmd_add_source() BEGIN')
     

@@ -30,3 +30,7 @@ import resources.lib.commands.misc_commands
 import resources.lib.commands.chk_commands
 import resources.lib.commands.report_commands
 import resources.lib.commands.search_commands
+
+
+ADD_LAUNCHER = 'ADD_LAUNCHER'
+ADD_SOURCE = 'ADD_SOURCE'
