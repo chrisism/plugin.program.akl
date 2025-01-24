@@ -1,5 +1,5 @@
 ## Current
-- Added default launcher in main plugin
+- Added default launcher, scanner and scraper in main plugin
 
 ## Previous
 - Fixed launching standalone sources

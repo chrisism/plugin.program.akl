@@ -43,7 +43,7 @@ msgid "Plugins"
 msgstr "settings.xml"
 
 msgctxt "#40018"
-msgid "Launching"
+msgid "ROM Launching"
 msgstr "settings.xml"
 
 ############################

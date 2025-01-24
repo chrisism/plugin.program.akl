@@ -124,6 +124,70 @@
             -->
             </group>
         </category>
+
+        <category id="akl_launching" label="40018">
+			<group id="1">
+                <setting id="media_state_action" type="integer" label="30121" help="">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30901">0</option>
+                            <option label="30902">1</option>
+                            <option label="30903">2</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="delay_tempo" type="integer" label="30122" help="">
+                    <level>0</level>
+                    <default>500</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <step>100</step>
+                        <maximum>1500</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+                <setting id="suspend_audio_engine" type="boolean" label="30123" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="suspend_screensaver" type="boolean" label="30124" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="suspend_joystick" type="boolean" label="30130" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="escape_romfile" type="boolean" label="30125" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="lirc_state" type="boolean" label="30126" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="windows_close_fds" type="boolean" label="30127" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="windows_cd_apppath" type="boolean" label="30128" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>        
         <category id="display" label="40014">
             <group id="grp_general" label="40021">
                 <setting id="display_execute_rom_by_default" type="boolean" label="40416" help="">
@@ -282,69 +346,6 @@
                 </setting>
             </group>
         </category> -->
-        <category id="akl_launching" label="40018">
-			<group id="1">
-                <setting id="media_state_action" type="integer" label="30121" help="">
-                    <level>0</level>
-                    <default>0</default>
-                    <constraints>
-                        <options>
-                            <option label="30901">0</option>
-                            <option label="30902">1</option>
-                            <option label="30903">2</option>
-                        </options>
-                    </constraints>
-                    <control type="spinner" format="string"/>
-                </setting>
-                <setting id="delay_tempo" type="integer" label="30122" help="">
-                    <level>0</level>
-                    <default>500</default>
-                    <constraints>
-                        <minimum>0</minimum>
-                        <step>100</step>
-                        <maximum>1500</maximum>
-                    </constraints>
-                    <control type="slider" format="integer">
-                        <popup>false</popup>
-                    </control>
-                </setting>
-                <setting id="suspend_audio_engine" type="boolean" label="30123" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="suspend_screensaver" type="boolean" label="30124" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="suspend_joystick" type="boolean" label="30130" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="escape_romfile" type="boolean" label="30125" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="lirc_state" type="boolean" label="30126" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="windows_close_fds" type="boolean" label="30127" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="windows_cd_apppath" type="boolean" label="30128" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-            </group>
-        </category>
         <category id="advanced" label="40016">
             <group id="5">
                 <setting id="fallback_to_retroplayer" type="boolean" label="40613" help="">
