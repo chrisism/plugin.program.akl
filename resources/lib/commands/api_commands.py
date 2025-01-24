@@ -193,7 +193,8 @@ def cmd_remove_roms(args) -> bool:
     
     kodi.notify(kodi.translate(41010).format(source.get_name()))
     
-    AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
+    if source_id:
+        AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': source_id})
     for collection in romcollections:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection.get_id()})
     AppMediator.async_cmd('RENDER_VCATEGORY_VIEWS')
@@ -334,7 +335,11 @@ def cmd_store_scraped_single_rom(args) -> bool:
     
     kodi.notify(kodi.translate(41009).format(rom.get_name()))
     
-    AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': rom.get_scanned_by()})
+    if rom.get_scanned_by():
+        AppMediator.async_cmd('RENDER_SOURCE_VIEW', {'source_id': rom.get_scanned_by()})
+    else:
+        AppMediator.async_cmd('RENDER_SOURCES_VIEW')
+        
     for collection_id in rom_collection_ids:
         AppMediator.async_cmd('RENDER_ROMCOLLECTION_VIEW', {'romcollection_id': collection_id})
         
