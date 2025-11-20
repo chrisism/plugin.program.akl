@@ -4,11 +4,11 @@ import sys
 import json
 
 from datetime import datetime
-from distutils.version import LooseVersion
 
 import xbmc
 
 from resources.lib import globals
+from resources.lib.packaging.version import Version as LooseVersion
 from resources.lib.repositories import UnitOfWork
 from resources.lib.webservice import WebService
 from resources.lib.commands.mediator import AppMediator

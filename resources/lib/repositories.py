@@ -4,7 +4,6 @@ import typing
 
 import json
 import datetime
-from distutils.version import LooseVersion
 
 import sqlite3
 from sqlite3.dbapi2 import Cursor
@@ -18,6 +17,7 @@ from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, 
 from resources.lib.domain import Asset, AssetPath, AssetMapping, RomAssetMapping
 from resources.lib.domain import VirtualCategoryFactory, VirtualCollectionFactory, ROMLauncherAddonFactory, g_assetFactory
 from resources.lib.domain import Source, ROMLauncherAddon, AklAddon
+from resources.lib.packaging.version import Version as LooseVersion
 
 
 # #################################################################################################

@@ -23,11 +23,11 @@ import collections
 
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
-from distutils.version import LooseVersion
 
 from akl.utils import kodi, io
 from akl import constants
 
+from resources.lib.packaging.version import Version as LooseVersion
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
 from resources.lib.repositories import UnitOfWork, AklAddonRepository, CategoryRepository, ROMCollectionRepository, XmlConfigurationRepository, SourcesRepository
