@@ -4,7 +4,6 @@ import typing
 
 import json
 import datetime
-from distutils.version import LooseVersion
 
 import sqlite3
 from sqlite3.dbapi2 import Cursor
@@ -14,6 +13,7 @@ from akl import constants
 
 from resources.lib import globals
 from resources.lib import queries as qry
+from resources.lib.version_utils import Version, parse_version
 from resources.lib.domain import MetaDataItemABC, Category, ROMCollection, ROM, VirtualCollection, RuleSet, Rule
 from resources.lib.domain import Asset, AssetPath, AssetMapping, RomAssetMapping
 from resources.lib.domain import VirtualCategoryFactory, VirtualCollectionFactory, ROMLauncherAddonFactory, g_assetFactory
@@ -413,8 +413,8 @@ class UnitOfWork(object):
             self._db_path.copy(temp_filepath)
         else:
             temp_filepath = self._db_path
-            
-        check_version = LooseVersion("1.3.99")
+
+        check_version = parse_version("1.3.99")
         any_failed = False
         for migration_file in migration_files:
             self.logger.info(f'Executing migration script: {migration_file.getPath()}')
@@ -481,8 +481,8 @@ class UnitOfWork(object):
 
     def get_version_from_migration_file(self, file: io.FileName):
         if "_" not in file.getBaseNoExt():
-            return LooseVersion(file.getBaseNoExt())
-        return LooseVersion(file.getBaseNoExt().split("_")[0])
+            return parse_version(file.getBaseNoExt())
+        return parse_version(file.getBaseNoExt().split("_")[0])
 
     def open_session(self, db_path: io.FileName = None):
         if db_path is None:

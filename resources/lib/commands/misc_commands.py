@@ -23,13 +23,13 @@ import collections
 
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
-from distutils.version import LooseVersion
 
 from akl.utils import kodi, io
 from akl import constants
 
 from resources.lib.commands.mediator import AppMediator
 from resources.lib import globals
+from resources.lib.version_utils import parse_version
 from resources.lib.repositories import UnitOfWork, AklAddonRepository, CategoryRepository, ROMCollectionRepository, XmlConfigurationRepository, SourcesRepository
 from resources.lib.domain import Category, ROMCollection, AklAddon
 
@@ -227,12 +227,12 @@ def cmd_execute_reset_db(args):
 @AppMediator.register('RUN_DB_MIGRATIONS')
 def cmd_execute_migrations(args):
     uow = UnitOfWork(globals.g_PATHS.DATABASE_FILE_PATH)
-    
-    db_version = LooseVersion(uow.get_database_version())
+
+    db_version = parse_version(uow.get_database_version())
     migrations_in_database = uow.get_migrations_history()
 
     options = collections.OrderedDict()
-    migrations_files_available = uow.get_migration_files(LooseVersion("0.0.0"))
+    migrations_files_available = uow.get_migration_files(parse_version("0.0.0"))
     
     for migration_file in migrations_files_available:
         file_name = migration_file.getBase()
@@ -248,7 +248,7 @@ def cmd_execute_migrations(args):
     
     logger.debug(f"RUN_DB_MIGRATIONS: Selected {selected_file}")
     migration_file = io.FileName(selected_file)
-    version_to_store = LooseVersion(globals.addon_version)
+    version_to_store = parse_version(globals.addon_version)
     file_version = uow.get_version_from_migration_file(migration_file)
     if file_version > version_to_store:
         version_to_store = file_version

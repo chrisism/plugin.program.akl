@@ -4,8 +4,6 @@ import sys
 import json
 
 from datetime import datetime
-from packaging.version import Version
-from packaging.version import parse as parse_version
 
 import xbmc
 
@@ -13,6 +11,7 @@ from resources.lib import globals
 from resources.lib.repositories import UnitOfWork
 from resources.lib.webservice import WebService
 from resources.lib.commands.mediator import AppMediator
+from resources.lib.version_utils import Version, parse_version
 import resources.lib.commands
         
 from akl.utils import io, kodi
